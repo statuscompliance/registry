@@ -1,0 +1,67 @@
+{
+  "name": "governify-registry",
+  "buildOn": "2018-04-18",
+  "version": "3.0.1",
+  "description": "Central repository for agreements",
+  "homepage": "https://github.com/isa-group/governify-registry",
+  "main": "index.js",
+  "keywords": [
+    "governify",
+    "registry",
+    "agreements"
+  ],
+  "license": "GPL-2.0",
+  "private": true,
+  "dependencies": {
+    "ajv": "^6.4.0",
+    "bluebird": "^3.5.1",
+    "body-parser": "^1.18.2",
+    "compression": "^1.7.2",
+    "cors": "^2.8.4",
+    "deep-diff": "^0.3.8",
+    "elastic-apm-node": "^3.5.0",
+    "express": "^4.16.3",
+    "helmet": "^3.12.0",
+    "js-yaml": "^3.11.0",
+    "json-schema-ref-parser": "^5.0.3",
+    "moment-timezone": "^0.5.16",
+    "mongoose": "^5.7.0",
+    "mustache": "^4.0.1",
+    "oas-tools": "^2.1.8",
+    "swagger-tools": "^0.10.3",
+    "winston": "^2.4.1"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "istanbul": "^0.4.5",
+    "mocha": "^5.1.0"
+  },
+  "scripts": {
+    "old_eslint": "eslint lib/**/*.js test/**/*.js",
+    "old_test": "./node_modules/.bin/mocha --reporter spec --require test/bootstrap/node test/*.test.js test/**/*.test.js",
+    "old_start": "node --max-old-space-size=20480 index.js",
+    "old_docs": "cmd /k generateDocs.bat",
+    "start": "node index.js",
+    "dev": "concurrently --kill-others \"yarn run start\" \"grunt watch\"",
+    "watch": "grunt watch",
+    "test": "grunt test",
+    "coverage": "grunt coverage",
+    "build": "grunt build",
+    "release:patch": "grunt release",
+    "release:minor": "grunt release:minor",
+    "release:major": "grunt release:major",
+    "deliver": "grunt deliver"
+  },
+  "author": {
+    "name": "ISA group",
+    "web": "http://www.isa.us.es/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/isa-group/governify-registry.git",
+    "github": "http://github.com/isa-group/governify-registry"
+  },
+  "docker": {
+    "url": "https://hub.docker.com/r/isagroup/governify-registry/"
+  }
+}
