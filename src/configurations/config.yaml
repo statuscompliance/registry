@@ -1,9 +1,9 @@
 ---
 production:
   database:
-    host: {{DB_HOST}}{{^DB_HOST}}mongo_registry{{/DB_HOST}}
-    port: {{DB_PORT}}{{^DB_PORT}}27017{{/DB_PORT}}
-    name: {{DB_NAME}}{{^DB_NAME}}registry{{/DB_NAME}}
+    host: $_[DB_HOST]$_[^DB_HOST]mongo_registry$_[/DB_HOST]
+    port: $_[DB_PORT]$_[^DB_PORT]27017$_[/DB_PORT]
+    name: $_[DB_NAME]$_[^DB_NAME]registry$_[/DB_NAME]
   email:
     defaultMailFrom: '"ISA-Group" <no-reply@isa.us.es>'
     mailerApiKey: this API key has been revoked. Pass it as an environment var to
@@ -17,11 +17,12 @@ production:
     progressiveTrace: false
   log:
     file: "./logs/prod-logs.log"
-    level: debug
+    level: $_[LOG_LEVEL]$_[^LOG_LEVEL]error$_[/LOG_LEVEL]
     maxFiles: 10
     maxSize: 10000000
   telemetry:
-    enabled: false
+    enabled: $_[TELEMETRY_ENABLED]$_[^TELEMETRY_ENABLED]false$_[/TELEMETRY_ENABLED]
+    server: $_[TELEMETRY_SERVER]$_[^TELEMETRY_SERVER]governify-telemetry:8200$_[/TELEMETRY_SERVER]
   maxAttempts: 20
   models:
     agreement:
@@ -74,7 +75,8 @@ development:
     maxFiles: 30
     maxSize: 10000000
   telemetry:
-    enabled: false
+    enabled: $_[TELEMETRY_ENABLED]$_[^TELEMETRY_ENABLED]false$_[/TELEMETRY_ENABLED]
+    server: $_[TELEMETRY_SERVER]$_[^TELEMETRY_SERVER]localhost:8200$_[/TELEMETRY_SERVER]
   maxAttempts: 10
   models:
     agreement:
@@ -127,7 +129,8 @@ testing:
     maxFiles: 30
     maxSize: 10000000
   telemetry:
-    enabled: false
+    enabled: $_[TELEMETRY_ENABLED]$_[^TELEMETRY_ENABLED]false$_[/TELEMETRY_ENABLED]
+    server: $_[TELEMETRY_SERVER]$_[^TELEMETRY_SERVER]localhost:8200$_[/TELEMETRY_SERVER]
   maxAttempts: 10
   models:
     agreement:

@@ -31,6 +31,7 @@ const fs = require('fs');
 const winston = require('winston');
 const path = require('path');
 const mustache = require('mustache');
+mustache.escape = function (text) { return text; };
 
 
 /**
@@ -88,7 +89,7 @@ function _addConfiguration(uri, encoding) {
     } else {
         configStringTemplate = fs.readFileSync(path.join(__dirname, uri), encoding);
     }
-    configString = mustache.render(configStringTemplate, process.env);
+    configString = mustache.render(configStringTemplate, process.env, {}, ['$_[', ']']);
     var newConfigurations = jsyaml.safeLoad(configString)[process.env.NODE_ENV ? process.env.NODE_ENV : 'development'];
 
     for (var c in newConfigurations) {
