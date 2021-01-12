@@ -64,8 +64,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/governify/registry.git",
-    "github": "http://github.com/governify/registry"
+    "url": "https://github.com/governify/registry"
   },
   "docker": {
     "url": "https://hub.docker.com/r/governify/registry"
