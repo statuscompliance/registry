@@ -222,6 +222,7 @@ function processMetric(agreement, metricId, metricQuery) {
                                         var log = agreement.context.definitions.logs[logId];
                                         //doing scope mapping
                                         metricState.scope = utils.scopes.computerToRegistryParser(metricState.scope, log.scopes);
+                                        metricState.errorMessage = "this should be returned";
                                     }
                                     //aggregate metrics in order to return all
                                     compositeResponse.push(metricState);

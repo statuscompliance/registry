@@ -89,7 +89,7 @@ function _initializeMiddleware(app, swaggerDocs, callback) {
             app.use(middleware.swaggerValidator());
 
             // Route validated requests to appropriate controller
-            app.use(middleware.swaggerRouter(module.exports.getRouterOption(index + 1)));
+            app.use(middleware.swaggerRouter(module.exports.getRouterOption( swaggerDoc.info.version)));
 
             // Serve the Swagger documents and Swagger UI
             app.use(middleware.swaggerUi({
