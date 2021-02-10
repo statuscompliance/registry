@@ -345,7 +345,8 @@ function _update(stateType, query, logsState, forceUpdate) {
                                     metric: query.metric,
                                     scope: metricValue.scope,
                                     period: metricValue.period,
-                                    window: query.window
+                                    window: query.window,
+                                    errorMessage: metricValue.errorMessage
                                 }, metricValue.value, {
                                      //   "logsState": logsState,
                                         evidences: metricValue.evidences,
