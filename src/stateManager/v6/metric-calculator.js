@@ -210,7 +210,7 @@ function processMetric(agreement, metricId, metricQuery) {
                         var errorString = "Error in Computer response " + res.statusCode + ':' + res.statusMessage;
                         return promiseErrorHandler(reject, "metrics", processMetric.name, httpResponse.statusCode, errorString);
                     }
-                    getComputationV2(computerObj.url + "/" + body.computation.replace(/^\//, ""), 60000).then(monthMetrics => {
+                    getComputationV2(computerObj.url + "/" + body.computation.replace(/^\//, ""), 60000, options).then(monthMetrics => {
                         try {
                             //Check if computer response is correct
                             if (monthMetrics && Array.isArray(monthMetrics)) {
@@ -222,7 +222,6 @@ function processMetric(agreement, metricId, metricQuery) {
                                         var log = agreement.context.definitions.logs[logId];
                                         //doing scope mapping
                                         metricState.scope = utils.scopes.computerToRegistryParser(metricState.scope, log.scopes);
-                                        metricState.errorMessage = "this should be returned";
                                     }
                                     //aggregate metrics in order to return all
                                     compositeResponse.push(metricState);
@@ -388,7 +387,7 @@ function processMetric(agreement, metricId, metricQuery) {
  * @param {Object} computationId computation ID
  * @param {Object} timeout Time between retrying requests in milliseconds
  * */
-function getComputationV2(computationURL, ttl) {
+function getComputationV2(computationURL, ttl, usedOptions) {
     return new Promise((resolve, reject) => {
         try {
             if (ttl < 0)
@@ -420,8 +419,12 @@ function getComputationV2(computationURL, ttl) {
                         }, realTimeout - firstTimeout);
                     } else if (res.statusCode == '200')
                         resolve(body.computations);
-                    else
+                    else if (res.statusCode == '400') {
+                        logger.error("Failed obtaining computations from collector: " + body.errorMessage +"\nCollector request used:\n" + JSON.stringify(usedOptions, null, 2));
+                        resolve([]);
+                    } else {
                         reject("Error when obtaining computation - " + res.statusMessage);
+                    }
                 });
             }, firstTimeout);
         } catch (err) {

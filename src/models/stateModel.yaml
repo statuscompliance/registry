@@ -15,8 +15,6 @@ scope:
     type: object
     patternProperties:
         '^[a-zA-Z0-9]*$': {}
-errorMessage:
-    type: object
 window:
     type: object
     patternProperties:
