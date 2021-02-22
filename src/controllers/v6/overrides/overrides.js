@@ -141,9 +141,11 @@ function changeOverride(override, agreement, guarantee, deleteOverride) {
                                     "State from override updated correctly-"
                                   );
                                   resolve("OK");
-                                  var requestData = {
+                                  var requestData = { "periods": [{
                                     from: override.period.from,
                                     to: override.period.to
+                                  }
+                                  ]
                                   };
                                   logger.info("DATA3");
                                   var AgreementModel = db.models.AgreementModel;
@@ -153,6 +155,7 @@ function changeOverride(override, agreement, guarantee, deleteOverride) {
                                     },
                                     function(err, agreementRes) {
                                       logger.info("DATA1:" + JSON.stringify(err) + " --- --- " + JSON.stringify(agreementRes));
+                    
                                       if (!err && agreementRes) {
                                         request(
                                           {
@@ -161,7 +164,7 @@ function changeOverride(override, agreement, guarantee, deleteOverride) {
                                                 .infrastructure.reporter +
                                               "/contracts/" +
                                               agreement +
-                                              "/ctrl/start",
+                                              "/createPointsFromPeriods",
                                             method: "POST",
                                             json: requestData
                                           },
