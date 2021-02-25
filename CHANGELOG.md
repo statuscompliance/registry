@@ -1,4 +1,21 @@
-# 3.1.0 (2021-01-26)
+# [3.2.0](https://github.com/governify/registry/compare/v3.1.0...v3.2.0) (2021-02-25)
+
+
+### Bug Fixes
+
+* errorMessage ([fb42fa8](https://github.com/governify/registry/commit/fb42fa85655d25f82572692eb6c5cb0307095268))
+* message db model ([79722e4](https://github.com/governify/registry/commit/79722e468a51287bf9e303417b3698224297b327))
+* message logged instead of passing to reporter ([6b530bc](https://github.com/governify/registry/commit/6b530bce8cf4c4bbf86a0c43a45b64753eb6a410))
+
+
+### Features
+
+* error message in registry response ([7e790d8](https://github.com/governify/registry/commit/7e790d831d7f94279459205493de20570207feb6))
+* Override endpoint and data fix ([132fbac](https://github.com/governify/registry/commit/132fbac4f9b622d43e63f6ec93dde6f10bf4c8c4))
+
+
+
+# [3.1.0](https://github.com/governify/registry/compare/b5e97ed42be2bd00ce4e6ecb62194b71e647ed38...v3.1.0) (2021-01-26)
 
 
 ### Bug Fixes
