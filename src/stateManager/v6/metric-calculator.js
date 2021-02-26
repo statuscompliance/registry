@@ -120,7 +120,7 @@ function processMetric(agreement, metricId, metricQuery) {
                     computerObj.config.ptkey,
                     computerObj.config.schedules,
                     computerObj.config.holidays || null,
-                    agreement.context.infrastructure.registry + "/states/" + agreement.id + "/guarantees/" + metricId + "/overrides"
+                    agreement.context.infrastructure.internal.registry + "/states/" + agreement.id + "/guarantees/" + metricId + "/overrides"
                 );
                 // if (!computerQuery.logs) {
                 //     return reject('Log not found for metric ' + metricId + '. ' +
@@ -298,7 +298,7 @@ function processMetric(agreement, metricId, metricQuery) {
                     "",
                     computerObj.config.schedules,
                     computerObj.config.holidays || null,
-                    agreement.context.infrastructure.registry + "/states/" + agreement.id + "/guarantees/" + metricId + "/overrides",
+                    agreement.context.infrastructure.internal.registry + "/states/" + agreement.id + "/guarantees/" + metricId + "/overrides",
                     computerObj.config.measures,
                 );
 

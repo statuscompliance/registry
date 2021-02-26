@@ -161,7 +161,7 @@ function changeOverride(override, agreement, guarantee, deleteOverride) {
                                           {
                                             url:
                                               agreementRes.context
-                                                .infrastructure.reporter +
+                                                .infrastructure.internal.reporter +
                                               "/contracts/" +
                                               agreement +
                                               "/createPointsFromPeriods",
