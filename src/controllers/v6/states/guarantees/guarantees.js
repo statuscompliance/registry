@@ -29,7 +29,8 @@ const Promise = require('bluebird');
 const JSONStream = require('JSONStream');
 const moment = require('moment');
 
-const config = require('../../../../configurations');
+const governify = require('governify-commons');
+const config = governify.configurator.getConfig('main');
 const logger = require('../../../../logger');
 const ErrorModel = require('../../../../errors').errorModel;
 

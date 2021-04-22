@@ -20,13 +20,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 'use strict';
 
-const registry = require('./server.js');
-const logger = require('./src/logger');
 
-logger.info('Deploy request received');
-registry.deploy(null, function () {
-    logger.info('Deploy successfully done');
-});
+
+const governify = require('governify-commons');
+let logger;
+
+console.log('Deploy request received')
+governify.init({
+    configurations: [{
+        name: 'main',
+        location: './configurations/config.' + (process.env.NODE_ENV || 'development') + '.yaml',
+        default: true
+    }
+    ]
+}).then(gov => {
+    logger = require('./src/logger');
+    const registry = require('./server.js');
+    registry.deploy(null, function () {
+        logger.info('Deploy successfully done');
+    });
+})
+
 
 // quit on ctrl-c when running docker in terminal
 process.on('SIGINT', function onSigint() {

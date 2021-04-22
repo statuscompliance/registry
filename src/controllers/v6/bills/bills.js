@@ -29,12 +29,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 const logger = require('../../../logger');
 const $RefParser = require('json-schema-ref-parser');
 const db = require('../../../database');
-const request = require('request');
 const utils = require('../../../utils');
 
-const states = require('../states/states');
 const ErrorModel = require('../../../errors/index.js').errorModel;
-const agreementManager = require('governify-agreement-manager').operations.states;
 const moment = require('moment-timezone');
 
 /**
