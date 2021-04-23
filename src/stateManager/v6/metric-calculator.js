@@ -133,7 +133,7 @@ function processMetric(agreement, metricId, metricQuery) {
                     return promiseErrorHandler(reject, "metrics", processMetric.name, err.response.status, errorString);
                 })
                 let collectorResponse = requestMetric.data;
-                let monthMetrics = await getComputationV2(collector.infrastructurePath, collector.endpoint + "/" + collectorResponse.computation.replace(/^\//, ""), 60000, options).catch(err => {
+                let monthMetrics = await getComputationV2(collector.infrastructurePath, collector.endpoint + "/" + collectorResponse.computation.replace(/^\//, ""), 60000).catch(err => {
                     let errorString = 'Error obtaining computation from computer: ' + metricId + '(' + err + ')';
                     return promiseErrorHandler(reject, "metrics", processMetric.name, 500, errorString, err);
                 });
@@ -298,7 +298,7 @@ function processMetric(agreement, metricId, metricQuery) {
  * @param {Object} computationId computation ID
  * @param {Object} timeout Time between retrying requests in milliseconds
  * */
-function getComputationV2(infrastructurePath, computationURL, ttl, usedOptions) {
+function getComputationV2(infrastructurePath, computationURL, ttl) {
     return new Promise((resolve, reject) => {
         try {
             if (ttl < 0)
@@ -321,7 +321,7 @@ function getComputationV2(infrastructurePath, computationURL, ttl, usedOptions) 
                     }
                 } catch (err) {
                     if (err?.response?.status === '400') {
-                        logger.error("Failed obtaining computations from collector: " + body.errorMessage + "\nCollector request used:\n" + JSON.stringify(usedOptions, null, 2));
+                        logger.error("Failed obtaining computations from collector: " + body.errorMessage + "\nCollector used: " + infrastructurePath + "\nEndpoint: " + computationURL);
                         resolve([]);
                     } else {
                         logger.error('Error when obtaining computation response from collector: ', infrastructurePath, ' - ComputationURL: ', computationURL, '- ERROR: ', err)
