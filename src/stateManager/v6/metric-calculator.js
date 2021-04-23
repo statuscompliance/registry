@@ -32,6 +32,7 @@ const request = require('request');
 const governify = require('governify-commons');
 const JSONStream = require('JSONStream');
 const qs = require('querystring');
+const util = require('util');
 
 const utils = require('../../utils');
 
@@ -133,7 +134,7 @@ function processMetric(agreement, metricId, metricQuery) {
                     return promiseErrorHandler(reject, "metrics", processMetric.name, err.response.status, errorString);
                 })
                 let collectorResponse = requestMetric.data;
-                let monthMetrics = await getComputationV2(collector.infrastructurePath, collector.endpoint + "/" + collectorResponse.computation.replace(/^\//, ""), 60000).catch(err => {
+                let monthMetrics = await getComputationV2(collector.infrastructurePath, "/" + collectorResponse.computation.replace(/^\//, ""), 60000).catch(err => {
                     let errorString = 'Error obtaining computation from computer: ' + metricId + '(' + err + ')';
                     return promiseErrorHandler(reject, "metrics", processMetric.name, 500, errorString, err);
                 });
@@ -306,28 +307,27 @@ function getComputationV2(infrastructurePath, computationURL, ttl) {
             let realTimeout = 1000; //Minimum = firstTimeout
             let firstTimeout = 500;
             setTimeout(async () => {
-                try {
-                    let computationRequest = await governify.infrastructure.getService(infrastructurePath).get(computationURL);
-                    let computationResponse = computationRequest.data;
-                    if (computationRequest.status === '202') {
+                governify.infrastructure.getService(infrastructurePath).get(computationURL).then(response => {
+                    if (response.status === 202) {
                         logger.metrics("Computation " + computationURL.split("/").pop + " not ready jet. Retrying in " + realTimeout + " ms.");
                         setTimeout(() => {
                             resolve(getComputationV2(infrastructurePath, computationURL, ttl - realTimeout))
                         }, realTimeout - firstTimeout);
-                    } else if (computationRequest.status === '200') {
-                        resolve(computationResponse.computations);
+                    } else if (response.status === 200) {
+                        resolve(response.data.computations);
                     } else {
-                        throw Error('Invalid response status from collector, ', computationRequest.status)
+                        // FIXME - Not returning response 
+                        reject(new Error('Invalid response status from collector. Response: \n', response));
                     }
-                } catch (err) {
-                    if (err?.response?.status === '400') {
-                        logger.error("Failed obtaining computations from collector: " + body.errorMessage + "\nCollector used: " + infrastructurePath + "\nEndpoint: " + computationURL);
+                }).catch(err => {
+                    if (err?.response?.status === 400) {
+                        logger.error("Failed obtaining computations from collector: " + err.response.data.errorMessage + "\nCollector used: " + infrastructurePath + "\nEndpoint: " + computationURL);
                         resolve([]);
                     } else {
                         logger.error('Error when obtaining computation response from collector: ', infrastructurePath, ' - ComputationURL: ', computationURL, '- ERROR: ', err)
-                        throw err;
+                        reject(err);
                     }
-                }
+                });
             }, firstTimeout);
         } catch (err) {
             reject(err);
