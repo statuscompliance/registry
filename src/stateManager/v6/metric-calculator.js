@@ -221,7 +221,7 @@ function processMetric(agreement, metricId, metricQuery) {
                     "",
                     metricCollectorObject.config.schedules,
                     metricCollectorObject.config.holidays || null,
-                    agreement.context.infrastructure.internal.registry + "/states/" + agreement.id + "/guarantees/" + metricId + "/overrides",
+                    governify.infrastructure.getServices().internal.registry.default + "/api/v6/states/" + agreement.id + "/guarantees/" + metricId + "/overrides",
                     metricCollectorObject.config.measures,
                 );
 
