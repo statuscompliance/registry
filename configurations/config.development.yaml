@@ -42,7 +42,7 @@ parallelProcess:
   metrics: false
 retryDelay: 2000
 server:
-  port: 8081
+  port: 5400
   timeout: 86400000
   bodySize: 50mb
   bypassCORS: true

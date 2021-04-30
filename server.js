@@ -148,10 +148,12 @@ module.exports = {
  * @param {function} callback callback function
  * @alias module:registry.deploy
  * */
-function _deploy(configurations, callback) {
+function _deploy(configurations, commonsMiddleware, callback) {
     if (configurations && configurations.loggerLevel) {
         logger.transports.console.level = configurations.loggerLevel;
     }
+
+    app.use('/commons', commonsMiddleware)
     logger.info('Trying to deploy server');
     if (configurations) {
         logger.info('Reading configuration...');

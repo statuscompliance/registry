@@ -28,11 +28,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 const logger = require('../../logger');
 const Promise = require('bluebird');
-const request = require('request');
 const governify = require('governify-commons');
 const JSONStream = require('JSONStream');
-const qs = require('querystring');
-const util = require('util');
 
 const utils = require('../../utils');
 

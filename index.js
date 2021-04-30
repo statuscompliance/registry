@@ -33,10 +33,10 @@ governify.init({
         default: true
     }
     ]
-}).then(gov => {
+}).then(commonsMiddleware => {
     logger = require('./src/logger');
     const registry = require('./server.js');
-    registry.deploy(null, function () {
+    registry.deploy(null, commonsMiddleware, function () {
         logger.info('Deploy successfully done');
     });
 })
