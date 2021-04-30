@@ -31,7 +31,7 @@ internal:
   database:
     default: 'mongo-registry'
     mongo-registry: 'mongodb://localhost:5001'
-    influx-reporter: 'influxdb://localhost:5002'
+    influx-reporter: 'http://localhost:5002'
     redis-ec: 'redis://localhost:5003'
 external:
   render:
