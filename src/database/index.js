@@ -25,8 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 'use strict';
-
-const config = require('../configurations');
+const governify = require('governify-commons');
+const config = governify.configurator.getConfig('main');
 const logger = require('../logger');
 
 const jsyaml = require('js-yaml');
@@ -65,7 +65,7 @@ function _connect(callback) {
         reconnectTries: Number.MAX_VALUE, //Never stop trying to reconnect
         reconnectInterval: 3000, 
       };
-    let databaseFullURL = "mongodb://" + config.database.host + ":" + config.database.port + "/" + config.database.name;
+    let databaseFullURL = governify.infrastructure.getServiceURL('internal.database.mongo-registry') + "/" + config.database.name;
     logger.info('Connecting to ' + databaseFullURL);
     mongoose.Promise = global.Promise;
     mongoose.connect(databaseFullURL,options).then(() => {

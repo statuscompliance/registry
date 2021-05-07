@@ -26,7 +26,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 'use strict';
 
-const config = require('../../configurations');
+const governify = require('governify-commons');
+const config = governify.configurator.getConfig('main');
 const logger = require('../../logger');
 
 const db = require('../../database');
@@ -34,7 +35,7 @@ const ErrorModel = require('../../errors/index.js').errorModel;
 const calculators = require('./calculators.js');
 
 const Promise = require('bluebird');
-const request = require('requestretry');
+//const request = require('requestretry');
 //const iso8601 = require('iso8601');
 const moment = require("moment");
 const utils = require('../../utils');
@@ -429,83 +430,83 @@ function Record(value, metadata) {
 }
 
 
-/**
- * Check if it is updated.
- * @function isUpdated
- * @param {String} agreement agreement ID
- * @param {Object} states states
- * */
-function isUpdated(agreement, states) {
-    return new Promise(function (resolve, reject) {
-        var logUris = null;
-        for (var log in agreement.context.definitions.logs) {
-            if (agreement.context.definitions.logs[log].default) {
-                logUris = agreement.context.definitions.logs[log].stateUri;
-            }
-        }
-        logger.sm("LogUris = " + logUris);
-        if (logUris) {
-            var current = states;
-            if (current) {
-                current = getCurrent(current[0]);
-                logUris += "?endgte=" + states[0].period.from + "&endlte=" + states[0].period.to;
-            }
+// /**
+//  * Check if it is updated.
+//  * @function isUpdated
+//  * @param {String} agreement agreement ID
+//  * @param {Object} states states
+//  * */
+// function isUpdated(agreement, states) {
+//     return new Promise(function (resolve, reject) {
+//         var logUris = null;
+//         for (var log in agreement.context.definitions.logs) {
+//             if (agreement.context.definitions.logs[log].default) {
+//                 logUris = agreement.context.definitions.logs[log].stateUri;
+//             }
+//         }
+//         logger.sm("LogUris = " + logUris);
+//         if (logUris) {
+//             var current = states;
+//             if (current) {
+//                 current = getCurrent(current[0]);
+//                 logUris += "?endgte=" + states[0].period.from + "&endlte=" + states[0].period.to;
+//             }
 
-            logger.sm('Sending request to LOG state URI...');
-            process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-            request.get({
-                uri: logUris,
-                json: true,
-                // The below parameters are specific to request-retry
-                maxAttempts: config.maxAttempts,
-                retryDelay: config.retryDelay,
-                retryStrategy: request.RetryStrategies.HTTPOrNetworkError // retry on 5xx or network errors
-            }, function (err, response, body) {
-                if (err) {
-                    logger.error(err);
-                    return reject("Error with Logs state URI this: " + err);
-                }
-                if (response) {
-                    logger.info('Number of request attempts to Logs state URI: ' + response.attempts);
-                }
-                if (response.statusCode == 200 && body) {
-                    if (current) {
-                        if (current.logsState) {
-                            if (current.logsState == body) {
-                                return resolve({
-                                    isUpdated: true,
-                                    logsState: body
-                                });
-                            } else {
-                                return resolve({
-                                    isUpdated: false,
-                                    logsState: body
-                                });
-                            }
-                        } else {
-                            return resolve({
-                                isUpdated: true,
-                                logsState: body
-                            });
-                        }
-                    } else {
-                        return resolve({
-                            isUpdated: false,
-                            logsState: body
-                        });
-                    }
-                } else {
-                    return reject("Error with Logs state URI this: " + logUris + " is not correct");
-                }
-            });
-        } else {
-            logger.sm("This metric is not calculated from logs, please PUT values.");
-            return resolve({
-                isUpdated: true
-            });
-        }
-    });
-}
+//             logger.sm('Sending request to LOG state URI...');
+//             process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+//             request.get({
+//                 uri: logUris,
+//                 json: true,
+//                 // The below parameters are specific to request-retry
+//                 maxAttempts: config.maxAttempts,
+//                 retryDelay: config.retryDelay,
+//                 retryStrategy: request.RetryStrategies.HTTPOrNetworkError // retry on 5xx or network errors
+//             }, function (err, response, body) {
+//                 if (err) {
+//                     logger.error(err);
+//                     return reject("Error with Logs state URI this: " + err);
+//                 }
+//                 if (response) {
+//                     logger.info('Number of request attempts to Logs state URI: ' + response.attempts);
+//                 }
+//                 if (response.statusCode == 200 && body) {
+//                     if (current) {
+//                         if (current.logsState) {
+//                             if (current.logsState == body) {
+//                                 return resolve({
+//                                     isUpdated: true,
+//                                     logsState: body
+//                                 });
+//                             } else {
+//                                 return resolve({
+//                                     isUpdated: false,
+//                                     logsState: body
+//                                 });
+//                             }
+//                         } else {
+//                             return resolve({
+//                                 isUpdated: true,
+//                                 logsState: body
+//                             });
+//                         }
+//                     } else {
+//                         return resolve({
+//                             isUpdated: false,
+//                             logsState: body
+//                         });
+//                     }
+//                 } else {
+//                     return reject("Error with Logs state URI this: " + logUris + " is not correct");
+//                 }
+//             });
+//         } else {
+//             logger.sm("This metric is not calculated from logs, please PUT values.");
+//             return resolve({
+//                 isUpdated: true
+//             });
+//         }
+//     });
+// }
 
 /**
  * Get current state.
