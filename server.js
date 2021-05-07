@@ -19,8 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 'use strict';
-
-const config = require("./src/configurations");
+const governify = require('governify-commons');
+const config = governify.configurator.getConfig('main');
 
 // Add this to the VERY top of the first file loaded in your app
 var apm = require('elastic-apm-node').start({
@@ -148,10 +148,12 @@ module.exports = {
  * @param {function} callback callback function
  * @alias module:registry.deploy
  * */
-function _deploy(configurations, callback) {
+function _deploy(configurations, commonsMiddleware, callback) {
     if (configurations && configurations.loggerLevel) {
         logger.transports.console.level = configurations.loggerLevel;
     }
+
+    app.use('/commons', commonsMiddleware)
     logger.info('Trying to deploy server');
     if (configurations) {
         logger.info('Reading configuration...');

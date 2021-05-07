@@ -27,14 +27,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 const logger = require('../../../logger');
 const $RefParser = require('json-schema-ref-parser');
 const db = require('../../../database');
-const request = require('request');
-
-const states = require('../states/states');
 const ErrorModel = require('../../../errors/index.js').errorModel;
-const agreementManager = require('governify-agreement-manager').operations.states;
-const config = require('../../../configurations')
+const governify = require('governify-commons');
 const bills = require('../bills/bills');
-const guarantees = require('../states/guarantees/guarantees')
+const guarantees = require('../states/guarantees/guarantees');
 
 /**
  * Registry override module.
@@ -50,25 +46,25 @@ const guarantees = require('../states/guarantees/guarantees')
  * @requires governify-agreement-manager
  * */
 module.exports = {
-    statesAgreementGuaranteesGuaranteeOverridesPOST: _statesAgreementGuaranteesGuaranteeOverridesPOST,
-    statesAgreementGuaranteesGuaranteeOverridesDELETE: _statesAgreementGuaranteesGuaranteeOverridesDELETE,
-    statesAgreementGuaranteesGuaranteeOverridesGET: _statesAgreementGuaranteesGuaranteeOverridesGET,
-    statesAgreementOverridesDELETE: _statesAgreementOverridesDELETE
+  statesAgreementGuaranteesGuaranteeOverridesPOST: _statesAgreementGuaranteesGuaranteeOverridesPOST,
+  statesAgreementGuaranteesGuaranteeOverridesDELETE: _statesAgreementGuaranteesGuaranteeOverridesDELETE,
+  statesAgreementGuaranteesGuaranteeOverridesGET: _statesAgreementGuaranteesGuaranteeOverridesGET,
+  statesAgreementOverridesDELETE: _statesAgreementOverridesDELETE
 };
 
 function createOverride(override, agreement, guarantee) {
-    return changeOverride(override, agreement, guarantee, false);
+  return changeOverride(override, agreement, guarantee, false);
 }
 
 function deleteOverride(override, agreement, guarantee) {
-    return changeOverride(override, agreement, guarantee, true);
+  return changeOverride(override, agreement, guarantee, true);
 }
 
 function changeOverride(override, agreement, guarantee, deleteOverride) {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     var billPromise = bills.getBill(agreement, override.period.from);
     billPromise.then(
-      function(billFromPeriod) {
+      function (billFromPeriod) {
         if (!billFromPeriod || billFromPeriod.state.toUpperCase() != "CLOSED") {
           var OverridesModel = db.models.OverridesModel;
           OverridesModel.findOne(
@@ -79,7 +75,7 @@ function changeOverride(override, agreement, guarantee, deleteOverride) {
               "overrides.scope.priority": override.scope.priority,
               "overrides.period.from": override.period.from
             },
-            function(err, result) {
+            function (err, result) {
               if (result && !deleteOverride) {
                 reject(new ErrorModel(500, "That override already exists."));
               } else if (!result && deleteOverride) {
@@ -90,7 +86,7 @@ function changeOverride(override, agreement, guarantee, deleteOverride) {
                     agreement: agreement,
                     guarantee: guarantee
                   },
-                  function(err, result) {
+                  function (err, result) {
                     if (err) {
                       logger.error(err.toString());
                       reject(new ErrorModel(500, err));
@@ -109,17 +105,17 @@ function changeOverride(override, agreement, guarantee, deleteOverride) {
                         },
                         deleteOverride
                           ? {
-                              $pull: {
-                                overrides: override
-                              }
+                            $pull: {
+                              overrides: override
                             }
+                          }
                           : {
-                              overrides: newOverrides
-                            },
+                            overrides: newOverrides
+                          },
                         {
                           upsert: true
                         },
-                        function(err) {
+                        function (err) {
                           if (err) {
                             logger.error(
                               "Mongo error saving override: " + err.toString()
@@ -136,16 +132,17 @@ function changeOverride(override, agreement, guarantee, deleteOverride) {
                             guarantees
                               .getGuarantees(agreement, guarantee, query, true)
                               .then(
-                                function(result) {
+                                function (result) {
                                   logger.info(
                                     "State from override updated correctly-"
                                   );
                                   resolve("OK");
-                                  var requestData = { "periods": [{
-                                    from: override.period.from,
-                                    to: override.period.to
-                                  }
-                                  ]
+                                  var requestData = {
+                                    "periods": [{
+                                      from: override.period.from,
+                                      to: override.period.to
+                                    }
+                                    ]
                                   };
                                   logger.info("DATA3");
                                   var AgreementModel = db.models.AgreementModel;
@@ -153,36 +150,19 @@ function changeOverride(override, agreement, guarantee, deleteOverride) {
                                     {
                                       id: agreement
                                     },
-                                    function(err, agreementRes) {
-                                      logger.info("DATA1:" + JSON.stringify(err) + " --- --- " + JSON.stringify(agreementRes));
-                    
+                                    async function (err, agreementRes) {
                                       if (!err && agreementRes) {
-                                        request(
-                                          {
-                                            url:
-                                              agreementRes.context
-                                                .infrastructure.internal.reporter +
-                                              "/contracts/" +
-                                              agreement +
-                                              "/createPointsFromPeriods",
-                                            method: "POST",
-                                            json: requestData
-                                          },
-                                          function(error, response, body) {
-                                            logger.info("DATA2:" + JSON.stringify(err) + " --- --- " + JSON.stringify(response) + " --- --- " + JSON.stringify(body));
-                                            if (
-                                              !error &&
-                                              response.statusCode == 200
-                                            ) {
-                                              logger.info(body);
-                                            }
-                                          }
-                                        );
+                                        let recalculateRequest = await governify.infrastructure.getService('internal.reporter').post('/api/v4/contracts/' + agreement + '/createPointsFromPeriods', requestData).catch(err => {
+                                          console.error('Error recalculating from override:', err)
+                                        });
+                                        if (recalculateRequest) {
+                                          console.log('Result of point recalculation due to an override: ', recalculateRequest.status)
+                                        }
                                       }
                                     }
                                   );
                                 },
-                                function(err) {
+                                function (err) {
                                   reject(err);
                                 }
                               );
@@ -204,7 +184,7 @@ function changeOverride(override, agreement, guarantee, deleteOverride) {
           );
         }
       },
-      function(err) {
+      function (err) {
         logger.info(err.toString);
       }
     );
@@ -218,22 +198,22 @@ function changeOverride(override, agreement, guarantee, deleteOverride) {
  * @alias module:agreement.agreementsPOST
  * */
 function _statesAgreementGuaranteesGuaranteeOverridesPOST(args, res) {
-    logger.info("New request to CREATE override");
-    $RefParser.dereference(args.override.value, function (err, schema) {
-        if (err) {
-            logger.error(err.toString());
-            res.status(500).json(new ErrorModel(500, err));
-        } else {
-            var overridePromise = createOverride(args.override.value, args.agreement.value, args.guarantee.value);
-            overridePromise.then(function (result) {
-                res.status(200).send(result);
-            },
-            function (error) {
-                res.status(error.code).json(error);
-            });
+  logger.info("New request to CREATE override");
+  $RefParser.dereference(args.override.value, function (err, schema) {
+    if (err) {
+      logger.error(err.toString());
+      res.status(500).json(new ErrorModel(500, err));
+    } else {
+      var overridePromise = createOverride(args.override.value, args.agreement.value, args.guarantee.value);
+      overridePromise.then(function (result) {
+        res.status(200).send(result);
+      },
+        function (error) {
+          res.status(error.code).json(error);
+        });
 
-        }
-    });
+    }
+  });
 }
 
 
@@ -245,20 +225,20 @@ function _statesAgreementGuaranteesGuaranteeOverridesPOST(args, res) {
  * @alias module:override.overrideDELETE
  * */
 function _statesAgreementGuaranteesGuaranteeOverridesDELETE(args, res) {
-    logger.info("New request to DELETE override");
-    $RefParser.dereference(args.override.value, function (err, schema) {
-        if (err) {
-            logger.error(err.toString());
-            res.status(500).json(new ErrorModel(500, err));
-        } else {
-            deleteOverride(args.override.value, args.agreement.value, args.guarantee.value).then(function (result) {
-                    res.status(200).send(result);
-                },
-                function (error) {
-                    res.status(error.code).json(error);
-                })
-        }
-    });
+  logger.info("New request to DELETE override");
+  $RefParser.dereference(args.override.value, function (err, schema) {
+    if (err) {
+      logger.error(err.toString());
+      res.status(500).json(new ErrorModel(500, err));
+    } else {
+      deleteOverride(args.override.value, args.agreement.value, args.guarantee.value).then(function (result) {
+        res.status(200).send(result);
+      },
+        function (error) {
+          res.status(error.code).json(error);
+        })
+    }
+  });
 }
 
 
@@ -270,27 +250,27 @@ function _statesAgreementGuaranteesGuaranteeOverridesDELETE(args, res) {
  * @alias module:agreement.agreementsGET
  * */
 function _statesAgreementGuaranteesGuaranteeOverridesGET(args, res) {
-    /**
-     * parameters expected in the args:
-     * namespace (String)
-     **/
-    logger.info("New request to GET overrides overrides/overrides.js");
-    var OverridesModel = db.models.OverridesModel;
-    OverridesModel.findOne({
-        'agreement': args.agreement.value,
-        'guarantee': args.guarantee.value
-    }, function (err, overrides) {
-        if (err) {
-            logger.error(err.toString());
-            res.status(500).json(new ErrorModel(500, err));
-        }
-        if (!overrides || overrides == "") {
-            res.status(200).json([]);
-        } else {
-            logger.info("Overrides returned");
-            res.status(200).json(overrides.overrides);
-        }
-    });
+  /**
+   * parameters expected in the args:
+   * namespace (String)
+   **/
+  logger.info("New request to GET overrides overrides/overrides.js");
+  var OverridesModel = db.models.OverridesModel;
+  OverridesModel.findOne({
+    'agreement': args.agreement.value,
+    'guarantee': args.guarantee.value
+  }, function (err, overrides) {
+    if (err) {
+      logger.error(err.toString());
+      res.status(500).json(new ErrorModel(500, err));
+    }
+    if (!overrides || overrides == "") {
+      res.status(200).json([]);
+    } else {
+      logger.info("Overrides returned");
+      res.status(200).json(overrides.overrides);
+    }
+  });
 }
 
 
@@ -304,18 +284,18 @@ function _statesAgreementGuaranteesGuaranteeOverridesGET(args, res) {
  * */
 function _statesAgreementOverridesDELETE(args, res) {
   logger.info("New request to DELETE all overrides for agreement");
- 
+
   var OverridesModel = db.models.OverridesModel;
   OverridesModel.deleteMany({
-      'agreement': args.agreement.value
+    'agreement': args.agreement.value
   }, function (err, result) {
-      if (err) {
-          logger.error(err.toString());
-          res.status(500).json(new ErrorModel(500, err));
-      } else {
-          logger.info("Deleted all overrides for agreement " + args.agreement.value);
-          res.status(200).send("OK");
-      }
+    if (err) {
+      logger.error(err.toString());
+      res.status(500).json(new ErrorModel(500, err));
+    } else {
+      logger.info("Deleted all overrides for agreement " + args.agreement.value);
+      res.status(200).send("OK");
+    }
   });
- 
+
 }
