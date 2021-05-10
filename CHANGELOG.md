@@ -1,3 +1,25 @@
+# [3.3.0](https://github.com/governify/registry/compare/v3.2.0...v3.3.0) (2021-05-07)
+
+
+### Bug Fixes
+
+* e2e pipeline ([69171ef](https://github.com/governify/registry/commit/69171ef597bd90dc8c7ab432bf5c54a9352fa9e7))
+* getComputation ([6697365](https://github.com/governify/registry/commit/669736543924ef32dbc225155b9f2ec0ba91febf))
+* getComputationV2 status handling ([249c802](https://github.com/governify/registry/commit/249c802704a1a1504d61c5c13602f19e18ff5f06))
+* States url with governify commons ([e3b7701](https://github.com/governify/registry/commit/e3b77015e7a3c4530555a2bf9f0f5cfa7ab92133))
+* update commons ([e59ec10](https://github.com/governify/registry/commit/e59ec109dbcffe95900804ce72a635daf9225a9a))
+* update local infrastructure ([7ede8a8](https://github.com/governify/registry/commit/7ede8a849cb9ea803d8b71b3171cf47886a246dd))
+
+
+### Features
+
+* update commons ([2b4ad56](https://github.com/governify/registry/commit/2b4ad56a0cc0ecd78609090702833c26ca97dd34))
+* Update for internal/external feat ([2fbc2af](https://github.com/governify/registry/commit/2fbc2afbde109ea73cf036d8c79b2c9301c5214a))
+* updated governify-commons ([8d63cfa](https://github.com/governify/registry/commit/8d63cfa9497f149db261d0a9e95574f90fd4b1bb))
+* Updating commons for registry ([f8fb721](https://github.com/governify/registry/commit/f8fb721d01e4db11e2c07a5253ec96cf829a00c3))
+
+
+
 # [3.2.0](https://github.com/governify/registry/compare/v3.1.0...v3.2.0) (2021-02-25)
 
 
