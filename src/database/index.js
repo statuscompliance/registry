@@ -64,6 +64,7 @@ function _connect(callback) {
         keepAlive: true,
         reconnectTries: Number.MAX_VALUE, //Never stop trying to reconnect
         reconnectInterval: 3000, 
+        useCreateIndex: true
       };
     let databaseFullURL = governify.infrastructure.getServiceURL('internal.database.mongo-registry') + "/" + config.database.name;
     logger.info('Connecting to ' + databaseFullURL);
