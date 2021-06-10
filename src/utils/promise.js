@@ -26,7 +26,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 'use strict';
 const Promise = require('bluebird');
-const logger = require('../logger');
+const governify = require('governify-commons');
+const logger = governify.getLogger().tag("promise-manager");
 const ErrorModel = require('../errors/index.js').errorModel;
 
 const errors = require('./errors');

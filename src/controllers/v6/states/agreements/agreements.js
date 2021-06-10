@@ -26,7 +26,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 'use strict';
 
-const logger = require('../../../../logger');
+const governify = require('governify-commons');
+const logger = governify.getLogger().tag("agreement-state-manager");
 const db = require('../../../../database');
 const stateManager = require('../../../../stateManager/v6/state-manager.js');
 const mailer = require('../../../../utils/mailer');
@@ -107,13 +108,13 @@ function _agreementIdDELETE(args, res) {
                     "agreementId": agreementId
                 }, function (err) {
                     if (!err) {
-                        logger.ctlState("Deleted bills for agreement " + agreementId);
+                        logger.info("Deleted bills for agreement " + agreementId);
                     } else {
                         logger.warning("Can't delete bills for agreement " + agreementId + " :" + err);
                     }
                 });
                 res.sendStatus(200);
-                logger.ctlState("Deleted state for agreement " + agreementId);
+                logger.info("Deleted state for agreement " + agreementId);
             } else {
                 res.sendStatus(404);
                 logger.warning("Can't delete state for agreement " + agreementId + " :" + err);
@@ -135,7 +136,7 @@ function _agreementIdDELETE(args, res) {
  * @alias module:agreements.statesDELETE
  * */
 function _statesDELETE(args, res) {
-    logger.ctlState("New request to DELETE all agreement states");
+    logger.info("New request to DELETE all agreement states");
     var StateModel = db.models.StateModel;
     StateModel.remove(function (err) {
         if (!err) {
@@ -256,7 +257,7 @@ function _agreementIdRELOAD(args, res) {
     var agreementId = args.agreements.value;
     var parameters = args.parameters.value;
 
-    logger.ctlState("New request to reload state of agreement " + agreementId);
+    logger.info("New request to reload state of agreement " + agreementId);
 
     var StateModel = db.models.StateModel;
     StateModel.find({
@@ -268,7 +269,7 @@ function _agreementIdRELOAD(args, res) {
                 (parameters.mail ? 'An email will be sent to ' + parameters.mail.to + ' when the process ends' : '');
             res.end(message);
 
-            logger.ctlState("Deleted state for agreement " + agreementId);
+            logger.info("Deleted state for agreement " + agreementId);
 
             var AgreementModel = db.models.AgreementModel;
             AgreementModel.findOne({
@@ -281,13 +282,13 @@ function _agreementIdRELOAD(args, res) {
                 stateManager({
                     id: agreementId
                 }).then(function (manager) {
-                    logger.ctlState("Calculating agreement state...");
+                    logger.info("Calculating agreement state...");
                     calculators.agreementCalculator.process(manager, parameters.requestedState).then(function () {
                         logger.debug("Agreement state has been calculated successfully");
                         if (errors.length > 0) {
                             logger.error("Agreement state reload has been finished with " + errors.length + " errors: \n" + JSON.stringify(errors));
                         } else {
-                            logger.ctlState("Agreement state reload has been finished successfully");
+                            logger.info("Agreement state reload has been finished successfully");
 
                             if (parameters.mail) {
                                 sendMail(agreement, parameters.mail);
@@ -317,7 +318,7 @@ function _agreementIdRELOAD(args, res) {
  * @param {Object} mail mail parameters
  * */
 function sendMail(agreement, mail) {
-    logger.ctlState("Sending email to " + mail.to);
+    logger.info("Sending email to " + mail.to);
 
     var logRequests = [];
     for (var logId in agreement.context.definitions.logs) {
@@ -364,8 +365,8 @@ function sendMail(agreement, mail) {
             if (error) {
                 return logger.error(error);
             }
-            logger.ctlState('Email to ' + mail.to + ' has been sent');
-            logger.ctlState('Summer is coming');
+            logger.info('Email to ' + mail.to + ' has been sent');
+            logger.info('Summer is coming');
         });
     });
 }

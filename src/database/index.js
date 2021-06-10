@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 'use strict';
 const governify = require('governify-commons');
 const config = governify.configurator.getConfig('main');
-const logger = require('../logger');
+const logger = governify.getLogger().tag("db-manager");
 
 const jsyaml = require('js-yaml');
 const fs = require('fs');

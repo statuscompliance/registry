@@ -27,7 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 'use strict';
 
 const stream = require('stream');
-const logger = require('../logger');
+const governify = require('governify-commons');
+const logger = governify.getLogger().tag("stream-manager");
 
 /**
  * Utils module.
@@ -55,12 +56,12 @@ function _createReadable(readFunction) {
 
     }).on('error', function (err) {
 
-        logger.streaming("Error while streaming: " + err.toString());
+        logger.error("Error while streaming: " + err.toString());
 
         //can receive data parameters
     }).on('data', function () {
 
-        logger.streaming("Streaming data...");
+        logger.info("Streaming data...");
 
     });
 

@@ -31,7 +31,7 @@ const moment = require('moment');
 
 const governify = require('governify-commons');
 const config = governify.configurator.getConfig('main');
-const logger = require('../../../../logger');
+const logger = governify.getLogger().tag("guarantees");
 const ErrorModel = require('../../../../errors').errorModel;
 
 const stateManager = require('../../../../stateManager/v6/state-manager');
@@ -113,18 +113,18 @@ function _guaranteesGET(req, res) {
     var from = req.query.from;
     var to = req.query.to;
     var newPeriodsFromGuarantees = req.query.newPeriodsFromGuarantees ? (req.query.newPeriodsFromGuarantees === "true") : true;
-    logger.ctlState("New request to GET guarantees - With new periods from guarantees: " + newPeriodsFromGuarantees);
+    logger.info("New request to GET guarantees - With new periods from guarantees: " + newPeriodsFromGuarantees);
 
     var result;
     if (config.streaming) {
-        logger.ctlState("### Streaming mode ###");
+        logger.info("### Streaming mode ###");
 
         res.setHeader('content-type', 'application/json; charset=utf-8');
         result = utils.stream.createReadable();
         result.pipe(JSONStream.stringify()).pipe(res);
 
     } else {
-        logger.ctlState("### NO Streaming mode ###");
+        logger.info("### NO Streaming mode ###");
         result = [];
     }
 
@@ -132,11 +132,11 @@ function _guaranteesGET(req, res) {
         id: agreementId
     }).then(function (manager) {
 
-        logger.ctlState("Getting state of guarantees...");
+        logger.info("Getting state of guarantees...");
         var validationErrors = [];
         if (config.parallelProcess.guarantees) {
 
-            logger.ctlState("### Process mode = PARALLEL ###");
+            logger.info("### Process mode = PARALLEL ###");
 
             var guaranteesPromises = [];
             manager.agreement.terms.guarantees.forEach(function (guarantee) {
@@ -162,7 +162,7 @@ function _guaranteesGET(req, res) {
             }
         } else {
 
-            logger.ctlState("### Process mode = SEQUENTIAL ###");
+            logger.info("### Process mode = SEQUENTIAL ###");
             var guaranteesQueries = [];
             manager.agreement.terms.guarantees.forEach(function (guarantee) {
                /* Process each guarantee individually, to create queries for every one */
@@ -227,7 +227,7 @@ function _guaranteesGET(req, res) {
  * @alias module:guarantees.guaranteeIdGET
  * */
 function _guaranteeIdGET(req, res) {
-    logger.ctlState("New request to GET guarantee");
+    logger.info("New request to GET guarantee");
     var args = req.swagger.params;
     var agreementId = args.agreement.value;
     var query = new Query(req.query);
@@ -237,12 +237,12 @@ function _guaranteeIdGET(req, res) {
     var to = req.query.to;
     var ret;
     if (config.streaming) {
-        logger.ctlState("### Streaming mode ###");
+        logger.info("### Streaming mode ###");
         res.setHeader('content-type', 'application/json; charset=utf-8');
         ret = utils.stream.createReadable();
         ret.pipe(JSONStream.stringify()).pipe(res);
     } else {
-        logger.ctlState("### NO Streaming mode ###");
+        logger.info("### NO Streaming mode ###");
     }
 
     stateManager({
@@ -325,10 +325,10 @@ function _guaranteeIdPenaltyGET(req, res) {
     var guaranteeId = args.guarantee.value;
     var agreementId = args.agreement.value;
     var query = new Query(req.query);
-    logger.ctlState("New request to GET penalty of " + guaranteeId);
+    logger.info("New request to GET penalty of " + guaranteeId);
 
     var offset = query.parameters.offset;
-    logger.ctlState("With offset = " + offset);
+    logger.info("With offset = " + offset);
 
     stateManager({
         id: agreementId
@@ -356,7 +356,7 @@ function _guaranteeIdPenaltyGET(req, res) {
                     to: element.to.subtract(Math.abs(offset), "months").toISOString()
                 };
 
-                logger.ctlState("Query before parse: " + JSON.stringify(query, null, 2));
+                logger.info("Query before parse: " + JSON.stringify(query, null, 2));
                 if (!query.log) {
                     throw new Error('Logs fields is required');
                 }
@@ -364,7 +364,7 @@ function _guaranteeIdPenaltyGET(req, res) {
                 var log = manager.agreement.context.definitions.logs[logId];
 
                 query.scope = utils.scopes.computerToRegistryParser(query.scope, log.scopes);
-                logger.ctlState("Query after parse: " + JSON.stringify(query, null, 2));
+                logger.info("Query after parse: " + JSON.stringify(query, null, 2));
 
                 return manager.get('guarantees', {
                     guarantee: guaranteeId,

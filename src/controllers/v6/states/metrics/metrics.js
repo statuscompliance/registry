@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 const governify = require('governify-commons');
 const config = governify.configurator.getConfig('main');
-const logger = require('../../../../logger');
+const logger = governify.getLogger().tag("metrics");
 
 const ErrorModel = require('../../../../errors/index.js').errorModel;
 const stateManager = require('../../../../stateManager/v6/state-manager');
@@ -69,15 +69,15 @@ function _metricsIdIncrease(args, res) {
     var metricId = args.metric.value;
     var query = args.scope.value;
 
-    logger.ctlState("New request to increase metric = %s, with values = %s", metricId, JSON.stringify(query, null, 2));
+    logger.info("New request to increase metric = %s, with values = %s", metricId, JSON.stringify(query, null, 2));
 
     stateManager({
         id: agreementId
     }).then(function (manager) {
         query.metric = metricId;
         manager.get('metrics', query).then(function (metric) {
-            logger.ctlState("Result of getting metricValues: " + JSON.stringify(metric, null, 2));
-            logger.ctlState("Query to put " + JSON.stringify(query, null, 2));
+            logger.info("Result of getting metricValues: " + JSON.stringify(metric, null, 2));
+            logger.info("Query to put " + JSON.stringify(query, null, 2));
             manager.put('metrics', query, manager.current(metric[0]).value + 1).then(function (success) {
                 res.json(success.map(function (element) {
                     return manager.current(element);
@@ -145,11 +145,11 @@ function _metricsGET(req, res) {
     var result;
     if (config.streaming) {
         res.setHeader('content-type', 'application/json; charset=utf-8');
-        logger.ctlState("### Streaming mode ###");
+        logger.info("### Streaming mode ###");
         result = utils.stream.createReadable();
         result.pipe(JSONStream.stringify()).pipe(res);
     } else {
-        logger.ctlState("### NO Streaming mode ###");
+        logger.info("### NO Streaming mode ###");
         result = [];
     }
 
@@ -221,12 +221,12 @@ function _metricsIdGET(req, res) {
 
     var result;
     if (config.streaming) {
-        logger.ctlState("### Streaming mode ###");
+        logger.info("### Streaming mode ###");
         res.setHeader('content-type', 'application/json; charset=utf-8');
         result = utils.stream.createReadable();
         result.pipe(JSONStream.stringify()).pipe(res);
     } else {
-        logger.ctlState("### NO Streaming mode ###");
+        logger.info("### NO Streaming mode ###");
         result = [];
     }
 

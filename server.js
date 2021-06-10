@@ -54,7 +54,7 @@ const fs = require('fs');
 const path = require('path');
 
 //Self dependencies
-const logger = require("./src/logger");
+const logger = governify.getLogger().tag("deploy")
 const db = require('./src/database');
 const swaggerUtils = require('./src/utils').swagger;
 const middlewares = require('./src/utils').middlewares;
@@ -149,9 +149,6 @@ module.exports = {
  * @alias module:registry.deploy
  * */
 function _deploy(configurations, commonsMiddleware, callback) {
-    if (configurations && configurations.loggerLevel) {
-        logger.transports.console.level = configurations.loggerLevel;
-    }
 
     app.use('/commons', commonsMiddleware)
     logger.info('Trying to deploy server');

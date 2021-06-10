@@ -26,7 +26,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 'use strict';
 
-const logger = require('../../../../logger');
+const governify = require('governify-commons');
+const logger = governify.getLogger().tag("pricing");
 const stateManager = require('../../../../stateManager/v6/state-manager.js');
 const utils = require('../../../../utils');
 
@@ -58,7 +59,7 @@ function _PricingBillingPenaltiesGET(req, res) {
     logger.warning(JSON.stringify(args));
     var agreementId = args.agreement.value;
     var query = new Query(req.query);
-    logger.ctlState("New request to get pricing state for agreementId = " + agreementId);
+    logger.info("New request to get pricing state for agreementId = " + agreementId);
 
     stateManager({
         id: agreementId
@@ -70,16 +71,16 @@ function _PricingBillingPenaltiesGET(req, res) {
         } else {
             manager.get('pricing', query).then(function (data) {
 
-                logger.ctlState("Sending Pricing-Billing-Penalties state");
+                logger.info("Sending Pricing-Billing-Penalties state");
                 res.json(data);
 
             }, function (err) {
-                logger.ctlState("ERROR: " + err.message);
+                logger.info("ERROR: " + err.message);
                 res.status(err.code).json(err);
             });
         }
     }, function (err) {
-        logger.ctlState("ERROR: " + err.message);
+        logger.info("ERROR: " + err.message);
         res.status(err.code).json(err);
     });
 }

@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 const governify = require('governify-commons');
 const config = governify.configurator.getConfig('main');
-const logger = require('../../logger');
+const logger = governify.getLogger().tag("state-manager");
 
 const db = require('../../database');
 const ErrorModel = require('../../errors/index.js').errorModel;
@@ -63,10 +63,10 @@ module.exports = initialize;
  * @alias module:stateManager.initialize
  * */
 function initialize(_agreement) {
-    logger.sm('(initialize) Initializing state with agreement ID = ' + _agreement.id);
+    logger.debug('(initialize) Initializing state with agreement ID = ' + _agreement.id);
     return new Promise(function (resolve, reject) {
         var AgreementModel = db.models.AgreementModel;
-        logger.sm("Searching agreement with agreementID = " + _agreement.id);
+        logger.debug("Searching agreement with agreementID = " + _agreement.id);
         //Executes a mongodb query to search Agreement file with id = _agreement
         AgreementModel.findOne({
             'id': _agreement.id
@@ -80,7 +80,7 @@ function initialize(_agreement) {
                     //Not found agreement with id = _agreement
                     return reject(new ErrorModel(404, 'There is no agreement with id: ' + _agreement.id));
                 }
-                logger.sm("StateManager for agreementID = " + _agreement.id + " initialized");
+                logger.debug("StateManager for agreementID = " + _agreement.id + " initialized");
                 //Building stateManager object with agreement definitions and stateManager method
                 //get ==> gets one or more states, put ==> save an scoped state,
                 //update ==> calculates one or more states and save them,
@@ -108,9 +108,9 @@ function initialize(_agreement) {
  * */
 function _get(stateType, query, forceUpdate) {
     var stateManager = this;
-    logger.sm('(_get) Retrieving state of ' + stateType + ' - ForceUpdate: ' + forceUpdate) ;
+    logger.debug('(_get) Retrieving state of ' + stateType + ' - ForceUpdate: ' + forceUpdate) ;
     return new Promise(function (resolve, reject) {
-        logger.sm("Getting " + stateType + " state for query =  " + JSON.stringify(query));
+        logger.debug("Getting " + stateType + " state for query =  " + JSON.stringify(query));
         var StateModel = db.models.StateModel;
         if (!query) {
             query = {};
@@ -121,26 +121,26 @@ function _get(stateType, query, forceUpdate) {
         StateModel.find(projectionBuilder(stateType, refineQuery(stateManager.agreement.id, stateType, query)), function (err, result) {
             if (err) {
                 //something fail on mongodb query and error is returned
-                logger.sm(JSON.stringify(err));
+                logger.debug(JSON.stringify(err));
                 return reject(new ErrorModel(500, "Error while retrieving %s states: %s", stateType, err.toString()));
             }
             //If there are states in mongodb match the query, checks if it's updated and returns.
             if (result.length > 0) {
-                logger.sm("There are " + stateType + " state for query =  " + JSON.stringify(query) + " in DB");
+                logger.debug("There are " + stateType + " state for query =  " + JSON.stringify(query) + " in DB");
                 var states = result;
 
-                logger.sm('Checking if ' + stateType + ' is updated...');
+                logger.debug('Checking if ' + stateType + ' is updated...');
               //  isUpdated(stateManager.agreement, states).then(function (data) {
                 
-               //     logger.sm("Updated: " + (data.isUpdated ? 'YES' : 'NO') + "[forceUpdate: " + forceUpdate + "]");
+               //     logger.debug("Updated: " + (data.isUpdated ? 'YES' : 'NO') + "[forceUpdate: " + forceUpdate + "]");
 
                     // if (data.isUpdated &&! forceUpdate) {
                     //     //States are updated, returns.
-                    //     logger.sm("Returning state of " + stateType);
+                    //     logger.debug("Returning state of " + stateType);
                     //     return resolve(states);
                     // } else {
                         //States are updated, returns.
-                        logger.sm("Refreshing states of " + stateType);
+                        logger.debug("Refreshing states of " + stateType);
                         stateManager.update(stateType, query, 0, forceUpdate).then(function (states) { //Change 0 with (data.logState) in case of using DB system.
                             return resolve(states);
                         }, function (err) {
@@ -148,15 +148,15 @@ function _get(stateType, query, forceUpdate) {
                         });
                //     }
                 // }, function (err) {
-                //     logger.sm(JSON.stringify(err));
+                //     logger.debug(JSON.stringify(err));
                 //     return reject(new ErrorModel(500, "Error while checking if " + stateType + " is is updated: " + err));
                 // });
             } else {
-                logger.sm("There are not " + stateType + " state for query =  " + JSON.stringify(query) + " in DB");
-                logger.sm("Adding states of " + stateType);
+                logger.debug("There are not " + stateType + " state for query =  " + JSON.stringify(query) + " in DB");
+                logger.debug("Adding states of " + stateType);
                 // isUpdated(stateManager.agreement).then(function (data) {
                     // if (data.isUpdated) {
-                    //     logger.sm("There is no state for this metric. Returning initial values.");
+                    //     logger.debug("There is no state for this metric. Returning initial values.");
                     //     var newState = new State(0, query, {});
                     //     return resolve([newState]);
                     // } else {
@@ -170,7 +170,7 @@ function _get(stateType, query, forceUpdate) {
                         });
                     // }
                 // }, function (err) {
-                //     logger.sm(JSON.stringify(err));
+                //     logger.debug(JSON.stringify(err));
                 //     return reject(new ErrorModel(500, "Error while checking if " + stateType + " state is updated: " + err));
                 // });
             }
@@ -190,13 +190,13 @@ function _get(stateType, query, forceUpdate) {
  * */
 function _put(stateType, query, value, metadata) {
     var stateManager = this;
-    logger.sm('(_put) Saving state of ' + stateType);
+    logger.debug('(_put) Saving state of ' + stateType);
     return new Promise(function (resolve, reject) {
         var StateModel = db.models.StateModel;
 
-        logger.sm("AGREEMENT: " + stateManager.agreement.id);
+        logger.debug("AGREEMENT: " + stateManager.agreement.id);
         var dbQuery = projectionBuilder(stateType, refineQuery(stateManager.agreement.id, stateType, query));
-        logger.sm("Updating " + stateType + " state... with refinedQuery = " + JSON.stringify(dbQuery, null, 2));
+        logger.debug("Updating " + stateType + " state... with refinedQuery = " + JSON.stringify(dbQuery, null, 2));
 
         StateModel.update(dbQuery, {
             $push: {
@@ -204,22 +204,22 @@ function _put(stateType, query, value, metadata) {
             }
         }, function (err, result) {
             if (err) {
-                logger.sm("Error, Is not possible to update state with this query = " + JSON.stringify(query));
+                logger.debug("Error, Is not possible to update state with this query = " + JSON.stringify(query));
                 return reject(new ErrorModel(500, err));
             } else {
-                logger.sm("NMODIFIED record:  " + JSON.stringify(result));
+                logger.debug("NMODIFIED record:  " + JSON.stringify(result));
 
                 var stateSignature = "StateSignature (" + result.nModified + ") " + "[";
                 for (var v in dbQuery) {
                     stateSignature += dbQuery[v];
                 }
                 stateSignature += "]";
-                logger.sm(stateSignature);
+                logger.debug(stateSignature);
 
                 // Check if there already is an state
                 if (result.nModified === 0) {
                     // There is no state for Guarantee / Metric , ....
-                    logger.sm("Creating new " + stateType + " state with the record...");
+                    logger.debug("Creating new " + stateType + " state with the record...");
 
                     var newState = new State(value, refineQuery(stateManager.agreement.id, stateType, query), metadata);
                     var stateModel = new StateModel(newState);
@@ -229,7 +229,7 @@ function _put(stateType, query, value, metadata) {
                             logger.error(err.toString());
                             return reject(new ErrorModel(500, err));
                         } else {
-                            logger.sm("Inserted new Record in the new " + stateType + " state.");
+                            logger.debug("Inserted new Record in the new " + stateType + " state.");
                             StateModel.find(projectionBuilder(stateType, refineQuery(stateManager.agreement.id, stateType, query)), function (err, result) {
                                 if (err) {
                                     logger.error(err.toString());
@@ -248,7 +248,7 @@ function _put(stateType, query, value, metadata) {
                 } else {
                     // There is some state for Guarantee / Metric , ....
                     // Lets add a new Record.
-                    logger.sm("Inserted new Record of " + stateType + " state.");
+                    logger.debug("Inserted new Record of " + stateType + " state.");
                     StateModel.find(projectionBuilder(stateType, refineQuery(stateManager.agreement.id, stateType, query)), function (err, result) {
                         if (err) {
                             logger.error(err.toString());
@@ -279,7 +279,7 @@ function _put(stateType, query, value, metadata) {
  * */
 function _update(stateType, query, logsState, forceUpdate) {
     var stateManager = this;
-    logger.sm('(_update) Updating state of ' + stateType);
+    logger.debug('(_update) Updating state of ' + stateType);
     return new Promise(function (resolve, reject) {
         switch (stateType) {
             case "agreement":
@@ -300,7 +300,7 @@ function _update(stateType, query, logsState, forceUpdate) {
             case "guarantees":
                 calculators.guaranteeCalculator.process(stateManager, query, forceUpdate)
                     .then(function (guaranteeStates) {
-                        logger.sm('Guarantee states for ' + guaranteeStates.guaranteeId + ' have been calculated (' + guaranteeStates.guaranteeValues.length + ') ');
+                        logger.debug('Guarantee states for ' + guaranteeStates.guaranteeId + ' have been calculated (' + guaranteeStates.guaranteeValues.length + ') ');
                         logger.debug('Guarantee states: ' + JSON.stringify(guaranteeStates, null, 2));
                         var processGuarantees = [];
                         guaranteeStates.guaranteeValues.forEach(function (guaranteeState) {
@@ -316,11 +316,11 @@ function _update(stateType, query, logsState, forceUpdate) {
                                   //  penalties: guaranteeState.penalties ? guaranteeState.penalties : null
                                 })); 
                         });
-                        logger.sm('Created parameters array for saving states of guarantee of length ' + processGuarantees.length);
-                        logger.sm('Persisting guarantee states...');
+                        logger.debug('Created parameters array for saving states of guarantee of length ' + processGuarantees.length);
+                        logger.debug('Persisting guarantee states...');
                         Promise.all(processGuarantees).then(function (guarantees) {
 
-                            logger.sm('All guarantee states have been persisted');
+                            logger.debug('All guarantee states have been persisted');
                             var result = [];
                             for (var a in guarantees) {
                                 result.push(guarantees[a][0]);
@@ -338,7 +338,7 @@ function _update(stateType, query, logsState, forceUpdate) {
             case "metrics":
                 calculators.metricCalculator.process(stateManager.agreement, query.metric, query)
                     .then(function (metricStates) {
-                        logger.sm('Metric states for ' + metricStates.metricId + ' have been calculated (' + metricStates.metricValues.length + ') ');
+                        logger.debug('Metric states for ' + metricStates.metricId + ' have been calculated (' + metricStates.metricValues.length + ') ');
                         var processMetrics = [];
                         metricStates.metricValues.forEach(function (metricValue) {
                             processMetrics.push(
@@ -353,10 +353,10 @@ function _update(stateType, query, logsState, forceUpdate) {
                                         parameters: metricValue.parameters
                                     }));
                         });
-                        logger.sm('Created parameters array for saving states of metric of length ' + processMetrics.length);
-                        logger.sm('Persisting metric states...');
+                        logger.debug('Created parameters array for saving states of metric of length ' + processMetrics.length);
+                        logger.debug('Persisting metric states...');
                         return Promise.all(processMetrics).then(function (metrics) {
-                            logger.sm('All metric states have been persisted');
+                            logger.debug('All metric states have been persisted');
                             var result = [];
                             for (var a in metrics) {
                                 result.push(metrics[a][0]);
@@ -372,7 +372,7 @@ function _update(stateType, query, logsState, forceUpdate) {
                 break;
             case "pricing":
                 calculators.pricingCalculator.process(stateManager.agreement, query, stateManager).then(function (pricingStates) {
-                    logger.sm('All pricing states (' + pricingStates.length + ') have been calculated ');
+                    logger.debug('All pricing states (' + pricingStates.length + ') have been calculated ');
                     return resolve(pricingStates);
                 }, function (err) {
                     logger.error(err.toString());
@@ -382,7 +382,7 @@ function _update(stateType, query, logsState, forceUpdate) {
 
             case "quotas":
                 calculators.quotasCalculator.process(stateManager, query).then(function (quotasStates) {
-                    logger.sm('All quotas states (' + quotasStates.length + ') has been calculated ');
+                    logger.debug('All quotas states (' + quotasStates.length + ') has been calculated ');
                     //putting quotas
                     return resolve(quotasStates);
                 }, function (err) {
@@ -444,7 +444,7 @@ function Record(value, metadata) {
 //                 logUris = agreement.context.definitions.logs[log].stateUri;
 //             }
 //         }
-//         logger.sm("LogUris = " + logUris);
+//         logger.debug("LogUris = " + logUris);
 //         if (logUris) {
 //             var current = states;
 //             if (current) {
@@ -452,7 +452,7 @@ function Record(value, metadata) {
 //                 logUris += "?endgte=" + states[0].period.from + "&endlte=" + states[0].period.to;
 //             }
 
-//             logger.sm('Sending request to LOG state URI...');
+//             logger.debug('Sending request to LOG state URI...');
 //             process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 //             request.get({
 //                 uri: logUris,
@@ -500,7 +500,7 @@ function Record(value, metadata) {
 //                 }
 //             });
 //         } else {
-//             logger.sm("This metric is not calculated from logs, please PUT values.");
+//             logger.debug("This metric is not calculated from logs, please PUT values.");
 //             return resolve({
 //                 isUpdated: true
 //             });
@@ -626,6 +626,6 @@ function projectionBuilder(stateType, query) {
             }
         }
     }
-    logger.sm("Mongo projection: " + JSON.stringify(projection, null, 2));
+    logger.debug("Mongo projection: " + JSON.stringify(projection, null, 2));
     return projection;
 }

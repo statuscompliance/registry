@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 const governify = require('governify-commons');
 const config = governify.configurator.getConfig('main');
-const logger = require('../../logger');
+const logger = governify.getLogger().tag("agreement-calculator");
 const moment = require('moment');
 const utils = require('../../utils');
 
@@ -103,8 +103,8 @@ function processMetrics(manager, parameters) {
         }
         var processMetrics = [];
         if (config.parallelProcess.metrics && false) { // parallel process is not implemented correctly
-            logger.agreement("Processing metrics in parallel mode");
-            logger.agreement("- metrics: " + metrics);
+            logger.debug("Processing metrics in parallel mode");
+            logger.debug("- metrics: " + metrics);
 
             //Setting up promise for executing in parallel mode
             metrics.forEach(function (metricId) {
@@ -123,12 +123,12 @@ function processMetrics(manager, parameters) {
             utils.promise.processParallelPromises(manager, processMetrics, null, null, null).then(resolve, reject);
 
         } else {
-            logger.agreement("Processing metrics in sequential mode");
-            logger.agreement("- metrics: " + metrics);
+            logger.debug("Processing metrics in sequential mode");
+            logger.debug("- metrics: " + metrics);
 
             //Setting up queries for executing in parallel mode
             metrics.forEach(function (metricId) {
-                logger.agreement("-- metricId: " + metricId);
+                logger.debug("-- metricId: " + metricId);
 
                 var metricDef = manager.agreement.terms.metrics[metricId];
                 if (metricDef.defaultStateReload) {
@@ -148,7 +148,7 @@ function processMetrics(manager, parameters) {
                         } //activate for PROSAS agreements
                     }
 
-                    logger.agreement('Scope for metricId=%s : %s', metricId, JSON.stringify(scope, null, 2));
+                    logger.debug('Scope for metricId=%s : %s', metricId, JSON.stringify(scope, null, 2));
                     var query = {
                         metric: metricId,
                         scope: scope,
@@ -169,7 +169,7 @@ function processMetrics(manager, parameters) {
                     if (!scope) {
                         delete query.scope;
                     }
-                    logger.agreement("query. ", JSON.stringify(query, null, 2));
+                    logger.debug("query. ", JSON.stringify(query, null, 2));
                     processMetrics.push(query);
                 }
 
@@ -208,8 +208,8 @@ function processGuarantees(manager, parameters) {
         }
 
         if (config.parallelProcess.guarantees) {
-            logger.agreement("Processing guarantees in parallel mode");
-            logger.agreement("- guarantees: " + guarantees);
+            logger.debug("Processing guarantees in parallel mode");
+            logger.debug("- guarantees: " + guarantees);
 
             //Setting up promise for executing in parallel mode
             var processGuarantees = [];
@@ -223,8 +223,8 @@ function processGuarantees(manager, parameters) {
             utils.promise.processParallelPromises(manager, processGuarantees, null, null, null).then(resolve, reject);
 
         } else {
-            logger.agreement("Processing guarantees in sequential mode");
-            logger.agreement("- guarantees: " + guarantees);
+            logger.debug("Processing guarantees in sequential mode");
+            logger.debug("- guarantees: " + guarantees);
 
             //Setting up queries for executing in parallel mode
             var guaranteeQueries = [];

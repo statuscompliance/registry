@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 const governify = require('governify-commons');
 const config = governify.configurator.getConfig('main');
-const logger = require('../../logger');
+const logger = governify.getLogger().tag("pricing-calculator");
 const utils = require('../../utils');
 
 const Promise = require('bluebird');
@@ -60,7 +60,7 @@ module.exports = {
 
 // TODO: issue #74
 function processPricing(agreementDef, query, manager) {
-    logger.pricing("Preparing Promise to calculate pricing states");
+    logger.info("Preparing Promise to calculate pricing states");
     return new Promise(function (resolve, reject) {
         // Get pricing definition
         var pricingPenaltiesDef = agreementDef.terms.pricing.billing.penalties;
@@ -89,10 +89,10 @@ function processPricing(agreementDef, query, manager) {
                     pricingPenaltiesDef.forEach(function (penalty) {
                         var penaltyId = Object.keys(penalty.over)[0];
                         var groupBy = Object.keys(penalty.groupBy);
-                        logger.pricing("Calculating pricing state with values: [penalty=" + penaltyId + ", aggregatedBy=" + penalty.aggregatedBy + ", groupBy= " + groupBy.toString() + "]");
+                        logger.info("Calculating pricing state with values: [penalty=" + penaltyId + ", aggregatedBy=" + penalty.aggregatedBy + ", groupBy= " + groupBy.toString() + "]");
                         for (var i = 0; i < guaranteeStates.length; i++) {
                             var guaranteeState = manager.current(guaranteeStates[i]);
-                            logger.info("Processing guaranteeState " + i + " node: " + guaranteeState.scope.node);
+                            logger.debug("Processing guaranteeState " + i + " node: " + guaranteeState.scope.node);
                             var classifier = {};
                             classifier.scope = {};
                             classifier.period = guaranteeState.period;
@@ -116,7 +116,7 @@ function processPricing(agreementDef, query, manager) {
                                 penalties[cIndex].value += guaranteeState.penalties[penaltyId];
                             }
                         }
-                        logger.pricing("penalties: " + JSON.stringify(penalties, null, 2));
+                        logger.debug("penalties: " + JSON.stringify(penalties, null, 2));
                     });
                 });
                 return resolve(penalties);
@@ -130,7 +130,7 @@ function processPricing(agreementDef, query, manager) {
             var guaranteesStates = [];
             // Harvest (sequentially) all states of all guarantees
             Promise.each(agreementDef.terms.guarantees, function (guarantee) {
-                logger.pricing("Getting state for guarantee = " + guarantee.id);
+                logger.info("Getting state for guarantee = " + guarantee.id);
                 return manager.get('guarantees', {
                     guarantee: guarantee.id,
                     period: {
@@ -139,13 +139,13 @@ function processPricing(agreementDef, query, manager) {
                     }
                 }).then(function (results) {
                     // store array of guarantee states
-                    logger.pricing("States retrieved from guarantee '" + guarantee.id + "' : " + results.length);
+                    logger.info("States retrieved from guarantee '" + guarantee.id + "' : " + results.length);
                     results.forEach(function (element) {
                         // Store single guarantee state
                         guaranteesStates.push(element);
                     });
                 }, function (err) {
-                    logger.pricing("Has ocurred an error getting guarantee = " + guarantee.id + ": " + err.toString());
+                    logger.error("Has ocurred an error getting guarantee = " + guarantee.id + ": " + err.toString());
                     return reject(err);
                 });
             }).then(function () {
@@ -158,7 +158,7 @@ function processPricing(agreementDef, query, manager) {
                     var penaltyId = Object.keys(penalty.over)[0];
                     // initialize grouping keys (e.g. serviceLine, activity)
                     var groupBy = Object.keys(penalty.groupBy);
-                    logger.pricing("Calculating pricing state with values: [penalty=" + penaltyId + ", aggregatedBy=" + penalty.aggregatedBy + ", groupBy= " + groupBy.toString() + "]:");
+                    logger.info("Calculating pricing state with values: [penalty=" + penaltyId + ", aggregatedBy=" + penalty.aggregatedBy + ", groupBy= " + groupBy.toString() + "]:");
                     var periods = utils.time.getPeriods(agreementDef, query.window ? query.window : {
                         window: {}
                     });
@@ -178,19 +178,19 @@ function processPricing(agreementDef, query, manager) {
                     for (var i = 0; i < guaranteesStates.length; i++) {
                         // Get current (most recent) record of the state.
                         var guaranteeState = manager.current(guaranteesStates[i]);
-                        logger.pricing("\t(" + i + "/" + guaranteesStates.length + ") Processing guaranteeState with scope: ");
-                        logger.pricing("\t\t\t" + JSON.stringify(guaranteeState.scope));
-                        logger.pricing("ID: " + guaranteeState.id);
-                        logger.pricing("Classifiers" + JSON.stringify(classifiers, null, 2));
+                        logger.debug("\t(" + i + "/" + guaranteesStates.length + ") Processing guaranteeState with scope: ");
+                        logger.debug("\t\t\t" + JSON.stringify(guaranteeState.scope));
+                        logger.debug("ID: " + guaranteeState.id);
+                        logger.debug("Classifiers" + JSON.stringify(classifiers, null, 2));
                         var classifier = classifiers.find(function (classif) {
-                            //logger.info(classif);
+                            //logger.debug(classif);
                             return moment.utc(moment.tz(guaranteeState.period.from, agreementDef.context.validity.timeZone)).isSameOrAfter(classif.period.from) &&
                                 moment.utc(moment.tz(guaranteeState.period.to, agreementDef.context.validity.timeZone)).isSameOrBefore(classif.period.to);
                         });
 
                         if (!!classifier) {
-                            logger.pricing("Classifier already initialized");
-                            logger.pricing(JSON.stringify(classifier, null, 2));
+                            logger.debug("Classifier already initialized");
+                            logger.debug("Classifier:", classifier);
 
                             var validScope = true;
                             groupBy.forEach(function (group) {
@@ -204,15 +204,15 @@ function processPricing(agreementDef, query, manager) {
                                     // Calculate aggregated values of penalty
                                     switch (penalty.aggregatedBy) {
                                         case 'sum':
-                                            logger.pricing("SUM " + guaranteeState.penalties[penaltyId] + " penalty to classifier");
+                                            logger.info("SUM " + guaranteeState.penalties[penaltyId] + " penalty to classifier");
                                             classifier.value += guaranteeState.penalties[penaltyId];
                                             break;
                                         case 'prod':
-                                            logger.pricing("PROD " + guaranteeState.penalties[penaltyId] + " penalty to classifier");
+                                            logger.info("PROD " + guaranteeState.penalties[penaltyId] + " penalty to classifier");
                                             classifier.value *= guaranteeState.penalties[penaltyId];
                                             break;
                                         default:
-                                            logger.pricing("(DEFAULT) SUM " + guaranteeState.penalties[penaltyId] + " penalty to classifier");
+                                            logger.info("(DEFAULT) SUM " + guaranteeState.penalties[penaltyId] + " penalty to classifier");
                                             classifier.value += guaranteeState.penalties[penaltyId];
                                     }
                                 }
@@ -235,11 +235,11 @@ function processPricing(agreementDef, query, manager) {
                             logger.info('Invalid guarantee period: ' + JSON.stringify(guaranteeState.period, null, 2));
                         }
                     }
-                    logger.pricing(" Penalties calculated: " + classifiers.length);
+                    logger.info(" Penalties calculated: " + classifiers.length);
                 });
                 return resolve(classifiers);
             }, function (err) {
-                logger.pricing(err.toString());
+                logger.info(err.toString());
                 return reject(err);
             });
         }

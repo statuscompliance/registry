@@ -23,12 +23,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 'use strict';
-
-const logger = require('../../../logger');
+const governify = require('governify-commons');
+const logger = governify.getLogger().tag("overrides")
 const $RefParser = require('json-schema-ref-parser');
 const db = require('../../../database');
 const ErrorModel = require('../../../errors/index.js').errorModel;
-const governify = require('governify-commons');
 const bills = require('../bills/bills');
 const guarantees = require('../states/guarantees/guarantees');
 
@@ -144,7 +143,6 @@ function changeOverride(override, agreement, guarantee, deleteOverride) {
                                     }
                                     ]
                                   };
-                                  logger.info("DATA3");
                                   var AgreementModel = db.models.AgreementModel;
                                   AgreementModel.findOne(
                                     {
@@ -153,10 +151,10 @@ function changeOverride(override, agreement, guarantee, deleteOverride) {
                                     async function (err, agreementRes) {
                                       if (!err && agreementRes) {
                                         let recalculateRequest = await governify.infrastructure.getService('internal.reporter').post('/api/v4/contracts/' + agreement + '/createPointsFromPeriods', requestData).catch(err => {
-                                          console.error('Error recalculating from override:', err)
+                                          logger.error('Error recalculating from override:', err)
                                         });
                                         if (recalculateRequest) {
-                                          console.log('Result of point recalculation due to an override: ', recalculateRequest.status)
+                                          logger.debug('Result of point recalculation due to an override: ', recalculateRequest.status)
                                         }
                                       }
                                     }
@@ -185,7 +183,7 @@ function changeOverride(override, agreement, guarantee, deleteOverride) {
         }
       },
       function (err) {
-        logger.info(err.toString);
+        logger.error(err.toString);
       }
     );
   });

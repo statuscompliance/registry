@@ -25,10 +25,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 "use strict";
-
-const logger = require('../../logger');
-const Promise = require('bluebird');
 const governify = require('governify-commons');
+const logger = governify.getLogger().tag("metric-calculator");
+const Promise = require('bluebird');
 const JSONStream = require('JSONStream');
 
 const utils = require('../../utils');
@@ -112,7 +111,7 @@ function processMetric(agreement, metricId, metricQuery) {
             logger.metrics('Using collector type: ' + collector.type);
 
             if (collector.type === 'GET-V1') {
-                console.error('This registry version is not compatible with the collector type:', collector.type);
+                logger.error('This registry version is not compatible with the collector type:', collector.type);
                 //TODO: To add compatibility for old collector versions (like collector-pivotal,collector-github), refactor the code to allow old GET collector types
                 //Old code for this implementation is available in the registry repository:
                 //https://github.com/governify/registry/blob/6b530bce8cf4c4bbf86a0c43a45b64753eb6a410/src/stateManager/v6/metric-calculator.js
@@ -231,7 +230,7 @@ function processMetric(agreement, metricId, metricQuery) {
                 // ### PREPARE REQUEST ###
                 //Build URL query that will use on computer request
                 var urlParams = Query.parseToQueryParams(collectorQuery);
-                console.log('URLPARAMS', JSON.stringify(urlParams))
+                logger.debug('Sending URL params to computer:', urlParams)
                 var compositeResponse = [];
                 logger.metrics("Sending request to computer with params: %s", JSON.stringify(collectorQuery, null, 2));
                 //Build and send computer request

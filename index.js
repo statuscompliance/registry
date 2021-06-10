@@ -23,9 +23,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 const governify = require('governify-commons');
-let logger;
+const logger = governify.getLogger().tag("initialization")
 
-console.log('Deploy request received')
+logger.info('Deploy request received')
 governify.init({
     configurations: [{
         name: 'main',

@@ -26,7 +26,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 'use strict';
 
-const logger = require('../../../../logger');
+const governify = require('governify-commons');
+const logger = governify.getLogger().tag("rates");
 const stateManager = require('../../../../stateManager/v6/state-manager.js');
 
 
