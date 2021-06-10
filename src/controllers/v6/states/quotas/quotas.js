@@ -4,9 +4,9 @@ Copyright (C) 2018 ISA group
 http://www.isa.us.es/
 https://github.com/isa-group/governify-registry
 
-governify-registry is an Open-source software available under the 
-GNU General Public License (GPL) version 2 (GPL v2) for non-profit 
-applications; for commercial licensing terms, please see README.md 
+governify-registry is an Open-source software available under the
+GNU General Public License (GPL) version 2 (GPL v2) for non-profit
+applications; for commercial licensing terms, please see README.md
 for any inquiry.
 
 This program is free software; you can redistribute it and/or modify
@@ -23,13 +23,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 'use strict';
 
 const governify = require('governify-commons');
-const logger = governify.getLogger().tag("quotas");
+const logger = governify.getLogger().tag('quotas');
 const stateManager = require('../../../../stateManager/v6/state-manager.js');
-
 
 /**
  * Quotas state module.
@@ -39,10 +37,9 @@ const stateManager = require('../../../../stateManager/v6/state-manager.js');
  * @requires stateManager
  * */
 module.exports = {
-    quotasGET: _quotasGET,
-    quotasQuotaGET: _quotasIdGET
+  quotasGET: _quotasGET,
+  quotasQuotaGET: _quotasIdGET
 };
-
 
 /**
  * Get all quotas.
@@ -51,20 +48,19 @@ module.exports = {
  * @param {Object} next next function
  * @alias module:quotas.quotasGET
  * */
-function _quotasGET(args, res) {
-    logger.info("New request to GET quotas");
-    var agreementId = args.agreement.value;
+function _quotasGET (args, res) {
+  logger.info('New request to GET quotas');
+  var agreementId = args.agreement.value;
 
-    stateManager({
-        id: agreementId
-    }).get("quotas", function (quotas) {
-        res.json(quotas);
-    }, function (err) {
-        logger.error(err.message.toString());
-        res.status(err.code).json(err);
-    });
+  stateManager({
+    id: agreementId
+  }).get('quotas', function (quotas) {
+    res.json(quotas);
+  }, function (err) {
+    logger.error(err.message.toString());
+    res.status(err.code).json(err);
+  });
 }
-
 
 /**
  * Get quotas by ID.
@@ -73,19 +69,19 @@ function _quotasGET(args, res) {
  * @param {Object} next next function
  * @alias module:quotas.quotasQuotaGET
  * */
-function _quotasIdGET(args, res) {
-    logger.info("New request to GET quota");
-    var agreementId = args.agreement.value;
-    var quotaId = args.quota.value;
+function _quotasIdGET (args, res) {
+  logger.info('New request to GET quota');
+  var agreementId = args.agreement.value;
+  var quotaId = args.quota.value;
 
-    stateManager({
-        id: agreementId
-    }).get("quotas", {
-        id: quotaId
-    }, function (quota) {
-        res.json(quota);
-    }, function (err) {
-        logger.error(err.message.toString());
-        res.status(err.code).json(err);
-    });
+  stateManager({
+    id: agreementId
+  }).get('quotas', {
+    id: quotaId
+  }, function (quota) {
+    res.json(quota);
+  }, function (err) {
+    logger.error(err.message.toString());
+    res.status(err.code).json(err);
+  });
 }

@@ -4,9 +4,9 @@ Copyright (C) 2018 ISA group
 http://www.isa.us.es/
 https://github.com/isa-group/governify-registry
 
-governify-registry is an Open-source software available under the 
-GNU General Public License (GPL) version 2 (GPL v2) for non-profit 
-applications; for commercial licensing terms, please see README.md 
+governify-registry is an Open-source software available under the
+GNU General Public License (GPL) version 2 (GPL v2) for non-profit
+applications; for commercial licensing terms, please see README.md
 for any inquiry.
 
 This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 'use strict';
 
 /**
@@ -31,24 +30,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @module calculators
  * */
 module.exports = {
-    /** 
+  /**
     * Agreement calculator.
     * @see module:agreementCalculator
     * */
-    agreementCalculator: require('./agreement-calculator.js'),
-    /** 
+  agreementCalculator: require('./agreement-calculator.js'),
+  /**
      * Guarantee calculator.
      * @see module:guaranteeCalculator
      * */
-    guaranteeCalculator: require('./guarantee-calculator.js'),
-    /** 
+  guaranteeCalculator: require('./guarantee-calculator.js'),
+  /**
      * Metric calculator.
      * @see module:metricCalculator
      * */
-    metricCalculator: require('./metric-calculator.js'),
-    /** 
+  metricCalculator: require('./metric-calculator.js'),
+  /**
      * Pricing calculator.
      * @see module:pricingCalculator
      * */
-    pricingCalculator: require('./pricing-calculator.js')
+  pricingCalculator: require('./pricing-calculator.js')
 };

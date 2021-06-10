@@ -4,9 +4,9 @@ Copyright (C) 2018 ISA group
 http://www.isa.us.es/
 https://github.com/isa-group/governify-registry
 
-governify-registry is an Open-source software available under the 
-GNU General Public License (GPL) version 2 (GPL v2) for non-profit 
-applications; for commercial licensing terms, please see README.md 
+governify-registry is an Open-source software available under the
+GNU General Public License (GPL) version 2 (GPL v2) for non-profit
+applications; for commercial licensing terms, please see README.md
 for any inquiry.
 
 This program is free software; you can redistribute it and/or modify
@@ -23,12 +23,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 'use strict';
 
 const stream = require('stream');
 const governify = require('governify-commons');
-const logger = governify.getLogger().tag("stream-manager");
+const logger = governify.getLogger().tag('stream-manager');
 
 /**
  * Utils module.
@@ -39,7 +38,7 @@ const logger = governify.getLogger().tag("stream-manager");
 
 module.exports = {
 
-    createReadable: _createReadable,
+  createReadable: _createReadable
 
 };
 
@@ -49,27 +48,24 @@ module.exports = {
  * @return {streamReadable} streamReadable streamReadable for pipe
  * @alias module:utils.stream.createReadable
  * */
-function _createReadable(readFunction) {
-    var streamReadable = new stream.Readable({
+function _createReadable (readFunction) {
+  var streamReadable = new stream.Readable({
 
-        objectMode: true
+    objectMode: true
 
-    }).on('error', function (err) {
+  }).on('error', function (err) {
+    logger.error('Error while streaming: ' + err.toString());
 
-        logger.error("Error while streaming: " + err.toString());
+    // can receive data parameters
+  }).on('data', function () {
+    logger.info('Streaming data...');
+  });
 
-        //can receive data parameters
-    }).on('data', function () {
+  if (!readFunction) {
+    streamReadable._read = function () { };
+  } else {
+    streamReadable._read = readFunction;
+  }
 
-        logger.info("Streaming data...");
-
-    });
-
-    if (!readFunction) {
-        streamReadable._read = function () { };
-    } else {
-        streamReadable._read = readFunction;
-    }
-
-    return streamReadable;
+  return streamReadable;
 }

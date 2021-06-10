@@ -4,9 +4,9 @@ Copyright (C) 2018 ISA group
 http://www.isa.us.es/
 https://github.com/isa-group/governify-registry
 
-governify-registry is an Open-source software available under the 
-GNU General Public License (GPL) version 2 (GPL v2) for non-profit 
-applications; for commercial licensing terms, please see README.md 
+governify-registry is an Open-source software available under the
+GNU General Public License (GPL) version 2 (GPL v2) for non-profit
+applications; for commercial licensing terms, please see README.md
 for any inquiry.
 
 This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 'use strict';
 
 /**
@@ -33,34 +32,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @see module:StateRegistryService
  */
 module.exports = {
-    /** 
+  /**
      * Whole agreement state.
      * @see module:agreementsState
      * */
-    agreements: require('./agreements/agreements.js'),
-    /** 
+  agreements: require('./agreements/agreements.js'),
+  /**
      * Guarantees state.
      * @see module:agreementsState
      * */
-    guarantees: require('./guarantees/guarantees.js'),
-    /** 
+  guarantees: require('./guarantees/guarantees.js'),
+  /**
      * Quotas state.
      * @see module:agreementsState
      * */
-    quotas: require('./quotas/quotas.js'),
-    /** 
+  quotas: require('./quotas/quotas.js'),
+  /**
      * Rates state.
      * @see module:agreementsState
      * */
-    rates: require('./rates/rates.js'),
-    /** 
+  rates: require('./rates/rates.js'),
+  /**
      * Metrics state.
      * @see module:agreementsState
      * */
-    metrics: require('./metrics/metrics.js'),
-    /** 
+  metrics: require('./metrics/metrics.js'),
+  /**
      * Pricing state.
      * @see module:agreementsState
      * */
-    pricing: require('./pricing/pricing.js')
+  pricing: require('./pricing/pricing.js')
 };
