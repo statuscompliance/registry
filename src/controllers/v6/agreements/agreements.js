@@ -119,7 +119,7 @@ function _agreementsDELETE(args, res) {
             states.agreements.statesDELETE(args, res);
         } else {
             res.sendStatus(404);
-            logger.warning("Can't delete all agreements: " + err);
+            logger.warn("Can't delete all agreements: " + err);
         }
     });
 }
@@ -169,7 +169,7 @@ function _agreementIdGET(args, res) {
         }
 
         if (!agreement) {
-            logger.warning('There is no agreement with id: ' + args.agreement.value);
+            logger.warn('There is no agreement with id: ' + args.agreement.value);
             return res.status(404).json(new ErrorModel(404, 'There is no agreement with id: ' + args.agreement.value));
         }
 
@@ -200,12 +200,12 @@ function _agreementIdDELETE(args, res) {
                 states.agreements.agreementIdDELETE(args, res);
             } else {
                 res.sendStatus(404);
-                logger.warning("Can't delete agreement with id " + agreementId);
+                logger.warn("Can't delete agreement with id " + agreementId);
             }
         });
     } else {
         res.sendStatus(400);
-        logger.warning("Can't delete agreement with id " + agreementId);
+        logger.warn("Can't delete agreement with id " + agreementId);
     }
 }
 

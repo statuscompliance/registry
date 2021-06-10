@@ -110,20 +110,20 @@ function _agreementIdDELETE(args, res) {
                     if (!err) {
                         logger.info("Deleted bills for agreement " + agreementId);
                     } else {
-                        logger.warning("Can't delete bills for agreement " + agreementId + " :" + err);
+                        logger.warn("Can't delete bills for agreement " + agreementId + " :" + err);
                     }
                 });
                 res.sendStatus(200);
                 logger.info("Deleted state for agreement " + agreementId);
             } else {
                 res.sendStatus(404);
-                logger.warning("Can't delete state for agreement " + agreementId + " :" + err);
+                logger.warn("Can't delete state for agreement " + agreementId + " :" + err);
             }
         });
 
     } else {
         res.sendStatus(400);
-        logger.warning("Can't delete state for agreement " + agreementId);
+        logger.warn("Can't delete state for agreement " + agreementId);
     }
 }
 
@@ -144,7 +144,7 @@ function _statesDELETE(args, res) {
             logger.info("Deleted state for all agreements");
         } else {
             res.sendStatus(404);
-            logger.warning("Can't delete state for all agreements: " + err);
+            logger.warn("Can't delete state for all agreements: " + err);
         }
     });
 }

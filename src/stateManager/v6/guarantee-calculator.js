@@ -239,7 +239,7 @@ function processScopedGuarantee(manager, query, guarantee, ofElement, forceUpdat
                 }
             }
             // timedScope array will group all metric values by the same scope and period
-            //logger.warning("This scopedGuarantee need these metric: " + JSON.stringify(processMetrics, null, 2));
+            //logger.warn("This scopedGuarantee need these metric: " + JSON.stringify(processMetrics, null, 2));
             var timedScopes = [];
             var metricValues = [];
             logger.debug('Obtaining required metrics states for scoped guarantee ' + guarantee.id + '...');
@@ -340,7 +340,7 @@ function calculatePenalty(agreement, guarantee, ofElement, timedScope, metricsVa
             value = metricsValues[metricId].value;
         }
         if (value === 'NaN' || value === '') {
-            logger.warning('Unexpected value (' + value + ') for metric ' + metricId + ' ');
+            logger.warn('Unexpected value (' + value + ') for metric ' + metricId + ' ');
             return;
         }
         vm.runInThisContext(metricId + " = " + value);
@@ -348,7 +348,7 @@ function calculatePenalty(agreement, guarantee, ofElement, timedScope, metricsVa
         if (metricsValues[metricId] && metricsValues[metricId].evidences) {
             guaranteeValue.evidences = guaranteeValue.evidences.concat(metricsValues[metricId].evidences);
         } else {
-            logger.warning('Metric without evidences: ' + JSON.stringify(metricsValues[metricId], null, 2));
+            logger.warn('Metric without evidences: ' + JSON.stringify(metricsValues[metricId], null, 2));
         }
 
         var val = {};

@@ -56,7 +56,7 @@ module.exports = {
 function _PricingBillingPenaltiesGET(req, res) {
     var args = req.swagger.params;
 
-    logger.warning(JSON.stringify(args));
+    logger.warn(JSON.stringify(args));
     var agreementId = args.agreement.value;
     var query = new Query(req.query);
     logger.info("New request to get pricing state for agreementId = " + agreementId);
