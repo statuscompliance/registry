@@ -105,7 +105,7 @@ function processMetric (agreement, metricId, metricQuery) {
 
       var scope = metricQuery.scope;
 
-      logger.metrics('Using collector type: ' + collector.type);
+      logger.info('Using collector type: ' + collector.type);
 
       if (collector.type === 'GET-V1') {
         logger.error('This registry version is not compatible with the collector type:', collector.type);
@@ -147,7 +147,7 @@ function processMetric (agreement, metricId, metricQuery) {
               // aggregate metrics in order to return all
               compositeResponse.push(metricState);
             });
-            logger.metrics('Mapping of columns names in log processed.');
+            logger.info('Mapping of columns names in log processed.');
 
             return resolve({
               metricId: metricId,
@@ -228,7 +228,7 @@ function processMetric (agreement, metricId, metricQuery) {
         var urlParams = Query.parseToQueryParams(collectorQuery);
         logger.debug('Sending URL params to computer:', urlParams);
         var compositeResponse = [];
-        logger.metrics('Sending request to computer with params: %s', JSON.stringify(collectorQuery, null, 2));
+        logger.info('Sending request to computer with params: %s', JSON.stringify(collectorQuery, null, 2));
         // Build and send computer request
         process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
         const requestMetric = await governify.infrastructure.getService(collector.infrastructurePath).request({
@@ -256,7 +256,7 @@ function processMetric (agreement, metricId, metricQuery) {
                 // aggregate metrics in order to return all
                 compositeResponse.push(metricState);
               });
-              logger.metrics('Mapping of columns names in log processed.');
+              logger.info('Mapping of columns names in log processed.');
             } else {
               const errorString = 'Error in computer response for metric: ' + metricId + '. Response is not an array:  ' + JSON.stringify(monthMetrics);
               return promiseErrorHandler(reject, 'metrics', processMetric.name, 500, errorString);
@@ -296,7 +296,7 @@ function getComputationV2 (infrastructurePath, computationURL, ttl) {
       setTimeout(async () => {
         governify.infrastructure.getService(infrastructurePath).get(computationURL).then(response => {
           if (response.status === 202) {
-            logger.metrics('Computation ' + computationURL.split('/').pop + ' not ready jet. Retrying in ' + realTimeout + ' ms.');
+            logger.info('Computation ' + computationURL.split('/').pop + ' not ready jet. Retrying in ' + realTimeout + ' ms.');
             setTimeout(() => {
               resolve(getComputationV2(infrastructurePath, computationURL, ttl - realTimeout));
             }, realTimeout - firstTimeout);

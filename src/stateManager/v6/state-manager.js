@@ -319,7 +319,7 @@ function _update (stateType, query, logsState, forceUpdate) {
               return resolve(result);
             });
           }).catch(function (err) {
-            logger.log(err);
+            logger.error(err);
             const errorString = 'Error processing guarantees';
             return promiseErrorHandler(reject, 'state-manager', '_update', 500, errorString, err);
           });
