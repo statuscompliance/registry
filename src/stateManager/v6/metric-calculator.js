@@ -290,7 +290,7 @@ function processMetric (agreement, metricId, metricQuery) {
 function getComputationV2 (infrastructurePath, computationURL, ttl) {
   return new Promise((resolve, reject) => {
     try {
-      if (ttl < 0) { reject('Retries time surpased TTL.'); }
+      if (ttl < 0) { reject('Retries time surpased TTL.'); return;}
       const realTimeout = 1000; // Minimum = firstTimeout
       const firstTimeout = 500;
       setTimeout(async () => {
