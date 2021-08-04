@@ -160,7 +160,6 @@ function _guaranteesGET (req, res) {
           return guarantee.id === e.id;
         });
         var requestWindow = guaranteeDefinition.of[0].window; // Get the window of the current guarantee
-        console.log(requestWindow)
         var periods;
         /* Create all the queries corresponding for the specified period and the current guarantee */
         var allQueries = [];
@@ -172,7 +171,6 @@ function _guaranteesGET (req, res) {
           } else {
             periods = [{ from: moment(from), to: moment(to) }];
           }
-          console.log(periods)
           // Create query for every period
           allQueries = periods.map(function (period) {
             return gUtils.buildGuaranteeQuery(guarantee.id, period.from.format(), period.to.format());

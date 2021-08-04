@@ -132,10 +132,7 @@ function _getPeriods (agreement, window) {
       dates[i+1].setMilliseconds(999)
       dates[i].setUTCHours(dates[i].getUTCHours()+getTimeZoneOffset(dates[i], agreement.context.validity.timeZone))
       dates[i+1].setUTCHours(dates[i+1].getUTCHours()+getTimeZoneOffset(dates[i+1], agreement.context.validity.timeZone))
-      if(i==dates.length-2){
-        console.log(1)
-        console.log(dates[i+1])
-      }
+ 
       if(dates[i+1]> Wfrom && dates[i+1]<= Wto){
         periods.push({
             from: moment.utc(dates[i]),
