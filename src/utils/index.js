@@ -30,7 +30,6 @@ const diff = require('deep-diff');
  * Utils module.
  * @module utils
  * @requires deep-diff
- * @requires moment
  * */
 
 module.exports = {

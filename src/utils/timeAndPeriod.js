@@ -119,8 +119,14 @@ function _getPeriods (agreement, window) {
       rruleSet.rrule(rruleFin);
       dates = rruleSet.all();
   }else{
-      rule = rrulestr(window.period)
-      dates = rule.between(new Date(from), new Date(to));
+    var rules = window.period.split("---");
+    var initPeriodRule = rrulestr(rules[0])
+    var endPeriodRule = rrulestr(rules[1])
+
+    var rruleSet = new RRuleSet();
+    rruleSet.rrule(initPeriodRule);
+    rruleSet.rrule(endPeriodRule);
+    dates = rruleSet.between(new Date(from), new Date(Wto));
   }
 
   //Sorting dates
@@ -132,7 +138,7 @@ function _getPeriods (agreement, window) {
       dates[i+1].setMilliseconds(999)
       dates[i].setUTCHours(dates[i].getUTCHours()+getTimeZoneOffset(dates[i], agreement.context.validity.timeZone))
       dates[i+1].setUTCHours(dates[i+1].getUTCHours()+getTimeZoneOffset(dates[i+1], agreement.context.validity.timeZone))
- 
+
       if(dates[i+1]> Wfrom && dates[i+1]<= Wto){
         periods.push({
             from: moment.utc(dates[i]),
@@ -143,45 +149,6 @@ function _getPeriods (agreement, window) {
 
   return periods;
 }
-
-var slots = {
-  quarterly: {
-    count: 3,
-    unit: 'months'
-  },
-  monthly: {
-    count: 1,
-    unit: 'months'
-  },
-  daily: {
-    count: 1,
-    unit: 'day'
-  },
-  hourly: {
-    count: 1,
-    unit: 'hour'
-  },
-  minutely: {
-    count: 1,
-    unit: 'minute'
-  },
-  secondly: {
-    count: 1,
-    unit: 'second'
-  },
-  weekly: {
-    count: 1,
-    unit: 'week'
-  },
-  biweekly: {
-    count: 2,
-    unit: 'week'
-  },
-  yearly: {
-    count: 1,
-    unit: 'years'
-  }
-};
 
 /**
  * Periods in milliseconds

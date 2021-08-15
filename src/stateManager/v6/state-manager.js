@@ -36,7 +36,6 @@ const calculators = require('./calculators.js');
 const Promise = require('bluebird');
 // const request = require('requestretry');
 // const iso8601 = require('iso8601');
-const moment = require('moment');
 const utils = require('../../utils');
 const promiseErrorHandler = utils.errors.promiseErrorHandler;
 
@@ -49,7 +48,6 @@ const promiseErrorHandler = utils.errors.promiseErrorHandler;
  * @requires calculators
  * @requires bluebird
  * @requires requestretry
- * @requires moment
  * */
 module.exports = initialize;
 
@@ -406,7 +404,7 @@ function State (value, query, metadata) {
  * */
 function Record (value, metadata) {
   this.value = value;
-  this.time = moment().toISOString();
+  this.time = new Date().toISOString();
   if (metadata) {
     for (var v in metadata) {
       this[v] = metadata[v];

@@ -189,6 +189,7 @@ function _guaranteesGET (req, res) {
           }
         }
       });
+      
       if (validationErrors.length === 0) {
         if (req.query.forceUpdate == 'true') {
           utils.promise.processSequentialPromises('guarantees', manager, guaranteesQueries, result, res, config.streaming, true);
