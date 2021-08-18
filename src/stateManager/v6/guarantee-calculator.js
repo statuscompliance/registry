@@ -87,7 +87,7 @@ function processGuarantee (manager, query, forceUpdate) {
 
   var processScopedGuarantees = [];
 
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     logger.debug("Searching guarantee '%s' in array:\n %s", guaranteeId, JSON.stringify(agreement.terms.guarantees, null, 2));
 
     // We retrieve the guarantee definition from the agreement that matches with the provided ID
@@ -104,8 +104,8 @@ function processGuarantee (manager, query, forceUpdate) {
     if (query.period && query.period.from === '*') {
       delete query.period;
     }
-    guarantee.of.forEach(function (ofElement, index) {
-      var guaranteeCalculationPeriods = utils.time.getPeriods(agreement, ofElement.window);
+    const processScopedGuarantees = await guarantee.of.reduce( async function (acc,ofElement, index) {
+      var guaranteeCalculationPeriods =  await utils.time.getPeriods(agreement, ofElement.window);
       var realPeriod = null;
       if (query.period) {
         realPeriod = guaranteeCalculationPeriods.find((element) => {
@@ -121,7 +121,8 @@ function processGuarantee (manager, query, forceUpdate) {
           };
         }
         logger.debug(index + '- ( processScopedGuarantee ) with query' + JSON.stringify(query, null, 2));
-        processScopedGuarantees.push({
+        var auxProcessScopedGuarantees = [... (await acc)];
+        auxProcessScopedGuarantees.push({
           manager: manager,
           query: query,
           guarantee: guarantee,
@@ -129,7 +130,8 @@ function processGuarantee (manager, query, forceUpdate) {
           forceUpdate: forceUpdate
         });
       }
-    });
+      return auxProcessScopedGuarantees;
+    },[]);
 
     var guaranteesValues = [];
     logger.debug('Processing scoped guarantee (' + guarantee.id + ')...');

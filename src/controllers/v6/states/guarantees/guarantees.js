@@ -123,7 +123,7 @@ function _guaranteesGET (req, res) {
 
   stateManager({
     id: agreementId
-  }).then(function (manager) {
+  }).then(async function (manager) {
     logger.info('Getting state of guarantees...');
     var validationErrors = [];
     if (config.parallelProcess.guarantees) {
@@ -153,8 +153,7 @@ function _guaranteesGET (req, res) {
       }
     } else {
       logger.info('### Process mode = SEQUENTIAL ###');
-      var guaranteesQueries = [];
-      manager.agreement.terms.guarantees.forEach(function (guarantee) {
+      const guaranteesQueries = await manager.agreement.terms.guarantees.reduce(async function (acc,guarantee) {
         /* Process each guarantee individually, to create queries for every one */
         var guaranteeDefinition = manager.agreement.terms.guarantees.find((e) => {
           return guarantee.id === e.id;
@@ -167,7 +166,7 @@ function _guaranteesGET (req, res) {
           requestWindow.from = from;
           requestWindow.end = to;
           if (newPeriodsFromGuarantees) {
-            periods = utils.time.getPeriods(manager.agreement, requestWindow);
+            periods = await utils.time.getPeriods(manager.agreement, requestWindow);
           } else {
             periods = [{ from: moment(from), to: moment(to) }];
           }
@@ -179,17 +178,19 @@ function _guaranteesGET (req, res) {
           allQueries.push(gUtils.buildGuaranteeQuery(guarantee.id));
         }
         /* Validate queries and add to the list */
+        var queries = [... (await acc)];
         for (var query of allQueries) {
           var validation = utils.validators.guaranteeQuery(query, guarantee.id);
           if (!validation.valid) {
             validation.guarantee = guarantee.id;
             validationErrors.push(validation);
           } else {
-            guaranteesQueries.push(query);
+            queries.push(query);
           }
         }
-      });
-      
+        return queries
+      },[]);
+      console.log(guaranteesQueries , "after")
       if (validationErrors.length === 0) {
         if (req.query.forceUpdate == 'true') {
           utils.promise.processSequentialPromises('guarantees', manager, guaranteesQueries, result, res, config.streaming, true);
