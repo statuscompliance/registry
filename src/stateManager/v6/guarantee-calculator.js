@@ -34,7 +34,6 @@ var Error = utils.errors.Error;
 
 const Promise = require('bluebird');
 const vm = require('vm');
-const moment = require('moment-timezone');
 
 /**
  * Guarantee calculator module.
@@ -43,7 +42,6 @@ const moment = require('moment-timezone');
  * @requires utils
  * @requires bluebird
  * @requires vm
- * @requires moment-timezone
  * @see module:calculators
  * */
 module.exports = {
@@ -185,9 +183,9 @@ function processScopedGuarantee (manager, query, guarantee, ofElement, forceUpda
       // We get the metrics to calculate from the with section of the scoped guarantee
       if (ofElement.with) {
         var window = ofElement.window;
-        window.initial = moment.utc(moment.tz(query.period && query.period.from ? query.period.from : ofElement.window.initial, agreement.context.validity.timeZone)).format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z';
+        window.initial = query.period.from;
         if (query.period && query.period.to) {
-          window.end = moment.utc(moment.tz(query.period.to, agreement.context.validity.timeZone)).format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z';
+          window.end = query.period.to
         }
         window.timeZone = agreement.context.validity.timeZone;
         // For each metric, we create an object with the parameters needed by the manager to be able to calculate the metric state
