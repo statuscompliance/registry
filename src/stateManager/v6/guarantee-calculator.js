@@ -99,25 +99,8 @@ function processGuarantee (manager, query, forceUpdate) {
       return promiseErrorHandler(reject, 'guarantees', 'processGuarantees', 404, errorString);
     }
     // We prepare the parameters needed by the processScopedGuarantee function
-    if (query.period && query.period.from === '*') {
-      delete query.period;
-    }
     const processScopedGuarantees = guarantee.of.reduce( function (acc,ofElement, index) {
-      var guaranteeCalculationPeriods = utils.time.getPeriods(agreement, ofElement.window);
-      var realPeriod = null;
       if (query.period) {
-        realPeriod = guaranteeCalculationPeriods.find((element) => {
-          return element.to.isSame(moment.utc(moment.tz(query.period.to, agreement.context.validity.timeZone)));
-        });
-      }
-      logger.debug('Real Period calculated:', realPeriod);
-      if (realPeriod || query.period) {
-        if (realPeriod) {
-          query.period = {
-            from: realPeriod.from.toISOString(),
-            to: realPeriod.to.toISOString()
-          };
-        }
         logger.debug(index + '- ( processScopedGuarantee ) with query' + JSON.stringify(query, null, 2));
         var auxProcessScopedGuarantees = [...acc];
         auxProcessScopedGuarantees.push({

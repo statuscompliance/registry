@@ -168,11 +168,11 @@ function _guaranteesGET (req, res) {
           if (newPeriodsFromGuarantees) {
             periods = utils.time.getPeriods(manager.agreement, requestWindow);
           } else {
-            periods = [{ from: moment(from), to: moment(to) }];
+            periods = [{ from: new Date(from), to: new Date(to) }];
           }
           // Create query for every period
           allQueries = periods.map(function (period) {
-            return gUtils.buildGuaranteeQuery(guarantee.id, period.from.format(), period.to.format());
+            return gUtils.buildGuaranteeQuery(guarantee.id, period.from, period.to);
           });
         } else {
           allQueries.push(gUtils.buildGuaranteeQuery(guarantee.id));
