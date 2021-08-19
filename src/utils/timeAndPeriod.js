@@ -41,12 +41,13 @@ module.exports = {
 
 
 /**
- * Check if an array contains a given object
- * @param {AgreementModel} agreement object to search for
- * @param {WindowModel} window array to search into
- * @alias module:utils.getPeriodsFrom
+ * This method returns a set of periods which are based on a window parameter.
+ * @param {AgreementModel} agreement agreement model
+ * @param {WindowModel} window window model
+ * @return {Set} set of periods
+ * @alias module:utils.getPeriods
  * */
-async function _getPeriods (agreement, window) {
+function _getPeriods (agreement, window) {
 
   var from = new Date(window.initial);
   var to = new Date();
@@ -54,8 +55,8 @@ async function _getPeriods (agreement, window) {
   var Wfrom = new Date(window.from);
   var Wto = window.end ? new Date(window.end) : new Date();
 
-  var dates = await gPeriods.getDates(from, to, window.period, Wto);
-  return await gPeriods.getPeriods(dates, agreement.context.validity.timeZone, true, Wfrom, Wto);
+  var dates = gPeriods.getDates(from, to, window.period, Wto);
+  return gPeriods.getPeriods(dates, agreement.context.validity.timeZone, true, Wfrom, Wto);
 }
 
 /**

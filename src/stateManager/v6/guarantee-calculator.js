@@ -85,9 +85,7 @@ function processGuarantee (manager, query, forceUpdate) {
   var agreement = manager.agreement;
   var guaranteeId = query.guarantee;
 
-  var processScopedGuarantees = [];
-
-  return new Promise(async (resolve, reject) => {
+  return new Promise( (resolve, reject) => {
     logger.debug("Searching guarantee '%s' in array:\n %s", guaranteeId, JSON.stringify(agreement.terms.guarantees, null, 2));
 
     // We retrieve the guarantee definition from the agreement that matches with the provided ID
@@ -104,8 +102,8 @@ function processGuarantee (manager, query, forceUpdate) {
     if (query.period && query.period.from === '*') {
       delete query.period;
     }
-    const processScopedGuarantees = await guarantee.of.reduce( async function (acc,ofElement, index) {
-      var guaranteeCalculationPeriods =  await utils.time.getPeriods(agreement, ofElement.window);
+    const processScopedGuarantees = guarantee.of.reduce( function (acc,ofElement, index) {
+      var guaranteeCalculationPeriods = utils.time.getPeriods(agreement, ofElement.window);
       var realPeriod = null;
       if (query.period) {
         realPeriod = guaranteeCalculationPeriods.find((element) => {
@@ -121,7 +119,7 @@ function processGuarantee (manager, query, forceUpdate) {
           };
         }
         logger.debug(index + '- ( processScopedGuarantee ) with query' + JSON.stringify(query, null, 2));
-        var auxProcessScopedGuarantees = [... (await acc)];
+        var auxProcessScopedGuarantees = [...acc];
         auxProcessScopedGuarantees.push({
           manager: manager,
           query: query,

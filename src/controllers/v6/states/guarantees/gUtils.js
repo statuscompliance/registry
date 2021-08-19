@@ -43,7 +43,6 @@ module.exports = {
  * @param {String} guaranteeId Id of guarantee which will be calculated
  * @param {ISODateString} from YYYY-MM-DDTHH:mm:ss.SSSZ
  * @return {ISODateString} to YYYY-MM-DDTHH:mm:ss.SSSZ
- * @alias module:gUtils.getPeriods
  * */
 function _buildGuaranteeQuery (guaranteeId, from, to) {
   var query = {};
