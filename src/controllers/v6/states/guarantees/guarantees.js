@@ -168,7 +168,7 @@ function _guaranteesGET (req, res) {
           if (newPeriodsFromGuarantees) {
             periods = utils.time.getPeriods(manager.agreement, requestWindow);
           } else {
-            periods = [{ from: new Date(from), to: new Date(to) }];
+            periods = [{ from: new Date(from).toISOString(), to: new Date(to).toISOString() }];
           }
           // Create query for every period
           allQueries = periods.map(function (period) {
