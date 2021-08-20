@@ -63,9 +63,9 @@ module.exports = {
  * @alias module:metrics.metricsIdIncrease
  * */
 function _metricsIdIncrease (args, res) {
-  var agreementId = args.agreement.value;
-  var metricId = args.metric.value;
-  var query = args.scope.value;
+  const agreementId = args.agreement.value;
+  const metricId = args.metric.value;
+  const query = args.scope.value;
 
   logger.info('New request to increase metric = %s, with values = %s', metricId, JSON.stringify(query, null, 2));
 
@@ -99,9 +99,9 @@ function _metricsIdIncrease (args, res) {
  * @alias module:metrics.metricsIdPUT
  * */
 function _metricsIdPOST (args, res) {
-  var agreementId = args.agreement.value;
-  var metricValue = args.metricValue.value;
-  var metricId = args.metric.value;
+  const agreementId = args.agreement.value;
+  const metricValue = args.metricValue.value;
+  const metricId = args.metric.value;
   // var query = new Query(req.query);
 
   logger.info('New request to PUT metrics over: ' + metricId + ' with value: ' + metricValue);
@@ -133,12 +133,12 @@ function _metricsIdPOST (args, res) {
  * @alias module:metrics.metricsPOST
  * */
 function _metricsGET (req, res) {
-  var args = req.swagger.params;
-  var agreementId = args.agreement.value;
+  const args = req.swagger.params;
+  const agreementId = args.agreement.value;
 
   logger.info('New request to GET metrics of agreement: ' + agreementId);
 
-  var result;
+  let result;
   if (config.streaming) {
     res.setHeader('content-type', 'application/json; charset=utf-8');
     logger.info('### Streaming mode ###');
@@ -154,12 +154,12 @@ function _metricsGET (req, res) {
   }).then(function (manager) {
     logger.info('Preparing requests to /states/' + agreementId + '/metrics/{metricId} : ');
 
-    var validationErrors = [];
+    const validationErrors = [];
     if (config.parallelProcess.metrics) {
       const promises = [];
       Object.keys(manager.agreement.terms.metrics).forEach(function (metricId) {
-        var query = new Query(req.query);
-        var validation = utils.validators.metricQuery(query, metricId, manager.agreement.terms.metrics[metricId]);
+        const query = new Query(req.query);
+        const validation = utils.validators.metricQuery(query, metricId, manager.agreement.terms.metrics[metricId]);
         if (!validation.valid) {
           validation.metric = metricId;
           validationErrors.push(validation);
@@ -174,10 +174,10 @@ function _metricsGET (req, res) {
         res.status(400).json(new ErrorModel(400, validationErrors));
       }
     } else {
-      var metricsQueries = [];
+      const metricsQueries = [];
       Object.keys(manager.agreement.terms.metrics).forEach(function (metricId) {
-        var query = new Query(req.query);
-        var validation = utils.validators.metricQuery(query, metricId, manager.agreement.terms.metrics[metricId]);
+        const query = new Query(req.query);
+        const validation = utils.validators.metricQuery(query, metricId, manager.agreement.terms.metrics[metricId]);
         if (!validation.valid) {
           validation.metric = metricId;
           validationErrors.push(validation);
@@ -205,12 +205,12 @@ function _metricsGET (req, res) {
  * @alias module:metrics.metricsIdPOST
  * */
 function _metricsIdGET (req, res) {
-  var args = req.swagger.params;
-  var agreementId = args.agreement.value;
-  var metricId = args.metric.value;
-  var query = new Query(req.query);
+  const args = req.swagger.params;
+  const agreementId = args.agreement.value;
+  const metricId = args.metric.value;
+  const query = new Query(req.query);
 
-  var result;
+  let result;
   if (config.streaming) {
     logger.info('### Streaming mode ###');
     res.setHeader('content-type', 'application/json; charset=utf-8');
@@ -224,7 +224,7 @@ function _metricsIdGET (req, res) {
   stateManager({
     id: agreementId
   }).then(function (manager) {
-    var validation = utils.validators.metricQuery(query, metricId, manager.agreement.terms.metrics[metricId]);
+    const validation = utils.validators.metricQuery(query, metricId, manager.agreement.terms.metrics[metricId]);
     if (!validation.valid) {
       logger.error('Query validation error');
       res.status(400).json(new ErrorModel(400, validation));
@@ -241,7 +241,7 @@ function _metricsIdGET (req, res) {
           result.push(null);
         }
       }).catch(function (err) {
-        var errorString = 'Error retrieving state values of metric: ' + metricId;
+        const errorString = 'Error retrieving state values of metric: ' + metricId;
         controllerErrorHandler(res, 'metrics-controller', '_metricsIdGET', 500, errorString, err);
       });
     }

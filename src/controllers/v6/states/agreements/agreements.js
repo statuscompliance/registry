@@ -66,7 +66,7 @@ module.exports = {
  * */
 function _agreementIdGET (args, res) {
   logger.info('New request to GET agreements (states/agreements/agreements.js)');
-  var agreementId = args.agreement.value;
+  const agreementId = args.agreement.value;
 
   stateManager({
     id: agreementId
@@ -91,15 +91,15 @@ function _agreementIdGET (args, res) {
  * @alias module:agreements.agreementIdDELETE
  * */
 function _agreementIdDELETE (args, res) {
-  var agreementId = args.agreement.value;
+  const agreementId = args.agreement.value;
   logger.info('New request to DELETE agreement state for agreement ' + agreementId);
   if (agreementId) {
-    var StateModel = db.models.StateModel;
+    const StateModel = db.models.StateModel;
     StateModel.remove({
       agreementId: agreementId
     }, function (err) {
       if (!err) {
-        var BillsModel = db.models.BillsModel; // Remove bills from that agreement
+        const BillsModel = db.models.BillsModel; // Remove bills from that agreement
         BillsModel.remove({
           agreementId: agreementId
         }, function (err) {
@@ -131,7 +131,7 @@ function _agreementIdDELETE (args, res) {
  * */
 function _statesDELETE (args, res) {
   logger.info('New request to DELETE all agreement states');
-  var StateModel = db.models.StateModel;
+  const StateModel = db.models.StateModel;
   StateModel.remove(function (err) {
     if (!err) {
       res.sendStatus(200);
@@ -153,17 +153,17 @@ function _statesDELETE (args, res) {
 function _statesFilter (req, res) {
   logger.info('New request to GET filtered agreements states (states/agreements/agreements.js) with params: ' + JSON.stringify(req.query));
 
-  var agreementId = req.swagger.params.agreement.value;
-  var indicator = req.query.indicator;
-  var type = req.query.type;
-  var from = req.query.from;
-  var to = req.query.to;
-  var at = req.query.at;
+  const agreementId = req.swagger.params.agreement.value;
+  const indicator = req.query.indicator;
+  const type = req.query.type;
+  const from = req.query.from;
+  const to = req.query.to;
+  const at = req.query.at;
 
   // Recreate scopes object
-  var scopeQuery = {};
-  var groupQuery = {};
-  for (var property in req.query) {
+  const scopeQuery = {};
+  let groupQuery = {};
+  for (const property in req.query) {
     if (property.startsWith('scope.')) {
       if (req.query[property] === '*') {
         scopeQuery[property] = {
@@ -189,9 +189,9 @@ function _statesFilter (req, res) {
     }
   }
 
-  var StateModel = db.models.StateModel;
+  const StateModel = db.models.StateModel;
 
-  var andQuery = {
+  const andQuery = {
     agreementId: {
       $eq: agreementId
     },
@@ -243,24 +243,24 @@ function _statesFilter (req, res) {
  * @alias module:agreements.agreementIdRELOAD
  * */
 function _agreementIdRELOAD (args, res) {
-  var agreementId = args.agreements.value;
-  var parameters = args.parameters.value;
+  const agreementId = args.agreements.value;
+  const parameters = args.parameters.value;
 
   logger.info('New request to reload state of agreement ' + agreementId);
 
-  var StateModel = db.models.StateModel;
+  const StateModel = db.models.StateModel;
   StateModel.find({
     agreementId: agreementId
   }).remove(function (err) {
-    var errors = [];
+    const errors = [];
     if (!err) {
-      var message = 'Reloading state of agreement ' + agreementId + '. ' +
+      const message = 'Reloading state of agreement ' + agreementId + '. ' +
                 (parameters.mail ? 'An email will be sent to ' + parameters.mail.to + ' when the process ends' : '');
       res.end(message);
 
       logger.info('Deleted state for agreement ' + agreementId);
 
-      var AgreementModel = db.models.AgreementModel;
+      const AgreementModel = db.models.AgreementModel;
       AgreementModel.findOne({
         id: agreementId
       }, function (err, agreement) {
@@ -308,14 +308,14 @@ function _agreementIdRELOAD (args, res) {
 function sendMail (agreement, mail) {
   logger.info('Sending email to ' + mail.to);
 
-  var logRequests = [];
-  for (var logId in agreement.context.definitions.logs) {
-    var log = agreement.context.definitions.logs[logId];
+  const logRequests = [];
+  for (const logId in agreement.context.definitions.logs) {
+    const log = agreement.context.definitions.logs[logId];
     log.id = logId;
     logRequests.push(log);
   }
 
-  var logStates = [];
+  const logStates = [];
   Promise.each(logRequests, function (log) {
     return new Promise(function (resolve, reject) {
       process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -342,7 +342,7 @@ function sendMail (agreement, mail) {
       mail.content += '<ul/>';
     }
 
-    var mailOptions = {
+    const mailOptions = {
       from: mail.from,
       to: mail.to,
       subject: mail.subject,

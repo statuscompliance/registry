@@ -62,8 +62,8 @@ module.exports = {
 function _pricingQuery (query) {
   const schema = require('../schemas/query-schema.json');
 
-  var schemaValidationResults = schemaValidation(schema, query);
-  var validation = true; var errors = [];
+  const schemaValidationResults = schemaValidation(schema, query);
+  let validation = true; let errors = [];
 
   if (!schemaValidationResults.isValid) {
     validation = validation && false;
@@ -82,16 +82,18 @@ function _metricQuery (query, metricId, metricDefinition) {
   // windows are required in metrics
   schema.required = ['scope', 'window'];
 
-  var schemaValidationResults = schemaValidation(schema, query);
-  var validation = true; var errors = [];
+  const schemaValidationResults = schemaValidation(schema, query);
+  let validation = true; let errors = [];
 
   // Parameters is not required add empty object if it is null.
   if (!query.parameters) { query.parameters = {}; }
 
-  query.period = query.period ? query.period : {
-    from: query.window ? query.window.initial : '*',
-    to: query.window ? query.window.end : '*'
-  };
+  query.period = query.period
+    ? query.period
+    : {
+        from: query.window ? query.window.initial : '*',
+        to: query.window ? query.window.end : '*'
+      };
 
   if (!schemaValidationResults.isValid) {
     validation = validation && false;
@@ -99,15 +101,15 @@ function _metricQuery (query, metricId, metricDefinition) {
   }
 
   // Parameters are only needed if they are present in the metric definition
-  var parametersCount = metricDefinition.parameters ? Object.keys(metricDefinition.parameters).length : 0;
-  var inParametersCount = query.parameters ? Object.keys(query.parameters).length : 0;
+  const parametersCount = metricDefinition.parameters ? Object.keys(metricDefinition.parameters).length : 0;
+  const inParametersCount = query.parameters ? Object.keys(query.parameters).length : 0;
   if ((parametersCount !== inParametersCount) && parametersCount !== 0) {
     validation = validation && false;
     errors.push('Metric ' + metricId + ' needs parameters: ' + Object.keys(metricDefinition.parameters || []).join(', '));
   }
 
   // ADD default values for scopes.
-  var scopeDef = metricDefinition.scope;
+  const scopeDef = metricDefinition.scope;
   Object.keys(scopeDef || {}).forEach((s) => {
     if (!query.scope[s]) {
       query.scope[s] = scopeDef[s].default;
@@ -127,8 +129,8 @@ function _metricQuery (query, metricId, metricDefinition) {
 function _guaranteeQuery (query, guaranteeId /*, guaranteeDefinition */) {
   const schema = require('../schemas/query-schema.json');
 
-  var schemaValidationResults = schemaValidation(schema, query);
-  var validation = true; var errors = [];
+  const schemaValidationResults = schemaValidation(schema, query);
+  let validation = true; let errors = [];
 
   if (!schemaValidationResults.isValid) {
     validation = validation && false;
@@ -159,10 +161,10 @@ function _guaranteeQuery (query, guaranteeId /*, guaranteeDefinition */) {
 }
 
 function schemaValidation (schema, data) {
-  var ajv = new Ajv();
-  var querySchemaValidator = ajv.compile(schema);
+  const ajv = new Ajv();
+  const querySchemaValidator = ajv.compile(schema);
 
-  var valid = querySchemaValidator(data);
+  const valid = querySchemaValidator(data);
 
   return {
     isValid: valid,

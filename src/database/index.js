@@ -31,7 +31,7 @@ const logger = governify.getLogger().tag('db-manager');
 const jsyaml = require('js-yaml');
 const fs = require('fs');
 const mongoose = require('mongoose');
-var $RefParser = require('json-schema-ref-parser');
+const $RefParser = require('json-schema-ref-parser');
 
 /**
  * Database module.
@@ -55,9 +55,9 @@ module.exports = {
  * @alias module:database.connect
  * */
 function _connect (callback) {
-  var instance = this;
-  var db = null;
-  var options = {
+  const instance = this;
+  let db = null;
+  const options = {
     keepAlive: true,
     reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
     reconnectInterval: 3000,
@@ -94,7 +94,7 @@ function _connect (callback) {
  * @alias module:db.close
  * */
 function _close (done) {
-  var instance = this;
+  const instance = this;
   if (this.db) {
     this.db.close(function (err) {
       instance.db = null;
@@ -110,7 +110,7 @@ function _close (done) {
  * @param {String} jsonModelUri model URI
  * */
 function setupModel (instance, modelName, jsonModelUri) {
-  var referencedJsonModel = jsyaml.safeLoad(fs.readFileSync(jsonModelUri));
+  const referencedJsonModel = jsyaml.safeLoad(fs.readFileSync(jsonModelUri));
   $RefParser.dereference(referencedJsonModel, function (err, dereferencedJsonModel) {
     if (err) {
       logger.info('dereference error in setupModel: ' + err);

@@ -43,15 +43,15 @@ module.exports = {
 };
 
 function _computerToRegistryParser (computerScope, mapping) {
-  var mappedScope = {};
+  const mappedScope = {};
   // reversing mapping
-  var mappingReversed = {};
-  for (var field in mapping) {
+  const mappingReversed = {};
+  for (const field in mapping) {
     mappingReversed[mapping[field]] = field;
   }
 
-  for (var scopeField in computerScope) {
-    var mappedScopeField = mappingReversed[scopeField];
+  for (const scopeField in computerScope) {
+    const mappedScopeField = mappingReversed[scopeField];
 
     if (mappingReversed && mappedScopeField) {
       mappedScope[mappedScopeField] = computerScope[scopeField];
@@ -64,10 +64,10 @@ function _computerToRegistryParser (computerScope, mapping) {
 }
 
 function _registryToComputerParser (queryScope, mapping) {
-  var mappedScope = {};
+  const mappedScope = {};
 
-  for (var scopeField in queryScope) {
-    var mappedScopeField = mapping[scopeField];
+  for (const scopeField in queryScope) {
+    const mappedScopeField = mapping[scopeField];
 
     if (mapping && mappedScopeField) {
       mappedScope[mappedScopeField] = queryScope[scopeField];

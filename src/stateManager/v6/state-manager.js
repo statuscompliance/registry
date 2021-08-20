@@ -60,7 +60,7 @@ module.exports = initialize;
 function initialize (_agreement) {
   logger.debug('(initialize) Initializing state with agreement ID = ' + _agreement.id);
   return new Promise(function (resolve, reject) {
-    var AgreementModel = db.models.AgreementModel;
+    const AgreementModel = db.models.AgreementModel;
     logger.debug('Searching agreement with agreementID = ' + _agreement.id);
     // Executes a mongodb query to search Agreement file with id = _agreement
     AgreementModel.findOne({
@@ -80,7 +80,7 @@ function initialize (_agreement) {
         // get ==> gets one or more states, put ==> save an scoped state,
         // update ==> calculates one or more states and save them,
         // current ==> do a map over state an returns the current record for this state.
-        var stateManager = {
+        const stateManager = {
           agreement: ag,
           get: _get,
           put: _put,
@@ -101,11 +101,11 @@ function initialize (_agreement) {
  * @return {Promise} Promise that will return an array of state objects
  * */
 function _get (stateType, query, forceUpdate) {
-  var stateManager = this;
+  const stateManager = this;
   logger.debug('(_get) Retrieving state of ' + stateType + ' - ForceUpdate: ' + forceUpdate);
   return new Promise(function (resolve, reject) {
     logger.debug('Getting ' + stateType + ' state for query =  ' + JSON.stringify(query));
-    var StateModel = db.models.StateModel;
+    const StateModel = db.models.StateModel;
     if (!query) {
       query = {};
     }
@@ -121,7 +121,7 @@ function _get (stateType, query, forceUpdate) {
       // If there are states in mongodb match the query, checks if it's updated and returns.
       if (result.length > 0) {
         logger.debug('There are ' + stateType + ' state for query =  ' + JSON.stringify(query) + ' in DB');
-        var states = result;
+        const states = result;
 
         logger.debug('Checking if ' + stateType + ' is updated...');
         //  isUpdated(stateManager.agreement, states).then(function (data) {
@@ -157,7 +157,7 @@ function _get (stateType, query, forceUpdate) {
         stateManager.update(stateType, query, 0, forceUpdate).then(function (states) {
           return resolve(states);
         }).catch(function (err) {
-          var errorString = 'Error getting metrics';
+          const errorString = 'Error getting metrics';
           return promiseErrorHandler(reject, 'state-manager', '_get', 500, errorString, err);
         });
         // }
@@ -180,13 +180,13 @@ function _get (stateType, query, forceUpdate) {
  * @return {Promise} Promise that will return an array of state objects
  * */
 function _put (stateType, query, value, metadata) {
-  var stateManager = this;
+  const stateManager = this;
   logger.debug('(_put) Saving state of ' + stateType);
   return new Promise(function (resolve, reject) {
-    var StateModel = db.models.StateModel;
+    const StateModel = db.models.StateModel;
 
     logger.debug('AGREEMENT: ' + stateManager.agreement.id);
-    var dbQuery = projectionBuilder(stateType, refineQuery(stateManager.agreement.id, stateType, query));
+    const dbQuery = projectionBuilder(stateType, refineQuery(stateManager.agreement.id, stateType, query));
     logger.debug('Updating ' + stateType + ' state... with refinedQuery = ' + JSON.stringify(dbQuery, null, 2));
 
     StateModel.update(dbQuery, {
@@ -200,8 +200,8 @@ function _put (stateType, query, value, metadata) {
       } else {
         logger.debug('NMODIFIED record:  ' + JSON.stringify(result));
 
-        var stateSignature = 'StateSignature (' + result.nModified + ') ' + '[';
-        for (var v in dbQuery) {
+        let stateSignature = 'StateSignature (' + result.nModified + ') ' + '[';
+        for (const v in dbQuery) {
           stateSignature += dbQuery[v];
         }
         stateSignature += ']';
@@ -212,8 +212,8 @@ function _put (stateType, query, value, metadata) {
           // There is no state for Guarantee / Metric , ....
           logger.debug('Creating new ' + stateType + ' state with the record...');
 
-          var newState = new State(value, refineQuery(stateManager.agreement.id, stateType, query), metadata);
-          var stateModel = new StateModel(newState);
+          const newState = new State(value, refineQuery(stateManager.agreement.id, stateType, query), metadata);
+          const stateModel = new StateModel(newState);
 
           stateModel.save(newState, function (err) {
             if (err) {
@@ -268,7 +268,7 @@ function _put (stateType, query, value, metadata) {
  * @return {Promise} Promise that will return an array of state objects
  * */
 function _update (stateType, query, logsState, forceUpdate) {
-  var stateManager = this;
+  const stateManager = this;
   logger.debug('(_update) Updating state of ' + stateType);
   return new Promise(function (resolve, reject) {
     switch (stateType) {
@@ -292,7 +292,7 @@ function _update (stateType, query, logsState, forceUpdate) {
           .then(function (guaranteeStates) {
             logger.debug('Guarantee states for ' + guaranteeStates.guaranteeId + ' have been calculated (' + guaranteeStates.guaranteeValues.length + ') ');
             logger.debug('Guarantee states: ' + JSON.stringify(guaranteeStates, null, 2));
-            var processGuarantees = [];
+            const processGuarantees = [];
             guaranteeStates.guaranteeValues.forEach(function (guaranteeState) {
               logger.debug('Guarantee state: ' + JSON.stringify(guaranteeState, null, 2));
               processGuarantees.push(stateManager.put(stateType, {
@@ -310,8 +310,8 @@ function _update (stateType, query, logsState, forceUpdate) {
             logger.debug('Persisting guarantee states...');
             Promise.all(processGuarantees).then(function (guarantees) {
               logger.debug('All guarantee states have been persisted');
-              var result = [];
-              for (var a in guarantees) {
+              const result = [];
+              for (const a in guarantees) {
                 result.push(guarantees[a][0]);
               }
               return resolve(result);
@@ -326,7 +326,7 @@ function _update (stateType, query, logsState, forceUpdate) {
         calculators.metricCalculator.process(stateManager.agreement, query.metric, query)
           .then(function (metricStates) {
             logger.debug('Metric states for ' + metricStates.metricId + ' have been calculated (' + metricStates.metricValues.length + ') ');
-            var processMetrics = [];
+            const processMetrics = [];
             metricStates.metricValues.forEach(function (metricValue) {
               processMetrics.push(
                 stateManager.put(stateType, {
@@ -344,14 +344,14 @@ function _update (stateType, query, logsState, forceUpdate) {
             logger.debug('Persisting metric states...');
             return Promise.all(processMetrics).then(function (metrics) {
               logger.debug('All metric states have been persisted');
-              var result = [];
-              for (var a in metrics) {
+              const result = [];
+              for (const a in metrics) {
                 result.push(metrics[a][0]);
               }
               return resolve(result);
             });
           }).catch(function (err) {
-            var errorString = 'Error processing metrics';
+            const errorString = 'Error processing metrics';
             return promiseErrorHandler(reject, 'state-manager', '_update', 500, errorString, err);
           });
         break;
@@ -389,7 +389,7 @@ function _update (stateType, query, logsState, forceUpdate) {
  * @param {Object} metadata {logsState, evidences, parameters}
  * */
 function State (value, query, metadata) {
-  for (var v in query) {
+  for (const v in query) {
     this[v] = query[v];
   }
   this.records = [];
@@ -406,7 +406,7 @@ function Record (value, metadata) {
   this.value = value;
   this.time = new Date().toISOString();
   if (metadata) {
-    for (var v in metadata) {
+    for (const v in metadata) {
       this[v] = metadata[v];
     }
   }
@@ -506,7 +506,7 @@ function getCurrent (state) {
  * @return {object} state
  * */
 function _current (state) {
-  var newState = {
+  const newState = {
     stateType: state.stateType,
     agreementId: state.agreementId,
     id: state.id,
@@ -514,9 +514,9 @@ function _current (state) {
     period: state.period,
     window: state.window ? state.window : undefined
   };
-  var currentRecord = getCurrent(state);
-  for (var v in currentRecord) {
-    if (v != 'time' && v != 'logsState') {
+  const currentRecord = getCurrent(state);
+  for (const v in currentRecord) {
+    if (v !== 'time' && v !== 'logsState') {
       newState[v] = currentRecord[v];
     }
   }
@@ -532,7 +532,7 @@ function _current (state) {
  * @return {object} refined query
  * */
 function refineQuery (agreementId, stateType, query) {
-  var refinedQuery = {};
+  const refinedQuery = {};
   refinedQuery.stateType = stateType;
   refinedQuery.agreementId = agreementId;
 
@@ -567,7 +567,7 @@ function refineQuery (agreementId, stateType, query) {
  * @return {String} mongo projection
  * */
 function projectionBuilder (stateType, query) {
-  var singular = {
+  const singular = {
     guarantees: 'guarantee',
     metrics: 'metric',
     quotas: 'quota',
@@ -575,24 +575,24 @@ function projectionBuilder (stateType, query) {
     pricing: 'pricing',
     agreement: 'agreement'
   };
-  var projection = {};
-  var singularStateType = singular[stateType];
+  const projection = {};
+  const singularStateType = singular[stateType];
   if (!singularStateType) {
     return logger.error("projectionBuilder error: stateType '%s' is not expected", stateType);
   }
 
-  var propValue = null;
-  var propName = null;
+  let propValue = null;
+  let propName = null;
   // iterate over element in the query (scope, period...)
-  for (var v in query) {
+  for (const v in query) {
     if (query[v] instanceof Object) {
-      var queryComponent = query[v];
+      const queryComponent = query[v];
       // if it is an object we iterate over it (e.g. period.*)
-      for (var qC in queryComponent) {
+      for (const qC in queryComponent) {
         propValue = null;
         propName = v + '.' + qC;
         propValue = queryComponent[qC];
-        if (propValue != '*') {
+        if (propValue !== '*') {
           projection[propName] = propValue;
         }
       }
@@ -601,7 +601,7 @@ function projectionBuilder (stateType, query) {
       propValue = null;
       propName = v;
       propValue = query[v];
-      if (propValue != '*') {
+      if (propValue !== '*') {
         projection[propName] = propValue;
       }
     }

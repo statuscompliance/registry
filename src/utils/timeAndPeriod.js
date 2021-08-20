@@ -39,7 +39,6 @@ module.exports = {
   convertPeriod: _convertPeriod
 };
 
-
 /**
  * This method returns a set of periods which are based on a window parameter.
  * @param {AgreementModel} agreement agreement model
@@ -48,14 +47,13 @@ module.exports = {
  * @alias module:utils.getPeriods
  * */
 function _getPeriods (agreement, window) {
+  const from = new Date(window.initial);
+  const to = new Date();
 
-  var from = new Date(window.initial);
-  var to = new Date();
+  const Wfrom = new Date(window.from);
+  const Wto = window.end ? new Date(window.end) : new Date();
 
-  var Wfrom = new Date(window.from);
-  var Wto = window.end ? new Date(window.end) : new Date();
-
-  var dates = gPeriods.getDates(from, to, window.period, Wto);
+  const dates = gPeriods.getDates(from, to, window.period, Wto);
   return gPeriods.getPeriods(dates, agreement.context.validity.timeZone, true, Wfrom, Wto);
 }
 

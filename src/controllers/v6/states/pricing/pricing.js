@@ -30,7 +30,7 @@ const logger = governify.getLogger().tag('pricing');
 const stateManager = require('../../../../stateManager/v6/state-manager.js');
 const utils = require('../../../../utils');
 
-var Error = utils.errors.Error;
+const Error = utils.errors.Error;
 const Query = utils.Query;
 
 /**
@@ -52,17 +52,17 @@ module.exports = {
  * @alias module:pricing.PricingBillingPenaltiesGET
  * */
 function _PricingBillingPenaltiesGET (req, res) {
-  var args = req.swagger.params;
+  const args = req.swagger.params;
 
   logger.warn(JSON.stringify(args));
-  var agreementId = args.agreement.value;
-  var query = new Query(req.query);
+  const agreementId = args.agreement.value;
+  const query = new Query(req.query);
   logger.info('New request to get pricing state for agreementId = ' + agreementId);
 
   stateManager({
     id: agreementId
   }).then(function (manager) {
-    var validation = utils.validators.pricingQuery(query);
+    const validation = utils.validators.pricingQuery(query);
     if (!validation.valid) {
       logger.error('Query validation error');
       res.status(400).json(new Error(400, validation));

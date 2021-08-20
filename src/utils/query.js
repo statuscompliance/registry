@@ -54,10 +54,10 @@ module.exports = class Query {
   }
 
   static parseToQueryParams (object, root) {
-    var string = '';
+    let string = '';
     // For each field in object
-    for (var f in object) {
-      var field = object[f];
+    for (let f in object) {
+      const field = object[f];
       // Check if it is an Object, an Array or a literal value
       if (field instanceof Object && !(field instanceof Array)) {
         // If it is an object do recursive
@@ -90,14 +90,14 @@ module.exports = class Query {
  * @param {String} filter Name for filtering
  */
 function addComplexParameter (args, filter) {
-  var queryObject = {};
+  const queryObject = {};
   Object.keys(args).forEach((e) => {
     let name = e.split('.');
 
-    var auxQueryObject = {};
-    if (e.indexOf(filter) !== -1 && name[0] == filter) {
+    const auxQueryObject = {};
+    if (e.indexOf(filter) !== -1 && name[0] === filter) {
       if (name.length > 2) {
-        var fieldName = name[1];
+        const fieldName = name[1];
         name.splice(0, 1);
         auxQueryObject[name.join('.')] = args[e];
         queryObject[fieldName] = addComplexParameter(auxQueryObject, name[0]);

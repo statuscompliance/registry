@@ -64,8 +64,8 @@ function _processParallelPromises (manager, promisesArray, result, res, streamin
       Promise.settle(promisesArray).then(function (promisesResults) {
         try {
           if (promisesResults.length > 0) {
-            for (var r in promisesResults) {
-              var onePromiseResults = promisesResults[r];
+            for (const r in promisesResults) {
+              const onePromiseResults = promisesResults[r];
               if (onePromiseResults.isFulfilled()) {
                 onePromiseResults.value().forEach(function (value) {
                   if (manager) {
@@ -78,7 +78,7 @@ function _processParallelPromises (manager, promisesArray, result, res, streamin
             }
             resolve(result);
           } else {
-            var err = 'Error processing Promises: empty result';
+            const err = 'Error processing Promises: empty result';
             logger.error(err);
             reject(err.toString());
           }
@@ -96,8 +96,8 @@ function _processParallelPromises (manager, promisesArray, result, res, streamin
     Promise.settle(promisesArray).then(function (promisesResults) {
       try {
         if (promisesResults.length > 0) {
-          for (var r in promisesResults) {
-            var onePromiseResults = promisesResults[r];
+          for (const r in promisesResults) {
+            const onePromiseResults = promisesResults[r];
             if (onePromiseResults.isFulfilled()) {
               onePromiseResults.value().forEach(function (value) {
                 if (manager) {
@@ -114,7 +114,7 @@ function _processParallelPromises (manager, promisesArray, result, res, streamin
             res.json(result);
           }
         } else {
-          var err = 'Error processing Promises: empty result';
+          const err = 'Error processing Promises: empty result';
           logger.error(err);
           res.status(500).json(new ErrorModel(500, err));
         }
@@ -147,8 +147,8 @@ function _processSequentialPromises (type, manager, queries, result, res, stream
     return new Promise(function (resolve, reject) {
       Promise.each(queries, function (query) {
         return manager.get(type, query, forceUpdate).then(function (states) {
-          for (var i in states) {
-            var state = states[i];
+          for (const i in states) {
+            const state = states[i];
             result.push(manager.current(state));
           }
         });
@@ -165,8 +165,8 @@ function _processSequentialPromises (type, manager, queries, result, res, stream
     // Controller mode using streaming
     Promise.each(queries, function (query) {
       return manager.get(type, query, forceUpdate).then(function (states) {
-        for (var i in states) {
-          var state = states[i];
+        for (const i in states) {
+          const state = states[i];
           // feeding stream
           result.push(manager.current(state));
         }

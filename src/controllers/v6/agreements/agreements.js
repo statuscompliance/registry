@@ -71,7 +71,7 @@ function _agreementsPOST (args, res) {
       logger.error(err.toString());
       res.status(500).json(new ErrorModel(500, err));
     } else {
-      var agreement = new db.models.AgreementModel(schema);
+      const agreement = new db.models.AgreementModel(schema);
       agreement.save(function (err) {
         if (err) {
           logger.error('Mongo error saving agreement: ' + err.toString());
@@ -81,7 +81,7 @@ function _agreementsPOST (args, res) {
           logger.info('Initializing agreement state');
           // Initialize state
           agreementManager.initializeState(schema, function (st) {
-            var state = new db.models.StateModel(st);
+            const state = new db.models.StateModel(st);
             state.save(function (err) {
               if (err) {
                 logger.error('Mongo error saving state: ' + err.toString());
@@ -110,7 +110,7 @@ function _agreementsPOST (args, res) {
  * */
 function _agreementsDELETE (args, res) {
   logger.info('New request to DELETE all agreements');
-  var AgreementModel = db.models.AgreementModel;
+  const AgreementModel = db.models.AgreementModel;
   AgreementModel.remove({}, function (err) {
     if (!err) {
       logger.info('Deleted all agreements');
@@ -135,7 +135,7 @@ function _agreementsGET (args, res) {
      * namespace (String)
      **/
   logger.info('New request to GET agreements agreements/agreements.js');
-  var AgreementModel = db.models.AgreementModel;
+  const AgreementModel = db.models.AgreementModel;
   AgreementModel.find(function (err, agreements) {
     if (err) {
       logger.error(err.toString());
@@ -155,7 +155,7 @@ function _agreementsGET (args, res) {
  * */
 function _agreementIdGET (args, res) {
   logger.info('New request to GET agreement with id = ' + args.agreement.value);
-  var AgreementModel = db.models.AgreementModel;
+  const AgreementModel = db.models.AgreementModel;
   AgreementModel.findOne({
     id: args.agreement.value
   }, function (err, agreement) {
@@ -183,9 +183,9 @@ function _agreementIdGET (args, res) {
  * */
 function _agreementIdDELETE (args, res) {
   logger.info('New request to DELETE agreement');
-  var agreementId = args.agreement.value;
+  const agreementId = args.agreement.value;
   if (agreementId) {
-    var AgreementModel = db.models.AgreementModel;
+    const AgreementModel = db.models.AgreementModel;
     AgreementModel.remove({
       id: agreementId
     }, function (err) {
@@ -212,7 +212,7 @@ function _agreementIdDELETE (args, res) {
  * @alias module:agreement.agreementsAgreementTermsGuaranteesGET
  * */
 function _agreementsAgreementTermsGuaranteesGET (args, res) {
-  var AgreementModel = db.models.AgreementModel;
+  const AgreementModel = db.models.AgreementModel;
   AgreementModel.find({
     id: args.agreement.value
   }, function (err, agreement) {
@@ -235,7 +235,7 @@ function _agreementsAgreementTermsGuaranteesGET (args, res) {
  * @alias module:agreement.agreementsAgreementTermsGuaranteesGuaranteeGET
  * */
 function _agreementsAgreementTermsGuaranteesGuaranteeGET (args, res) {
-  var AgreementModel = db.models.AgreementModel;
+  const AgreementModel = db.models.AgreementModel;
   AgreementModel.find({
     id: args.agreement.value
   }, function (err, agreement) {
@@ -244,7 +244,7 @@ function _agreementsAgreementTermsGuaranteesGuaranteeGET (args, res) {
       res.end();
     }
     if (agreement.length === 1) {
-      var guarantee = agreement[0].terms.guarantees.filter(function (guarantee) {
+      const guarantee = agreement[0].terms.guarantees.filter(function (guarantee) {
         return guarantee.id === args.guarantee.value;
       });
       res.setHeader('Content-Type', 'application/json');

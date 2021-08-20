@@ -38,8 +38,8 @@ const stateManager = require('../../../../stateManager/v6/state-manager');
 const gUtils = require('./gUtils.js');
 const utils = require('../../../../utils');
 
-var Query = utils.Query;
-var controllerErrorHandler = utils.errors.controllerErrorHandler;
+const Query = utils.Query;
+const controllerErrorHandler = utils.errors.controllerErrorHandler;
 
 /**
  * Guarantees module
@@ -66,12 +66,12 @@ function _getGuarantees (agreementId, guaranteeId, query, forceUpdate) {
     stateManager({
       id: agreementId
     }).then(function (manager) {
-      var guaranteesQueries = [];
-      var validationErrors = [];
+      const guaranteesQueries = [];
+      const validationErrors = [];
       manager.agreement.terms.guarantees.forEach(function (guarantee) {
-        var queryM = gUtils.buildGuaranteeQuery(guarantee.id, query.from, query.to);
+        const queryM = gUtils.buildGuaranteeQuery(guarantee.id, query.from, query.to);
 
-        var validation = utils.validators.guaranteeQuery(queryM, guarantee.id, guarantee);
+        const validation = utils.validators.guaranteeQuery(queryM, guarantee.id, guarantee);
         if (!validation.valid) {
           validation.guarantee = guarantee.id;
           validationErrors.push(validation);
@@ -103,13 +103,13 @@ function _getGuarantees (agreementId, guaranteeId, query, forceUpdate) {
  * @alias module:guarantees.guaranteesGET
  * */
 function _guaranteesGET (req, res) {
-  var agreementId = req.swagger.params.agreement.value;
-  var from = req.query.from;
-  var to = req.query.to;
-  var newPeriodsFromGuarantees = req.query.newPeriodsFromGuarantees ? (req.query.newPeriodsFromGuarantees === 'true') : true;
+  const agreementId = req.swagger.params.agreement.value;
+  const from = req.query.from;
+  const to = req.query.to;
+  const newPeriodsFromGuarantees = req.query.newPeriodsFromGuarantees ? (req.query.newPeriodsFromGuarantees === 'true') : true;
   logger.info('New request to GET guarantees - With new periods from guarantees: ' + newPeriodsFromGuarantees);
 
-  var result;
+  let result;
   if (config.streaming) {
     logger.info('### Streaming mode ###');
 
@@ -125,15 +125,15 @@ function _guaranteesGET (req, res) {
     id: agreementId
   }).then(function (manager) {
     logger.info('Getting state of guarantees...');
-    var validationErrors = [];
+    const validationErrors = [];
     if (config.parallelProcess.guarantees) {
       logger.info('### Process mode = PARALLEL ###');
 
-      var guaranteesPromises = [];
+      const guaranteesPromises = [];
       manager.agreement.terms.guarantees.forEach(function (guarantee) {
-        var query = new Query(req.query);
+        const query = new Query(req.query);
 
-        var validation = utils.validators.guaranteeQuery(query, guarantee.id, guarantee);
+        const validation = utils.validators.guaranteeQuery(query, guarantee.id, guarantee);
         if (!validation.valid) {
           validation.guarantee = guarantee.id;
           validationErrors.push(validation);
@@ -153,15 +153,15 @@ function _guaranteesGET (req, res) {
       }
     } else {
       logger.info('### Process mode = SEQUENTIAL ###');
-      const guaranteesQueries =  manager.agreement.terms.guarantees.reduce(function (acc,guarantee) {
+      const guaranteesQueries = manager.agreement.terms.guarantees.reduce(function (acc, guarantee) {
         /* Process each guarantee individually, to create queries for every one */
-        var guaranteeDefinition = manager.agreement.terms.guarantees.find((e) => {
+        const guaranteeDefinition = manager.agreement.terms.guarantees.find((e) => {
           return guarantee.id === e.id;
         });
-        var requestWindow = guaranteeDefinition.of[0].window; // Get the window of the current guarantee
-        var periods;
+        const requestWindow = guaranteeDefinition.of[0].window; // Get the window of the current guarantee
+        let periods;
         /* Create all the queries corresponding for the specified period and the current guarantee */
-        var allQueries = [];
+        let allQueries = [];
         if (from && to) {
           requestWindow.from = from;
           requestWindow.end = to;
@@ -178,9 +178,9 @@ function _guaranteesGET (req, res) {
           allQueries.push(gUtils.buildGuaranteeQuery(guarantee.id));
         }
         /* Validate queries and add to the list */
-        var queries = [...acc];
-        for (var query of allQueries) {
-          var validation = utils.validators.guaranteeQuery(query, guarantee.id);
+        const queries = [...acc];
+        for (const query of allQueries) {
+          const validation = utils.validators.guaranteeQuery(query, guarantee.id);
           if (!validation.valid) {
             validation.guarantee = guarantee.id;
             validationErrors.push(validation);
@@ -188,8 +188,8 @@ function _guaranteesGET (req, res) {
             queries.push(query);
           }
         }
-        return queries
-      },[]);
+        return queries;
+      }, []);
       if (validationErrors.length === 0) {
         if (req.query.forceUpdate == 'true') {
           utils.promise.processSequentialPromises('guarantees', manager, guaranteesQueries, result, res, config.streaming, true);
@@ -215,14 +215,14 @@ function _guaranteesGET (req, res) {
  * */
 function _guaranteeIdGET (req, res) {
   logger.info('New request to GET guarantee');
-  var args = req.swagger.params;
-  var agreementId = args.agreement.value;
-  var query = new Query(req.query);
-  var guaranteeId = args.guarantee.value;
-  var forceUpdate = req.query.forceupdate ? req.query.forceupdate : 'false';
-  var from = req.query.from;
-  var to = req.query.to;
-  var ret;
+  const args = req.swagger.params;
+  const agreementId = args.agreement.value;
+  const query = new Query(req.query);
+  const guaranteeId = args.guarantee.value;
+  const forceUpdate = req.query.forceupdate ? req.query.forceupdate : 'false';
+  const from = req.query.from;
+  const to = req.query.to;
+  let ret;
   if (config.streaming) {
     logger.info('### Streaming mode ###');
     res.setHeader('content-type', 'application/json; charset=utf-8');
@@ -235,13 +235,13 @@ function _guaranteeIdGET (req, res) {
   stateManager({
     id: agreementId
   }).then(function (manager) {
-    var guaranteeDefinition = manager.agreement.terms.guarantees.find((e) => {
+    const guaranteeDefinition = manager.agreement.terms.guarantees.find((e) => {
       return guaranteeId === e.id;
     });
-    var requestWindow = guaranteeDefinition.of[0].window; // Create the window for the current request
+    const requestWindow = guaranteeDefinition.of[0].window; // Create the window for the current request
     logger.info('Iniciating guarantee (' + guaranteeId + ') calculation with window' + JSON.stringify(requestWindow));
-    var periods;
-    var allQueries = [];
+    let periods;
+    let allQueries = [];
     if (from && to) {
       requestWindow.initial = from;
       requestWindow.end = to;
@@ -253,10 +253,10 @@ function _guaranteeIdGET (req, res) {
     } else {
       allQueries.push(gUtils.buildGuaranteeQuery(guaranteeId));
     }
-    var results = [];
+    const results = [];
     logger.info('Processing ' + allQueries.length + ' queries for the request');
     Promise.each(allQueries, function (queryInd) {
-      var validation = utils.validators.guaranteeQuery(queryInd, guaranteeId, guaranteeDefinition);
+      const validation = utils.validators.guaranteeQuery(queryInd, guaranteeId, guaranteeDefinition);
       if (!validation.valid) {
         const errorString = 'Query validation error';
         return controllerErrorHandler(res, 'guarantees-controller', '_guaranteeIdGET', 400, errorString);
@@ -267,7 +267,7 @@ function _guaranteeIdGET (req, res) {
               ret.push(manager.current(element));
             });
           } else {
-            var result = success.map(function (element) {
+            const result = success.map(function (element) {
               return manager.current(element);
             });
 
@@ -299,19 +299,19 @@ function _guaranteeIdGET (req, res) {
  * @alias module:guarantees.guaranteeIdPenaltyPOST
  * */
 function _guaranteeIdPenaltyGET (req, res) {
-  var args = req.swagger.params;
-  var guaranteeId = args.guarantee.value;
-  var agreementId = args.agreement.value;
-  var query = new Query(req.query);
+  const args = req.swagger.params;
+  const guaranteeId = args.guarantee.value;
+  const agreementId = args.agreement.value;
+  const query = new Query(req.query);
   logger.info('New request to GET penalty of ' + guaranteeId);
 
-  var offset = query.parameters.offset;
+  const offset = query.parameters.offset;
   logger.info('With offset = ' + offset);
 
   stateManager({
     id: agreementId
   }).then(function (manager) {
-    var validation = utils.validators.metricQuery(query, guaranteeId, manager.agreement.terms.guarantees.find((e) => {
+    const validation = utils.validators.metricQuery(query, guaranteeId, manager.agreement.terms.guarantees.find((e) => {
       return e.id === guaranteeId;
     }));
 
@@ -319,15 +319,15 @@ function _guaranteeIdPenaltyGET (req, res) {
       logger.error('Query validation error');
       res.status(400).json(new ErrorModel(400, validation));
     } else {
-      var periods = utils.time.getPeriods(manager.agreement, query.window);
-      var result = [];
+      const periods = utils.time.getPeriods(manager.agreement, query.window);
+      const result = [];
 
       Promise.each(periods, function (element) {
-        var metricPeriod = {
+        const metricPeriod = {
           from: element.from.toISOString(),
           to: element.to.toISOString()
         };
-        var p = {
+        const p = {
           from: element.from.subtract(Math.abs(offset), 'months').toISOString(),
           to: element.to.subtract(Math.abs(offset), 'months').toISOString()
         };
@@ -336,8 +336,8 @@ function _guaranteeIdPenaltyGET (req, res) {
         if (!query.log) {
           throw new Error('Logs fields is required');
         }
-        var logId = Object.keys(query.log)[0];
-        var log = manager.agreement.context.definitions.logs[logId];
+        const logId = Object.keys(query.log)[0];
+        const log = manager.agreement.context.definitions.logs[logId];
 
         query.scope = utils.scopes.computerToRegistryParser(query.scope, log.scopes);
         logger.info('Query after parse: ' + JSON.stringify(query, null, 2));
@@ -347,17 +347,17 @@ function _guaranteeIdPenaltyGET (req, res) {
           scope: query.scope,
           period: p
         }).then(function (success) {
-          var ret = [];
-          for (var ie in success) {
-            var e = success[ie];
+          const ret = [];
+          for (const ie in success) {
+            const e = success[ie];
             if (moment(e.period.from).isSameOrAfter(p.from) && moment(e.period.to).isSameOrBefore(p.to) /* && gUtils.checkQuery(e, query) */) {
               ret.push(e);
             }
           }
-          for (var i in ret) {
+          for (const i in ret) {
             if (manager.current(ret[i]).penalties) {
-              var penalties = manager.current(ret[i]).penalties;
-              for (var penaltyI in penalties) {
+              const penalties = manager.current(ret[i]).penalties;
+              for (const penaltyI in penalties) {
                 result.push(new gUtils.penaltyMetric(ret[i].scope, query.parameters, metricPeriod, query.logs, penaltyI, penalties[penaltyI]));
               }
             }
