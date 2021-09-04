@@ -57,7 +57,7 @@ function _getPeriods (agreement, window) {
   const Wfrom = new Date(window.from ? window.from : from);
   const Wto = window.end ? new Date(window.end) : new Date();
 
-  const dates = gPeriods.getDates(from, to, window.period ? window.period : "monthly", Wto);
+  const dates = gPeriods.getDates(from, to, window.period ? window.period : "monthly", Wto, window.rules);
   return gPeriods.getPeriods(dates, agreement.context.validity.timeZone, true, Wfrom, Wto);
 }
 
