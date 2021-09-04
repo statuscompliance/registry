@@ -47,13 +47,17 @@ module.exports = {
  * @alias module:utils.getPeriods
  * */
 function _getPeriods (agreement, window) {
-  const from = new Date(window.initial);
+  if (!window) {
+    window = {};
+  }
+
+  const from = new Date(window.initial ? window.initial : agreement.context.validity.initial);
   const to = new Date();
 
-  const Wfrom = new Date(window.from);
+  const Wfrom = new Date(window.from ? window.from : from);
   const Wto = window.end ? new Date(window.end) : new Date();
 
-  const dates = gPeriods.getDates(from, to, window.period, Wto);
+  const dates = gPeriods.getDates(from, to, window.period ? window.period : "monthly", Wto);
   return gPeriods.getPeriods(dates, agreement.context.validity.timeZone, true, Wfrom, Wto);
 }
 

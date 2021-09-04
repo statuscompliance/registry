@@ -128,7 +128,7 @@ function _billsGET (req, res) {
             let periods;
             if (from && to) {
               const window = {
-                initial: from,
+                from: from,
                 end: to
               };
               periods = utils.time.getPeriods(agreement, window);
