@@ -106,6 +106,7 @@ function _guaranteesGET (req, res) {
   const agreementId = req.swagger.params.agreement.value;
   const from = req.query.from;
   const to = req.query.to;
+  const lastPeriod = req.query.lastPeriod ? (req.query.lastPeriod === 'true') : true;
   const newPeriodsFromGuarantees = req.query.newPeriodsFromGuarantees ? (req.query.newPeriodsFromGuarantees === 'true') : true;
   logger.info('New request to GET guarantees - With new periods from guarantees: ' + newPeriodsFromGuarantees);
 
@@ -170,12 +171,18 @@ function _guaranteesGET (req, res) {
           } else {
             periods = [{ from: new Date(from).toISOString(), to: new Date(to).toISOString() }];
           }
+
           // Create query for every period
           allQueries = periods.map(function (period) {
             return gUtils.buildGuaranteeQuery(guarantee.id, period.from, period.to);
           });
         } else {
-          allQueries.push(gUtils.buildGuaranteeQuery(guarantee.id));
+          if(lastPeriod){
+            const period = utils.time.getLastPeriod(manager.agreement, requestWindow);
+            allQueries.push(gUtils.buildGuaranteeQuery(guarantee.id, period.from, period.to));
+          }else{
+            allQueries.push(guarantee.id);
+          }
         }
         /* Validate queries and add to the list */
         const queries = [...acc];

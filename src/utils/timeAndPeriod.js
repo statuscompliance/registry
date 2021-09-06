@@ -35,6 +35,7 @@ const gPeriods = governify.periods;
 
 module.exports = {
   getPeriods: _getPeriods,
+  getLastPeriod: _getLastPeriod,
   periods: periods,
   convertPeriod: _convertPeriod
 };
@@ -59,6 +60,25 @@ function _getPeriods (agreement, window) {
 
   const dates = gPeriods.getDates(from, to, window.period ? window.period : "monthly", Wto, window.rules);
   return gPeriods.getPeriods(dates, agreement.context.validity.timeZone, true, Wfrom, Wto);
+}
+
+/**
+ * This method returns a set of periods which are based on a window parameter.
+ * @param {AgreementModel} agreement agreement model
+ * @param {WindowModel} window window model
+ * @return {Set} set of periods
+ * @alias module:utils.getLastPeriod
+ * */
+ function _getLastPeriod (agreement, window) {
+  if (!window) {
+    window = {};
+  }
+
+  const from = new Date(window.initial ? window.initial : agreement.context.validity.initial);
+  const to = new Date();
+
+  const Wto = window.end ? new Date(window.end) : new Date();
+  return gPeriods.getLastPeriod(from, to, window.period ? window.period : "monthly", Wto, window.rules, agreement.context.validity.timeZone);
 }
 
 /**
