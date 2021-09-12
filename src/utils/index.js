@@ -30,7 +30,6 @@ const diff = require('deep-diff');
  * Utils module.
  * @module utils
  * @requires deep-diff
- * @requires moment
  * */
 
 module.exports = {
@@ -90,8 +89,8 @@ module.exports = {
  * @alias module:utils.containsObject
  * */
 function _containsObject (obj, array) {
-  for (var i = 0; i < array.length; i++) {
-    var difs = diff(array[i], obj);
+  for (let i = 0; i < array.length; i++) {
+    const difs = diff(array[i], obj);
     if (difs === undefined || difs === null) {
       return i;
     }

@@ -26,13 +26,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 'use strict';
 const governify = require('governify-commons');
 const config = governify.configurator.getConfig('main');
-//const logger = governify.getLogger().tag('mailer');
+// const logger = governify.getLogger().tag('mailer');
 
 const nodemailer = require('nodemailer');
 const sgTransport = require('nodemailer-sendgrid-transport');
 
 // it is necessary to create this object since it is passed to sendGrid transport nodemailer
-var options = {
+const options = {
   auth: {
     api_key: config.email.mailerApiKey
   }

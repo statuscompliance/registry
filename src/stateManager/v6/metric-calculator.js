@@ -63,7 +63,7 @@ function processMetric (agreement, metricId, metricQuery) {
         return reject('Metric ' + metricId + ' not found.');
       }
 
-      var collector = metric.collector;
+      const collector = metric.collector;
 
       /** ### BUILD COMPUTER REQUEST QUERY ###**/
       var collectorQuery = {};
@@ -123,7 +123,7 @@ function processMetric (agreement, metricId, metricQuery) {
           data: { config: collector.config, metric: metric.measure }
         }
         ).catch(err => {
-          var errorString = 'Error in Collector response ' + err.response.status + ':' + err.response.data;
+          const errorString = 'Error in Collector response ' + err.response.status + ':' + err.response.data;
           return promiseErrorHandler(reject, 'metrics', processMetric.name, err.response.status, errorString);
         });
         const collectorResponse = requestMetric.data;
@@ -139,8 +139,8 @@ function processMetric (agreement, metricId, metricQuery) {
             monthMetrics.forEach(function (metricState) {
               if (metricState.log && metric.scope) {
                 // Getting the correct log for mapping scope
-                var logId = Object.keys(metricState.log)[0];
-                var log = agreement.context.definitions.logs[logId];
+                const logId = Object.keys(metricState.log)[0];
+                const log = agreement.context.definitions.logs[logId];
                 // doing scope mapping
                 metricState.scope = utils.scopes.computerToRegistryParser(metricState.scope, log.scopes);
               }
@@ -167,7 +167,7 @@ function processMetric (agreement, metricId, metricQuery) {
           return reject('Metric ' + metricId + ' not found.');
         }
 
-        var metricCollectorObject = metric.collector;
+        const metricCollectorObject = metric.collector;
 
         /** ### BUILD COMPUTER REQUEST QUERY ###**/
         var collectorQuery = {};
@@ -179,15 +179,15 @@ function processMetric (agreement, metricId, metricQuery) {
         }
 
         // Select logs data. If metric has not log, select by default log.
-        var logDefinition, logId;
+        let logDefinition, logId;
         if (metric.log) {
           logId = Object.keys(metric.log)[0]; // control this potential error
           if (!logId) { throw new Error('The log field of metric is not well defined in the agreement'); }
           logDefinition = metric.log[logId];
         } else {
           // Search default log
-          var agLogs = agreement.context.definitions.logs;
-          for (var l in agLogs) {
+          const agLogs = agreement.context.definitions.logs;
+          for (const l in agLogs) {
             if (agLogs[l].default) {
               logId = l;
               logDefinition = agLogs[l];
@@ -225,7 +225,7 @@ function processMetric (agreement, metricId, metricQuery) {
 
         // ### PREPARE REQUEST ###
         // Build URL query that will use on computer request
-        var urlParams = Query.parseToQueryParams(collectorQuery);
+        const urlParams = Query.parseToQueryParams(collectorQuery);
         logger.debug('Sending URL params to computer:', urlParams);
         var compositeResponse = [];
         logger.info('Sending request to computer with params: %s', JSON.stringify(collectorQuery, null, 2));
@@ -236,7 +236,7 @@ function processMetric (agreement, metricId, metricQuery) {
           method: 'GET',
           responseType: 'stream'
         }).catch(err => {
-          var errorString = 'Error in PPINOT Computer response ' + err.response.status + ':' + err.response.data;
+          const errorString = 'Error in PPINOT Computer response ' + err.response.status + ':' + err.response.data;
           return promiseErrorHandler(reject, 'metrics', processMetric.name, err.response.status, errorString);
         });
         const requestStream = requestMetric.data;
@@ -248,8 +248,8 @@ function processMetric (agreement, metricId, metricQuery) {
               monthMetrics.forEach(function (metricState) {
                 if (metricState.log && metric.scope) {
                   // Getting the correct log for mapping scope
-                  var logId = Object.keys(metricState.log)[0];
-                  var log = agreement.context.definitions.logs[logId];
+                  const logId = Object.keys(metricState.log)[0];
+                  const log = agreement.context.definitions.logs[logId];
                   // doing scope mapping
                   metricState.scope = utils.scopes.computerToRegistryParser(metricState.scope, log.scopes);
                 }
@@ -290,7 +290,7 @@ function processMetric (agreement, metricId, metricQuery) {
 function getComputationV2 (infrastructurePath, computationURL, ttl) {
   return new Promise((resolve, reject) => {
     try {
-      if (ttl < 0) { reject('Retries time surpased TTL.'); return;}
+      if (ttl < 0) { reject('Retries time surpased TTL.'); return; }
       const realTimeout = 1000; // Minimum = firstTimeout
       const firstTimeout = 500;
       setTimeout(async () => {

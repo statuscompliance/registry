@@ -24,7 +24,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 'use strict';
-const moment = require('moment-timezone');
+const governify = require('governify-commons');
+const gPeriods = governify.periods;
 
 /**
  * Utils module.
@@ -34,78 +35,51 @@ const moment = require('moment-timezone');
 
 module.exports = {
   getPeriods: _getPeriods,
+  getLastPeriod: _getLastPeriod,
   periods: periods,
   convertPeriod: _convertPeriod
 };
 
 /**
- * Check if an array contains a given object
- * @param {AgreementModel} agreement object to search for
- * @param {WindowModel} window array to search into
- * @alias module:utils.getPeriodsFrom
+ * This method returns a set of periods which are based on a window parameter.
+ * @param {AgreementModel} agreement agreement model
+ * @param {WindowModel} window window model
+ * @return {Set} set of periods
+ * @alias module:utils.getPeriods
  * */
 function _getPeriods (agreement, window) {
-  var periods = [];
   if (!window) {
     window = {};
   }
-  var slot = slots[window.period || 'monthly'];
-  var Wfrom = moment.utc(moment.tz(window.initial ? window.initial : agreement.context.validity.initial, agreement.context.validity.timeZone));
-  var Wto = window.end ? moment.utc(moment.tz(window.end, agreement.context.validity.timeZone)) : moment.utc();
 
-  var from = moment.utc(moment.tz(Wfrom, agreement.context.validity.timeZone));
-  var to = moment.utc(moment.tz(Wfrom, agreement.context.validity.timeZone).add(slot.count, slot.unit).subtract(1, 'milliseconds'));
+  const from = new Date(window.initial ? window.initial : agreement.context.validity.initial);
+  const to = new Date();
 
-  while (!to || to.isSameOrBefore(Wto)) {
-    periods.push({
-      from: from,
-      to: to
-    });
-    from = moment.utc(moment.tz(from, agreement.context.validity.timeZone).add(slot.count, slot.unit));
-    to = moment.utc(moment.tz(from, agreement.context.validity.timeZone).add(slot.count, slot.unit).subtract(1, 'milliseconds'));
-  }
+  const Wfrom = new Date(window.from ? window.from : from);
+  const Wto = window.end ? new Date(window.end) : new Date();
 
-  return periods;
+  const dates = gPeriods.getDates(from, to, window.period ? window.period : "monthly", Wto, window.rules);
+  return gPeriods.getPeriods(dates, agreement.context.validity.timeZone, true, Wfrom, Wto);
 }
 
-var slots = {
-  quarterly: {
-    count: 3,
-    unit: 'months'
-  },
-  monthly: {
-    count: 1,
-    unit: 'months'
-  },
-  daily: {
-    count: 1,
-    unit: 'day'
-  },
-  hourly: {
-    count: 1,
-    unit: 'hour'
-  },
-  minutely: {
-    count: 1,
-    unit: 'minute'
-  },
-  secondly: {
-    count: 1,
-    unit: 'second'
-  },
-  weekly: {
-    count: 1,
-    unit: 'week'
-  },
-  biweekly: {
-    count: 2,
-    unit: 'week'
-  },
-  yearly: {
-    count: 1,
-    unit: 'years'
+/**
+ * This method returns a set of periods which are based on a window parameter.
+ * @param {AgreementModel} agreement agreement model
+ * @param {WindowModel} window window model
+ * @return {Set} set of periods
+ * @alias module:utils.getLastPeriod
+ * */
+ function _getLastPeriod (agreement, window) {
+  if (!window) {
+    window = {};
   }
-};
+
+  const from = new Date(window.initial ? window.initial : agreement.context.validity.initial);
+  const to = new Date();
+
+  const Wto = window.end ? new Date(window.end) : new Date();
+  return gPeriods.getLastPeriod(from, to, window.period ? window.period : "monthly", Wto, window.rules, agreement.context.validity.timeZone);
+}
 
 /**
  * Periods in milliseconds

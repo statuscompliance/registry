@@ -63,7 +63,7 @@ function _getRouterOption (version) {
  * @alias module:swagger.getSwaggerDoc
  * */
 function _getSwaggerDoc (version) {
-  var spec = fs.readFileSync('./src/api/swaggerV' + version + '.yaml', 'utf8');
+  const spec = fs.readFileSync('./src/api/swaggerV' + version + '.yaml', 'utf8');
   return jsyaml.safeLoad(spec);
 }
 

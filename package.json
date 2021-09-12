@@ -32,6 +32,7 @@
     "nodemailer": "^6.6.0",
     "nodemailer-sendgrid-transport": "^0.2.0",
     "oas-tools": "^2.1.8",
+    "rrule": "^2.6.8",
     "swagger-tools": "^0.10.3"
   },
   "devDependencies": {

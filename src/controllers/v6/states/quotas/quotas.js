@@ -50,7 +50,7 @@ module.exports = {
  * */
 function _quotasGET (args, res) {
   logger.info('New request to GET quotas');
-  var agreementId = args.agreement.value;
+  const agreementId = args.agreement.value;
 
   stateManager({
     id: agreementId
@@ -71,8 +71,8 @@ function _quotasGET (args, res) {
  * */
 function _quotasIdGET (args, res) {
   logger.info('New request to GET quota');
-  var agreementId = args.agreement.value;
-  var quotaId = args.quota.value;
+  const agreementId = args.agreement.value;
+  const quotaId = args.quota.value;
 
   stateManager({
     id: agreementId

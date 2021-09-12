@@ -50,7 +50,7 @@ module.exports = {
  * */
 function _ratesGET (args, res) {
   logger.info('New request to GET rates');
-  var agreementId = args.agreement.value;
+  const agreementId = args.agreement.value;
 
   stateManager({
     id: agreementId
@@ -71,8 +71,8 @@ function _ratesGET (args, res) {
  * */
 function _ratesIdGET (args, res) {
   logger.info('New request to GET rate');
-  var agreementId = args.agreement.value;
-  var rateId = args.rate.value;
+  const agreementId = args.agreement.value;
+  const rateId = args.rate.value;
 
   stateManager({
     id: agreementId

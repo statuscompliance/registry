@@ -43,10 +43,9 @@ module.exports = {
  * @param {String} guaranteeId Id of guarantee which will be calculated
  * @param {ISODateString} from YYYY-MM-DDTHH:mm:ss.SSSZ
  * @return {ISODateString} to YYYY-MM-DDTHH:mm:ss.SSSZ
- * @alias module:gUtils.getPeriods
  * */
 function _buildGuaranteeQuery (guaranteeId, from, to) {
-  var query = {};
+  const query = {};
   query.guarantee = guaranteeId;
   if (from) {
     query.period = {};
@@ -86,13 +85,13 @@ function _PenaltyMetric (scope, parameters, period, logs, penaltyName, penaltyVa
  * @alias module:gUtils.checkQuery
  * */
 function _checkQuery (state, query) {
-  var ret = true;
-  for (var v in query) {
-    if (v != 'parameters' && v != 'evidences' && v != 'logs' && v != 'window') {
+  let ret = true;
+  for (const v in query) {
+    if (v !== 'parameters' && v !== 'evidences' && v !== 'logs' && v !== 'window') {
       if (query[v] instanceof Object) {
         ret = ret && _checkQuery(state[v], query[v]);
       } else {
-        if ((state[v] !== query[v] && query[v] != '*') || !state[v]) {
+        if ((state[v] !== query[v] && query[v] !== '*') || !state[v]) {
           ret = ret && false;
         }
       }

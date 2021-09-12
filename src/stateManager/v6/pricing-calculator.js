@@ -61,17 +61,17 @@ function processPricing (agreementDef, query, manager) {
   logger.info('Preparing Promise to calculate pricing states');
   return new Promise(function (resolve, reject) {
     // Get pricing definition
-    var pricingPenaltiesDef = agreementDef.terms.pricing.billing.penalties;
+    const pricingPenaltiesDef = agreementDef.terms.pricing.billing.penalties;
 
     // Initialize scope classifiers
-    var classifiers = [];
+    const classifiers = [];
 
     // Initialize penalty object that will be constructed and returned
-    var penalties = [];
+    const penalties = [];
 
     if (config.parallelProcess.guarantees) {
       // ** Parallel calculation **
-      var processGuarantees = [];
+      const processGuarantees = [];
       agreementDef.terms.guarantees.forEach(function (guarantee) {
         processGuarantees.push(manager.get('guarantees', {
           guarantee: guarantee.id,
@@ -85,10 +85,10 @@ function processPricing (agreementDef, query, manager) {
       Promise.all(processGuarantees).then(function (guaranteesStates) {
         guaranteesStates.forEach(function (guaranteeStates) {
           pricingPenaltiesDef.forEach(function (penalty) {
-            var penaltyId = Object.keys(penalty.over)[0];
-            var groupBy = Object.keys(penalty.groupBy);
+            const penaltyId = Object.keys(penalty.over)[0];
+            const groupBy = Object.keys(penalty.groupBy);
             logger.info('Calculating pricing state with values: [penalty=' + penaltyId + ', aggregatedBy=' + penalty.aggregatedBy + ', groupBy= ' + groupBy.toString() + ']');
-            for (var i = 0; i < guaranteeStates.length; i++) {
+            for (let i = 0; i < guaranteeStates.length; i++) {
               var guaranteeState = manager.current(guaranteeStates[i]);
               logger.debug('Processing guaranteeState ' + i + ' node: ' + guaranteeState.scope.node);
               var classifier = {};
@@ -100,7 +100,7 @@ function processPricing (agreementDef, query, manager) {
                 classifier.scope[group] = guaranteeState.scope[group];
               });
 
-              var cIndex = utils.containsObject(classifier, classifiers);
+              let cIndex = utils.containsObject(classifier, classifiers);
               if (cIndex == -1) {
                 cIndex = classifiers.push(classifier) - 1;
                 penalties[cIndex] = {
@@ -125,7 +125,7 @@ function processPricing (agreementDef, query, manager) {
     } else {
       // ** Sequential calculation **
       // Initialize array for guarantees states to be queried
-      var guaranteesStates = [];
+      const guaranteesStates = [];
       // Harvest (sequentially) all states of all guarantees
       Promise.each(agreementDef.terms.guarantees, function (guarantee) {
         logger.info('Getting state for guarantee = ' + guarantee.id);
@@ -150,19 +150,21 @@ function processPricing (agreementDef, query, manager) {
         // Once we have all guarantee States...
         // For each penalty in the definition of pricing/billing/penalties...
         // Generate an item in the penalties array for each serviceLine, for each activity, for each period
-        var classifiers = [];
+        const classifiers = [];
         pricingPenaltiesDef.forEach(function (penalty) {
           // initialize Id of penalty (e.g. PTOT)
-          var penaltyId = Object.keys(penalty.over)[0];
+          const penaltyId = Object.keys(penalty.over)[0];
           // initialize grouping keys (e.g. serviceLine, activity)
-          var groupBy = Object.keys(penalty.groupBy);
+          const groupBy = Object.keys(penalty.groupBy);
           logger.info('Calculating pricing state with values: [penalty=' + penaltyId + ', aggregatedBy=' + penalty.aggregatedBy + ', groupBy= ' + groupBy.toString() + ']:');
-          var periods = utils.time.getPeriods(agreementDef, query.window ? query.window : {
-            window: {}
-          });
+          const periods = utils.time.getPeriods(agreementDef, query.window
+            ? query.window
+            : {
+                window: {}
+              });
           periods.forEach(function (period) {
             // Populate scopes from groupBy (e.g. serviceLine & activity)
-            var classifier = {};
+            const classifier = {};
             classifier.scope = {};
             groupBy.forEach(function (group) {
               classifier.scope[group] = penalty.groupBy[group].default;
@@ -173,7 +175,7 @@ function processPricing (agreementDef, query, manager) {
             classifiers.push(classifier);
           });
           // For all states (of all guarantees) harvested...
-          for (var i = 0; i < guaranteesStates.length; i++) {
+          for (let i = 0; i < guaranteesStates.length; i++) {
             // Get current (most recent) record of the state.
             var guaranteeState = manager.current(guaranteesStates[i]);
             logger.debug('\t(' + i + '/' + guaranteesStates.length + ') Processing guaranteeState with scope: ');

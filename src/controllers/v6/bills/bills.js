@@ -69,14 +69,14 @@ function _billsPUT (args, res) {
       logger.error(err.toString());
       res.status(500).json(new ErrorModel(500, err));
     } else {
-      var BillsModel = db.models.BillsModel;
-      var bills = new db.models.BillsModel(schema);
+      const BillsModel = db.models.BillsModel;
+      // const bills = new db.models.BillsModel(schema);
       BillsModel.findOne({ agreementId: args.bill.value.agreementId, billId: args.bill.value.billId }, function (err, result) {
         if (err) {
           logger.error(err.toString());
           res.status(500).json(new ErrorModel(500, err));
         } else {
-          if (result && result.state == 'closed') {
+          if (result && result.state === 'closed') {
             res.status(403).send('Is not allowed to edit when state is closed.');
           } else {
             BillsModel.update({ agreementId: args.bill.value.agreementId, billId: args.bill.value.billId }, args.bill.value, { upsert: true }, function (err, result) {
@@ -107,12 +107,12 @@ function _billsGET (req, res) {
      * namespace (String)
      **/
 
-  var args = req.swagger.params;
-  var from = args.from.value;
-  var to = args.to.value;
+  const args = req.swagger.params;
+  const from = args.from.value;
+  const to = args.to.value;
   logger.info('New request to GET bills bills/bills.js');
-  var BillsModel = db.models.BillsModel;
-  var AgreementModel = db.models.AgreementModel;
+  const BillsModel = db.models.BillsModel;
+  const AgreementModel = db.models.AgreementModel;
 
   AgreementModel.findOne({ id: args.agreementId.value }, function (err, agreement) {
     if (err) {
@@ -125,27 +125,27 @@ function _billsGET (req, res) {
             logger.error(err.toString());
             res.status(500).json(new ErrorModel(500, err));
           } else {
-            var periods;
+            let periods;
             if (from && to) {
-              var window = {
-                initial: from,
+              const window = {
+                from: from,
                 end: to
               };
               periods = utils.time.getPeriods(agreement, window);
             } else {
               periods = utils.time.getPeriods(agreement);
             }
-            var billsComplete = [];
-            var billsDates = [];
-            var orderedBills = [];
-            for (var x in bills) {
-              var bill = bills[x];
+
+            const billsDates = [];
+            const orderedBills = [];
+            for (const x in bills) {
+              const bill = bills[x];
               billsDates.push(moment(bill.period.from).unix());
             }
-            for (var i in periods) {
-              var period = periods[i];
+            for (const i in periods) {
+              const period = periods[i];
               if (!billsDates.includes(moment(period.from).unix())) {
-                var standardBill = {
+                const standardBill = {
                   agreementId: args.agreementId.value,
                   billId: moment(period.from).unix() + '',
                   state: 'open',
@@ -173,7 +173,7 @@ function _billsGET (req, res) {
  * @alias module:bills.getBill
  * */
 function _getBill (agreementId, from) {
-  var BillsModel = db.models.BillsModel;
+  const BillsModel = db.models.BillsModel;
   return BillsModel.findOne({ agreementId: agreementId, 'period.from': from }, function (err, bill) {
     if (err) {
       logger.error(err.toString());
@@ -187,8 +187,8 @@ function _getBill (agreementId, from) {
  * @alias module:bills.getBill
  * */
 function _billsDELETE (req, res) {
-  var args = req.swagger.params;
-  var BillsModel = db.models.BillsModel;
+  const args = req.swagger.params;
+  const BillsModel = db.models.BillsModel;
   return BillsModel.deleteMany({ agreementId: args.agreementId.value }, function (err, bill) {
     if (err) {
       res.status(404).send('Agreement not found');

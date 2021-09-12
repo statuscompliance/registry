@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 'use strict';
 
-
 /**
  * Registry module.
  * @module registry
@@ -43,12 +42,12 @@ module.exports = {
  * @param {function} callback callback function
  * @alias module:registry.deploy
  * */
-function _deploy(configurations, commonsMiddleware, callback) {
+function _deploy (configurations, commonsMiddleware, callback) {
   const governify = require('governify-commons');
   const config = governify.configurator.getConfig('main');
 
   // Add this to the VERY top of the first file loaded in your app
-  var apm = require('elastic-apm-node').start({
+  const apm = require('elastic-apm-node').start({
     // Override service name from package.json
     // Allowed characters: a-z, A-Z, 0-9, -, _, and space
     // Override service name from package.json
@@ -149,8 +148,8 @@ function _deploy(configurations, commonsMiddleware, callback) {
   logger.info('Trying to deploy server');
   if (configurations) {
     logger.info('Reading configuration...');
-    for (var c in configurations) {
-      var prop = configurations[c];
+    for (const c in configurations) {
+      const prop = configurations[c];
       logger.info('Setting property' + c + ' with value ' + prop);
       config.setProperty(c, prop);
     }
@@ -160,7 +159,7 @@ function _deploy(configurations, commonsMiddleware, callback) {
     logger.info('Initializing app after db connection');
     if (!err) {
       // list of swagger documents, one for each version of the api.
-      var swaggerDocs = [
+      const swaggerDocs = [
         swaggerUtils.getSwaggerDoc(6)
       ];
       // initialize swagger middleware for each swagger documents.
@@ -196,7 +195,7 @@ function _deploy(configurations, commonsMiddleware, callback) {
  * @param {function} callback callback function
  * @alias module:registry.undeploy
  * */
-function _undeploy(callback) {
+function _undeploy (callback) {
   if (db) {
     db.close(function () {
       server.close(function () {

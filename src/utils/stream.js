@@ -49,7 +49,7 @@ module.exports = {
  * @alias module:utils.stream.createReadable
  * */
 function _createReadable (readFunction) {
-  var streamReadable = new stream.Readable({
+  const streamReadable = new stream.Readable({
 
     objectMode: true
 

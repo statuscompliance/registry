@@ -65,7 +65,7 @@ function _process (manager, parameters) {
       processGuarantees(manager, parameters).then(function (guaranteeResults) {
         // Process metrics
         processMetrics(manager, parameters).then(function (metricResults) {
-          var ret = guaranteeResults.concat(metricResults);
+          const ret = guaranteeResults.concat(metricResults);
 
           return resolve(ret);
         }, reject);
@@ -86,24 +86,24 @@ function _process (manager, parameters) {
 function processMetrics (manager, parameters) {
   return new Promise(function (resolve, reject) {
     // Getting all guarantee from agreement to be calculated.
-    var metrics = [];
+    let metrics = [];
     if (!parameters.metrics) {
       metrics = Object.keys(manager.agreement.terms.metrics);
     } else {
-      for (var metricId in manager.agreement.terms.metrics) {
+      for (const metricId in manager.agreement.terms.metrics) {
         if (Object.keys(parameters.metrics).indexOf(metricId) != -1) {
           metrics.push(metricId);
         }
       }
     }
-    var processMetrics = [];
+    const processMetrics = [];
     if (config.parallelProcess.metrics && false) { // parallel process is not implemented correctly
       logger.debug('Processing metrics in parallel mode');
       logger.debug('- metrics: ' + metrics);
 
       // Setting up promise for executing in parallel mode
       metrics.forEach(function (metricId) {
-        var priorities = ['P1', 'P2', 'P3'];
+        let priorities = ['P1', 'P2', 'P3'];
         if (metricId == 'SPU_IO_K00') {
           priorities = [''];
         }
@@ -124,16 +124,16 @@ function processMetrics (manager, parameters) {
       metrics.forEach(function (metricId) {
         logger.debug('-- metricId: ' + metricId);
 
-        var metricDef = manager.agreement.terms.metrics[metricId];
+        const metricDef = manager.agreement.terms.metrics[metricId];
         if (metricDef.defaultStateReload) {
           // it's supposed that computer accepts always scope[key] = '*';
-          var scope = null;
+          let scope = null;
           if (metricDef.scope) {
             scope = {};
-            var metricsScp = metricDef.scope;
+            const metricsScp = metricDef.scope;
             // for (var s in metricsScp) {
             //     var scopeType = metricsScp[s];
-            for (var st in metricsScp) {
+            for (const st in metricsScp) {
               scope[st] = metricsScp.default || '*';
             }
             // }
@@ -143,7 +143,7 @@ function processMetrics (manager, parameters) {
           }
 
           logger.debug('Scope for metricId=%s : %s', metricId, JSON.stringify(scope, null, 2));
-          var query = {
+          const query = {
             metric: metricId,
             scope: scope,
             parameters: {},
@@ -172,7 +172,7 @@ function processMetrics (manager, parameters) {
       utils.promise.processSequentialPromises('metrics', manager, processMetrics, null, null, null)
         .then(resolve)
         .catch(function (err) {
-          var errorString = 'Error processing agreements';
+          const errorString = 'Error processing agreements';
           return promiseErrorHandler(reject, 'agreements', processMetrics.name, err.code || 500, errorString, err);
         });
     }
@@ -188,7 +188,7 @@ function processMetrics (manager, parameters) {
 function processGuarantees (manager, parameters) {
   return new Promise(function (resolve, reject) {
     // Getting all guarantee from agreement to be calculated.
-    var guarantees = [];
+    let guarantees = [];
     if (!parameters.guarantees) {
       guarantees = manager.agreement.terms.guarantees;
     } else {
@@ -202,7 +202,7 @@ function processGuarantees (manager, parameters) {
       logger.debug('- guarantees: ' + guarantees);
 
       // Setting up promise for executing in parallel mode
-      var processGuarantees = [];
+      const processGuarantees = [];
       guarantees.forEach(function (guarantee) {
         processGuarantees.push(manager.get('guarantees', {
           guarantee: guarantee.id
@@ -216,7 +216,7 @@ function processGuarantees (manager, parameters) {
       logger.debug('- guarantees: ' + guarantees);
 
       // Setting up queries for executing in parallel mode
-      var guaranteeQueries = [];
+      const guaranteeQueries = [];
       guarantees.forEach(function (element) {
         guaranteeQueries.push({
           guarantee: element.id

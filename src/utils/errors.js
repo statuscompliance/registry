@@ -39,7 +39,7 @@ const logger = governify.getLogger().tag('error-handler');
  */
 function promiseErrorHandler (reject, level, functionName, code, message, root) {
   // Call to the generic error handler
-  var newError = new ErrorHandler(level, functionName, code, message, root);
+  const newError = new ErrorHandler(level, functionName, code, message, root);
   // If progressive trace is true print the progressive trace.
   if (config.errors.progressiveTrace) {
     logger.error(newError.stackTrace(true));
@@ -61,7 +61,7 @@ function promiseErrorHandler (reject, level, functionName, code, message, root) 
  */
 function controllerErrorHandler (res, level, functionName, code, message, root) {
   // Call to the generic error handler
-  var newError = new ErrorHandler(level, functionName, code, message, root);
+  const newError = new ErrorHandler(level, functionName, code, message, root);
   // Print the progressive trace of the error
   logger.error(newError.stackTrace(true));
   // Send the response to the client.
@@ -79,12 +79,12 @@ function controllerErrorHandler (res, level, functionName, code, message, root) 
  */
 function ErrorHandler (level, functionName, code, message, root) {
   // Get the line of code, where the error has occurred.
-  var regexp = /\(.+\)|at\s+.+\d$/;
-  var stack = new Error().stack.split('\n')[3];
-  var at = regexp.exec(stack)[0];
+  const regexp = /\(.+\)|at\s+.+\d$/;
+  const stack = new Error().stack.split('\n')[3];
+  let at = regexp.exec(stack)[0];
 
   const path = require('path');
-  var projectRoot = path.dirname(require.main.filename);
+  const projectRoot = path.dirname(require.main.filename);
 
   // Remove project directory in order to show only relative path
   if (at && at[0] === '(') {
@@ -97,7 +97,7 @@ function ErrorHandler (level, functionName, code, message, root) {
   }
 
   // Build error message
-  var msg = '[' + level + '][' + functionName + '] - ' + message + ' at .' + at;
+  const msg = '[' + level + '][' + functionName + '] - ' + message + ' at .' + at;
 
   // Return the error model
   return new ErrorModel(code, msg, root);
@@ -117,7 +117,7 @@ class ErrorModel {
 
   // Print the progressive trace of the error
   stackTrace (top) {
-    var msg = this.message;
+    let msg = this.message;
     if (top && this.root) { msg += '\nError trace: '; }
     if (this.root && this.root instanceof ErrorModel) {
       msg += '\n\t' + this.root.stackTrace(false);
