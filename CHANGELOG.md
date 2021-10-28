@@ -1,3 +1,39 @@
+# [3.4.0](https://github.com/governify/registry/compare/v3.3.0...v3.4.0) (2021-10-28)
+
+
+### Bug Fixes
+
+* Handling collector error ([0515c80](https://github.com/governify/registry/commit/0515c80dd0d21f6927006f69e0ef297414a4ce07))
+* lint ([5316f03](https://github.com/governify/registry/commit/5316f0310bb5eb083d4516607a52153fc083f635))
+* linted for format ([c687245](https://github.com/governify/registry/commit/c687245d2c19a9d2a5d8a3a87fffb7444a8f0a92))
+* logger.log & logger.metrics ([637d5dd](https://github.com/governify/registry/commit/637d5dde4872aec571b7e848ec5b71dc27b003bf))
+* rm collectors from external infrastructure ([96bf890](https://github.com/governify/registry/commit/96bf890cce1f92da57859f1d34e2364a5b12a8cb))
+
+
+### Features
+
+* E2E assets to develop ([2a1dc07](https://github.com/governify/registry/commit/2a1dc071143ece2468b5be134790deeb3cf0930b))
+* fixed logger ([66f34d8](https://github.com/governify/registry/commit/66f34d892ca7586a7bcdd3420f621c1b3f297338))
+* getPeriods implemented ([530aac5](https://github.com/governify/registry/commit/530aac5f42c10980ca545009cf2534742c3a366a))
+* mongo indexes ([2ee09a8](https://github.com/governify/registry/commit/2ee09a83ebd7efe99856e4545d772670c094395c))
+* New logs fix ([835a78a](https://github.com/governify/registry/commit/835a78a0623e60f6a9fae0f1658d14731f0181a1))
+* npm update governify-commons ([1af0f8e](https://github.com/governify/registry/commit/1af0f8e83b00ce349fda31055baaaffc9b4b1591))
+* npm update governify-commons ([297a31c](https://github.com/governify/registry/commit/297a31c4e9679cef60b976879931f26af7c86d35))
+* refactor period calculation ([5655031](https://github.com/governify/registry/commit/5655031a75ac971189e2525f2c38eba5e94e8bff))
+* refactor period calculation ([794f475](https://github.com/governify/registry/commit/794f4752c9151899c090c4c1da841fdce0394787))
+* refactor period calculation ([9e53938](https://github.com/governify/registry/commit/9e539383257d6a09c674c140542e54d55465a9f3))
+* refactor period calculation ([472120b](https://github.com/governify/registry/commit/472120bfdbd41acfd4af6b29d3e37b1ab5cc59c6))
+* refactor period calculation ([d930554](https://github.com/governify/registry/commit/d9305546e860378e636b6cd8dd8d1422ecf59488))
+* refactor period calculation ([358d4b5](https://github.com/governify/registry/commit/358d4b54ebf2841c5b1070e4c749e04210461044))
+* refactor period calculation ([d7ec645](https://github.com/governify/registry/commit/d7ec645afe3beb9563d0e4e938f3cba4699c2025))
+* refactor period calculation ([436fe56](https://github.com/governify/registry/commit/436fe56668c458330cd9955e5b18f3c96d5166ce))
+* refactor period calculation ([1d7a60d](https://github.com/governify/registry/commit/1d7a60d17f0e7bccf8ffbf1e24cce0280be7eb2e))
+* refactor period calculation ([df0c5cb](https://github.com/governify/registry/commit/df0c5cb8919d62a87aa9dea7487ada87de70c82f))
+* update commons v1.14 ([98ec4b1](https://github.com/governify/registry/commit/98ec4b1b3e86b0216f657444984d1d6de5997f7c))
+* Updating logs to commons ([a9cadc4](https://github.com/governify/registry/commit/a9cadc4eee83255057dead1602038cf79ec674b8))
+
+
+
 # [3.3.0](https://github.com/governify/registry/compare/v3.2.0...v3.3.0) (2021-05-07)
 
 
