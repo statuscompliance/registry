@@ -20,48 +20,45 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 'use strict';
 
-
-
 const governify = require('governify-commons');
-let logger;
+const logger = governify.getLogger().tag('initialization');
 
-console.log('Deploy request received')
+logger.info('Deploy request received');
+
 governify.init({
-    configurations: [{
-        name: 'main',
-        location: './configurations/config.' + (process.env.NODE_ENV || 'development') + '.yaml',
-        default: true
-    }
-    ]
+  configurations: [{
+    name: 'main',
+    location: './configurations/config.' + (process.env.NODE_ENV || 'development') + '.yaml',
+    default: true
+  }
+  ]
 }).then(commonsMiddleware => {
-    logger = require('./src/logger');
-    const registry = require('./server.js');
-    registry.deploy(null, commonsMiddleware, function () {
-        logger.info('Deploy successfully done');
-    });
-})
-
+  const registry = require('./server.js');
+  registry.deploy(null, commonsMiddleware, function () {
+    logger.info('Deploy successfully done');
+  });
+});
 
 // quit on ctrl-c when running docker in terminal
-process.on('SIGINT', function onSigint() {
-    logger.info('Got SIGINT (aka ctrl-c in docker). Graceful shutdown ', new Date().toISOString());
-    shutdown();
+process.on('SIGINT', function onSigint () {
+  logger.info('Got SIGINT (aka ctrl-c in docker). Graceful shutdown ', new Date().toISOString());
+  shutdown();
 });
 
 // quit properly on docker stop
-process.on('SIGTERM', function onSigterm() {
-    logger.info('Got SIGTERM (docker container stop). Graceful shutdown ', new Date().toISOString());
-    shutdown();
+process.on('SIGTERM', function onSigterm () {
+  logger.info('Got SIGTERM (docker container stop). Graceful shutdown ', new Date().toISOString());
+  shutdown();
 });
 
 // shut down server
-function shutdown() {
+function shutdown () {
+  process.exit();
+  /* registry.undeploy(function (err) {
+    if (err) {
+      logger.error(err);
+      process.exitCode = 1;
+    }
     process.exit();
-    registry.undeploy(function (err) {
-        if (err) {
-            logger.error(err);
-            process.exitCode = 1;
-        }
-        process.exit();
-    });
+  }); */
 }

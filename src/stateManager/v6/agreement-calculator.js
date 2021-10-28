@@ -4,9 +4,9 @@ Copyright (C) 2018 ISA group
 http://www.isa.us.es/
 https://github.com/isa-group/governify-registry
 
-governify-registry is an Open-source software available under the 
-GNU General Public License (GPL) version 2 (GPL v2) for non-profit 
-applications; for commercial licensing terms, please see README.md 
+governify-registry is an Open-source software available under the
+GNU General Public License (GPL) version 2 (GPL v2) for non-profit
+applications; for commercial licensing terms, please see README.md
 for any inquiry.
 
 This program is free software; you can redistribute it and/or modify
@@ -23,12 +23,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-"use strict";
+'use strict';
 
 const governify = require('governify-commons');
 const config = governify.configurator.getConfig('main');
-const logger = require('../../logger');
+const logger = governify.getLogger().tag('agreement-calculator');
 const moment = require('moment');
 const utils = require('../../utils');
 
@@ -43,9 +42,8 @@ const promiseErrorHandler = utils.errors.promiseErrorHandler;
  * @see module:calculators
  * */
 module.exports = {
-    process: _process
+  process: _process
 };
-
 
 /**
  * Process agreement.
@@ -57,30 +55,27 @@ module.exports = {
  * */
 
 // from and to parameters in future versions , from, to
-function _process(manager, parameters) {
-    return new Promise(function (resolve, reject) {
-        try {
-            if (!parameters) {
-                parameters = {};
-            }
-            //Process guarantees
-            processGuarantees(manager, parameters).then(function (guaranteeResults) {
-                // Process metrics
-                processMetrics(manager, parameters).then(function (metricResults) {
-                    var ret = guaranteeResults.concat(metricResults);
+function _process (manager, parameters) {
+  return new Promise(function (resolve, reject) {
+    try {
+      if (!parameters) {
+        parameters = {};
+      }
+      // Process guarantees
+      processGuarantees(manager, parameters).then(function (guaranteeResults) {
+        // Process metrics
+        processMetrics(manager, parameters).then(function (metricResults) {
+          const ret = guaranteeResults.concat(metricResults);
 
-                    return resolve(ret);
-                }, reject);
-
-            }, reject);
-
-        } catch (e) {
-            logger.error(e);
-            return reject(e);
-        }
-    });
+          return resolve(ret);
+        }, reject);
+      }, reject);
+    } catch (e) {
+      logger.error(e);
+      return reject(e);
+    }
+  });
 }
-
 
 /**
  * Process metrics.
@@ -88,105 +83,101 @@ function _process(manager, parameters) {
  * @param {Object} manager manager
  * @param {Object} parameters parameters
  * */
-function processMetrics(manager, parameters) {
-    return new Promise(function (resolve, reject) {
-        //Getting all guarantee from agreement to be calculated.
-        var metrics = [];
-        if (!parameters.metrics) {
-            metrics = Object.keys(manager.agreement.terms.metrics);
-        } else {
-            for (var metricId in manager.agreement.terms.metrics) {
-                if (Object.keys(parameters.metrics).indexOf(metricId) != -1) {
-                    metrics.push(metricId);
-                }
+function processMetrics (manager, parameters) {
+  return new Promise(function (resolve, reject) {
+    // Getting all guarantee from agreement to be calculated.
+    let metrics = [];
+    if (!parameters.metrics) {
+      metrics = Object.keys(manager.agreement.terms.metrics);
+    } else {
+      for (const metricId in manager.agreement.terms.metrics) {
+        if (Object.keys(parameters.metrics).indexOf(metricId) != -1) {
+          metrics.push(metricId);
+        }
+      }
+    }
+    const processMetrics = [];
+    if (config.parallelProcess.metrics && false) { // parallel process is not implemented correctly
+      logger.debug('Processing metrics in parallel mode');
+      logger.debug('- metrics: ' + metrics);
+
+      // Setting up promise for executing in parallel mode
+      metrics.forEach(function (metricId) {
+        let priorities = ['P1', 'P2', 'P3'];
+        if (metricId == 'SPU_IO_K00') {
+          priorities = [''];
+        }
+
+        priorities.forEach(function (priority) {
+          parameters.metrics[metricId].scope.priority = priority;
+          processMetrics.push(manager.get('metrics', parameters.metrics[metricId]));
+        });
+      });
+
+      // Executing in parallel
+      utils.promise.processParallelPromises(manager, processMetrics, null, null, null).then(resolve, reject);
+    } else {
+      logger.debug('Processing metrics in sequential mode');
+      logger.debug('- metrics: ' + metrics);
+
+      // Setting up queries for executing in parallel mode
+      metrics.forEach(function (metricId) {
+        logger.debug('-- metricId: ' + metricId);
+
+        const metricDef = manager.agreement.terms.metrics[metricId];
+        if (metricDef.defaultStateReload) {
+          // it's supposed that computer accepts always scope[key] = '*';
+          let scope = null;
+          if (metricDef.scope) {
+            scope = {};
+            const metricsScp = metricDef.scope;
+            // for (var s in metricsScp) {
+            //     var scopeType = metricsScp[s];
+            for (const st in metricsScp) {
+              scope[st] = metricsScp.default || '*';
             }
+            // }
+            if (!scope.priority) {
+              scope.priority = 'P2';
+            } // activate for PROSAS agreements
+          }
+
+          logger.debug('Scope for metricId=%s : %s', metricId, JSON.stringify(scope, null, 2));
+          const query = {
+            metric: metricId,
+            scope: scope,
+            parameters: {},
+            evidences: [],
+            window: {
+              initial: moment.utc(moment.tz(metricDef.window.initial, manager.agreement.context.validity.timeZone)).format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z',
+              timeZone: manager.agreement.context.validity.timeZone,
+              period: metricDef.window.period,
+              type: metricDef.window.type
+            }, // how to get window
+            period: {
+              from: '*',
+              to: '*'
+            }
+          };
+
+          if (!scope) {
+            delete query.scope;
+          }
+          logger.debug('query. ', JSON.stringify(query, null, 2));
+          processMetrics.push(query);
         }
-        var processMetrics = [];
-        if (config.parallelProcess.metrics && false) { // parallel process is not implemented correctly
-            logger.agreement("Processing metrics in parallel mode");
-            logger.agreement("- metrics: " + metrics);
+      });
 
-            //Setting up promise for executing in parallel mode
-            metrics.forEach(function (metricId) {
-                var priorities = ['P1', 'P2', 'P3'];
-                if (metricId == 'SPU_IO_K00') {
-                    priorities = [''];
-                }
-
-                priorities.forEach(function (priority) {
-                    parameters.metrics[metricId].scope.priority = priority;
-                    processMetrics.push(manager.get('metrics', parameters.metrics[metricId]));
-                });
-            });
-
-            //Executing in parallel
-            utils.promise.processParallelPromises(manager, processMetrics, null, null, null).then(resolve, reject);
-
-        } else {
-            logger.agreement("Processing metrics in sequential mode");
-            logger.agreement("- metrics: " + metrics);
-
-            //Setting up queries for executing in parallel mode
-            metrics.forEach(function (metricId) {
-                logger.agreement("-- metricId: " + metricId);
-
-                var metricDef = manager.agreement.terms.metrics[metricId];
-                if (metricDef.defaultStateReload) {
-                    // it's supposed that computer accepts always scope[key] = '*';
-                    var scope = null;
-                    if (metricDef.scope) {
-                        scope = {};
-                        var metricsScp = metricDef.scope;
-                        // for (var s in metricsScp) {
-                        //     var scopeType = metricsScp[s];
-                        for (var st in metricsScp) {
-                            scope[st] = metricsScp.default || '*';
-                        }
-                        // }
-                        if (!scope.priority) {
-                            scope.priority = 'P2';
-                        } //activate for PROSAS agreements
-                    }
-
-                    logger.agreement('Scope for metricId=%s : %s', metricId, JSON.stringify(scope, null, 2));
-                    var query = {
-                        metric: metricId,
-                        scope: scope,
-                        parameters: {},
-                        evidences: [],
-                        window: {
-                            initial: moment.utc(moment.tz(metricDef.window.initial, manager.agreement.context.validity.timeZone)).format("YYYY-MM-DDTHH:mm:ss.SSS") + "Z",
-                            timeZone: manager.agreement.context.validity.timeZone,
-                            period: metricDef.window.period,
-                            type: metricDef.window.type
-                        }, //how to get window
-                        period: {
-                            from: '*',
-                            to: '*'
-                        }
-                    };
-
-                    if (!scope) {
-                        delete query.scope;
-                    }
-                    logger.agreement("query. ", JSON.stringify(query, null, 2));
-                    processMetrics.push(query);
-                }
-
-            });
-
-            // Processing metrics in sequential mode.
-            utils.promise.processSequentialPromises('metrics', manager, processMetrics, null, null, null)
-                .then(resolve)
-                .catch(function (err) {
-                    var errorString = 'Error processing agreements';
-                    return promiseErrorHandler(reject, "agreements", processMetrics.name, err.code || 500, errorString, err);
-                });
-
-        }
-    });
+      // Processing metrics in sequential mode.
+      utils.promise.processSequentialPromises('metrics', manager, processMetrics, null, null, null)
+        .then(resolve)
+        .catch(function (err) {
+          const errorString = 'Error processing agreements';
+          return promiseErrorHandler(reject, 'agreements', processMetrics.name, err.code || 500, errorString, err);
+        });
+    }
+  });
 }
-
 
 /**
  * Process guarantees.
@@ -194,49 +185,46 @@ function processMetrics(manager, parameters) {
  * @param {Object} manager manager
  * @param {Object} parameters parameters
  * */
-function processGuarantees(manager, parameters) {
-    return new Promise(function (resolve, reject) {
+function processGuarantees (manager, parameters) {
+  return new Promise(function (resolve, reject) {
+    // Getting all guarantee from agreement to be calculated.
+    let guarantees = [];
+    if (!parameters.guarantees) {
+      guarantees = manager.agreement.terms.guarantees;
+    } else {
+      guarantees = manager.agreement.terms.guarantees.filter(function (guarantee) {
+        return Object.keys(parameters.guarantees).indexOf(guarantee.id) != -1;
+      });
+    }
 
-        //Getting all guarantee from agreement to be calculated.
-        var guarantees = [];
-        if (!parameters.guarantees) {
-            guarantees = manager.agreement.terms.guarantees;
-        } else {
-            guarantees = manager.agreement.terms.guarantees.filter(function (guarantee) {
-                return Object.keys(parameters.guarantees).indexOf(guarantee.id) != -1;
-            });
-        }
+    if (config.parallelProcess.guarantees) {
+      logger.debug('Processing guarantees in parallel mode');
+      logger.debug('- guarantees: ' + guarantees);
 
-        if (config.parallelProcess.guarantees) {
-            logger.agreement("Processing guarantees in parallel mode");
-            logger.agreement("- guarantees: " + guarantees);
+      // Setting up promise for executing in parallel mode
+      const processGuarantees = [];
+      guarantees.forEach(function (guarantee) {
+        processGuarantees.push(manager.get('guarantees', {
+          guarantee: guarantee.id
+        }));
+      });
 
-            //Setting up promise for executing in parallel mode
-            var processGuarantees = [];
-            guarantees.forEach(function (guarantee) {
-                processGuarantees.push(manager.get('guarantees', {
-                    guarantee: guarantee.id
-                }));
-            });
+      // Executing in parallel
+      utils.promise.processParallelPromises(manager, processGuarantees, null, null, null).then(resolve, reject);
+    } else {
+      logger.debug('Processing guarantees in sequential mode');
+      logger.debug('- guarantees: ' + guarantees);
 
-            //Executing in parallel
-            utils.promise.processParallelPromises(manager, processGuarantees, null, null, null).then(resolve, reject);
+      // Setting up queries for executing in parallel mode
+      const guaranteeQueries = [];
+      guarantees.forEach(function (element) {
+        guaranteeQueries.push({
+          guarantee: element.id
+        });
+      });
 
-        } else {
-            logger.agreement("Processing guarantees in sequential mode");
-            logger.agreement("- guarantees: " + guarantees);
-
-            //Setting up queries for executing in parallel mode
-            var guaranteeQueries = [];
-            guarantees.forEach(function (element) {
-                guaranteeQueries.push({
-                    guarantee: element.id
-                });
-            });
-
-            //Executing sequentially
-            utils.promise.processSequentialPromises('guarantees', manager, guaranteeQueries, null, null, null).then(resolve, reject);
-
-        }
-    });
+      // Executing sequentially
+      utils.promise.processSequentialPromises('guarantees', manager, guaranteeQueries, null, null, null).then(resolve, reject);
+    }
+  });
 }

@@ -4,9 +4,9 @@ Copyright (C) 2018 ISA group
 http://www.isa.us.es/
 https://github.com/isa-group/governify-registry
 
-governify-registry is an Open-source software available under the 
-GNU General Public License (GPL) version 2 (GPL v2) for non-profit 
-applications; for commercial licensing terms, please see README.md 
+governify-registry is an Open-source software available under the
+GNU General Public License (GPL) version 2 (GPL v2) for non-profit
+applications; for commercial licensing terms, please see README.md
 for any inquiry.
 
 This program is free software; you can redistribute it and/or modify
@@ -23,10 +23,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 'use strict';
 const Promise = require('bluebird');
-const logger = require('../logger');
+const governify = require('governify-commons');
+const logger = governify.getLogger().tag('promise-manager');
 const ErrorModel = require('../errors/index.js').errorModel;
 
 const errors = require('./errors');
@@ -42,8 +42,8 @@ const promiseErrorHandler = errors.promiseErrorHandler;
  * */
 
 module.exports = {
-    processParallelPromises: _processParallelPromises,
-    processSequentialPromises: _processSequentialPromises
+  processParallelPromises: _processParallelPromises,
+  processSequentialPromises: _processSequentialPromises
 };
 
 /**
@@ -55,80 +55,79 @@ module.exports = {
  * @param {Boolean} streaming Decide if stream or not stream response
  * @alias module:gUtils.processMode
  * */
-function _processParallelPromises(manager, promisesArray, result, res, streaming) {
-    if (!result && !res) {
-        //Promise mode
-        result = [];
+function _processParallelPromises (manager, promisesArray, result, res, streaming) {
+  if (!result && !res) {
+    // Promise mode
+    result = [];
 
-        return new Promise(function (resolve, reject) {
-            Promise.settle(promisesArray).then(function (promisesResults) {
-                try {
-                    if (promisesResults.length > 0) {
-                        for (var r in promisesResults) {
-                            var onePromiseResults = promisesResults[r];
-                            if (onePromiseResults.isFulfilled()) {
-                                onePromiseResults.value().forEach(function (value) {
-                                    if (manager) {
-                                        result.push(manager.current(value));
-                                    } else {
-                                        result.push(value);
-                                    }
-                                });
-                            }
-                        }
-                        resolve(result);
-                    } else {
-                        var err = 'Error processing Promises: empty result';
-                        logger.error(err);
-                        reject(err.toString());
-                    }
-                } catch (err) {
-                    logger.error(err);
-                    reject(err.toString());
-                }
-            }, function (err) {
-                logger.error(err);
-                reject(err.toString());
-            });
-        });
-    } else {
-        //Controller mode using streaming
-        Promise.settle(promisesArray).then(function (promisesResults) {
-            try {
-                if (promisesResults.length > 0) {
-                    for (var r in promisesResults) {
-                        var onePromiseResults = promisesResults[r];
-                        if (onePromiseResults.isFulfilled()) {
-                            onePromiseResults.value().forEach(function (value) {
-                                if (manager) {
-                                    result.push(manager.current(value));
-                                } else {
-                                    result.push(value);
-                                }
-                            });
-                        }
-                    }
-                    if (streaming) {
-                        result.push(null);
-                    } else {
-                        res.json(result);
-                    }
-                } else {
-                    var err = 'Error processing Promises: empty result';
-                    logger.error(err);
-                    res.status(500).json(new ErrorModel(500, err));
-                }
-            } catch (err) {
-                logger.error(err);
-                res.status(500).json(new ErrorModel(500, err));
+    return new Promise(function (resolve, reject) {
+      Promise.settle(promisesArray).then(function (promisesResults) {
+        try {
+          if (promisesResults.length > 0) {
+            for (const r in promisesResults) {
+              const onePromiseResults = promisesResults[r];
+              if (onePromiseResults.isFulfilled()) {
+                onePromiseResults.value().forEach(function (value) {
+                  if (manager) {
+                    result.push(manager.current(value));
+                  } else {
+                    result.push(value);
+                  }
+                });
+              }
             }
-        }, function (err) {
+            resolve(result);
+          } else {
+            const err = 'Error processing Promises: empty result';
             logger.error(err);
-            res.status(500).json(new ErrorModel(500, err));
-        });
-    }
+            reject(err.toString());
+          }
+        } catch (err) {
+          logger.error(err);
+          reject(err.toString());
+        }
+      }, function (err) {
+        logger.error(err);
+        reject(err.toString());
+      });
+    });
+  } else {
+    // Controller mode using streaming
+    Promise.settle(promisesArray).then(function (promisesResults) {
+      try {
+        if (promisesResults.length > 0) {
+          for (const r in promisesResults) {
+            const onePromiseResults = promisesResults[r];
+            if (onePromiseResults.isFulfilled()) {
+              onePromiseResults.value().forEach(function (value) {
+                if (manager) {
+                  result.push(manager.current(value));
+                } else {
+                  result.push(value);
+                }
+              });
+            }
+          }
+          if (streaming) {
+            result.push(null);
+          } else {
+            res.json(result);
+          }
+        } else {
+          const err = 'Error processing Promises: empty result';
+          logger.error(err);
+          res.status(500).json(new ErrorModel(500, err));
+        }
+      } catch (err) {
+        logger.error(err);
+        res.status(500).json(new ErrorModel(500, err));
+      }
+    }, function (err) {
+      logger.error(err);
+      res.status(500).json(new ErrorModel(500, err));
+    });
+  }
 }
-
 
 /**
  * Process mode.
@@ -140,62 +139,50 @@ function _processParallelPromises(manager, promisesArray, result, res, streaming
  * @param {Boolean} streaming Decide if stream or not stream response
  * @alias module:gUtils.processMode
  * */
-function _processSequentialPromises(type, manager, queries, result, res, streaming, forceUpdate) {
+function _processSequentialPromises (type, manager, queries, result, res, streaming, forceUpdate) {
+  if (!result && !res) {
+    // Promise mode
+    result = [];
 
-
-    if (!result && !res) {
-        //Promise mode
-        result = [];
-
-        return new Promise(function (resolve, reject) {
-            Promise.each(queries, function (query) {
-
-                return manager.get(type, query, forceUpdate).then(function (states) {
-                    for (var i in states) {
-                        var state = states[i];
-                        result.push(manager.current(state));
-                    }
-                });
-                //This catch will be controller by the each.catch in order to stop 
-                //the execution when 1 promise fails
-
-            }).then(function () {
-                resolve(result);
-            }).catch(function (err) {
-
-                let errorString = "Error processing sequential promises";
-                return promiseErrorHandler(reject, "promise", "_processSequentialPromises", 500, errorString, err);
-
-            });
+    return new Promise(function (resolve, reject) {
+      Promise.each(queries, function (query) {
+        return manager.get(type, query, forceUpdate).then(function (states) {
+          for (const i in states) {
+            const state = states[i];
+            result.push(manager.current(state));
+          }
         });
-
-    } else {
-        //Controller mode using streaming
-        Promise.each(queries, function (query) {
-
-            return manager.get(type, query, forceUpdate).then(function (states) {
-                for (var i in states) {
-                    var state = states[i];
-                    //feeding stream
-                    result.push(manager.current(state));
-                }
-            });
-            //This catch will be controller by the each.catch in order to stop 
-            //the execution when 1 promise fails
-
-        }).then(function () {
-            //end stream
-            if (streaming) {
-                result.push(null);
-            } else {
-                res.json(result);
-            }
-        }).catch(function (err) {
-
-            let errorString = "Error processing sequential promises in controllers";
-            return controllerErrorHandler(res, "promise", "_processSequentialPromises", 500, errorString, JSON.stringify(err));
-
-        });
-    }
-
+        // This catch will be controller by the each.catch in order to stop
+        // the execution when 1 promise fails
+      }).then(function () {
+        resolve(result);
+      }).catch(function (err) {
+        const errorString = 'Error processing sequential promises';
+        return promiseErrorHandler(reject, 'promise', '_processSequentialPromises', 500, errorString, err);
+      });
+    });
+  } else {
+    // Controller mode using streaming
+    Promise.each(queries, function (query) {
+      return manager.get(type, query, forceUpdate).then(function (states) {
+        for (const i in states) {
+          const state = states[i];
+          // feeding stream
+          result.push(manager.current(state));
+        }
+      });
+      // This catch will be controller by the each.catch in order to stop
+      // the execution when 1 promise fails
+    }).then(function () {
+      // end stream
+      if (streaming) {
+        result.push(null);
+      } else {
+        res.json(result);
+      }
+    }).catch(function (err) {
+      const errorString = 'Error processing sequential promises in controllers';
+      return controllerErrorHandler(res, 'promise', '_processSequentialPromises', 500, errorString, JSON.stringify(err));
+    });
+  }
 }

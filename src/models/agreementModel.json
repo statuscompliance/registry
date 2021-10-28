@@ -1,6 +1,7 @@
 {
     "id": {
-        "type": "string"
+        "type": "string",
+        "index": true
     },
     "version": {
         "type": "string"

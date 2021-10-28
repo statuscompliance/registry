@@ -4,9 +4,9 @@
 // http://www.isa.us.es/
 // https://github.com/isa-group/governify-registry
 
-// governify-registry is an Open-source software available under the 
-// GNU General Public License (GPL) version 2 (GPL v2) for non-profit 
-// applications; for commercial licensing terms, please see README.md 
+// governify-registry is an Open-source software available under the
+// GNU General Public License (GPL) version 2 (GPL v2) for non-profit
+// applications; for commercial licensing terms, please see README.md
 // for any inquiry.
 
 // This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // */
 
-
 // 'use strict';
 
 // const config = require('../../configurations');
@@ -31,7 +30,6 @@
 // const ErrorModel = require('../../errors/index.js').errorModel;
 
 // const Promise = require('bluebird');
-
 
 // /**
 //  * Quotas calculator module.

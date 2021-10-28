@@ -4,9 +4,9 @@ Copyright (C) 2018 ISA group
 http://www.isa.us.es/
 https://github.com/isa-group/governify-registry
 
-governify-registry is an Open-source software available under the 
-GNU General Public License (GPL) version 2 (GPL v2) for non-profit 
-applications; for commercial licensing terms, please see README.md 
+governify-registry is an Open-source software available under the
+GNU General Public License (GPL) version 2 (GPL v2) for non-profit
+applications; for commercial licensing terms, please see README.md
 for any inquiry.
 
 This program is free software; you can redistribute it and/or modify
@@ -23,59 +23,58 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 'use strict';
 
 /**
  * @module utils.scopes
  */
 module.exports = {
-    /**
-     * @function 
+  /**
+     * @function
      * @param
      */
-    registryToComputerParser: _registryToComputerParser,
+  registryToComputerParser: _registryToComputerParser,
 
-    /**
-     * @function 
+  /**
+     * @function
      * @param
      */
-    computerToRegistryParser: _computerToRegistryParser
+  computerToRegistryParser: _computerToRegistryParser
 };
 
-function _computerToRegistryParser(computerScope, mapping) {
-    var mappedScope = {};
-    //reversing mapping
-    var mappingReversed = {};
-    for (var field in mapping) {
-        mappingReversed[mapping[field]] = field;
+function _computerToRegistryParser (computerScope, mapping) {
+  const mappedScope = {};
+  // reversing mapping
+  const mappingReversed = {};
+  for (const field in mapping) {
+    mappingReversed[mapping[field]] = field;
+  }
+
+  for (const scopeField in computerScope) {
+    const mappedScopeField = mappingReversed[scopeField];
+
+    if (mappingReversed && mappedScopeField) {
+      mappedScope[mappedScopeField] = computerScope[scopeField];
+    } else {
+      mappedScope[scopeField] = computerScope[scopeField];
     }
+  }
 
-    for (var scopeField in computerScope) {
-        var mappedScopeField = mappingReversed[scopeField];
-
-        if (mappingReversed && mappedScopeField) {
-            mappedScope[mappedScopeField] = computerScope[scopeField];
-        } else {
-            mappedScope[scopeField] = computerScope[scopeField];
-        }
-    }
-
-    return mappedScope;
+  return mappedScope;
 }
 
-function _registryToComputerParser(queryScope, mapping) {
-    var mappedScope = {};
+function _registryToComputerParser (queryScope, mapping) {
+  const mappedScope = {};
 
-    for (var scopeField in queryScope) {
-        var mappedScopeField = mapping[scopeField];
+  for (const scopeField in queryScope) {
+    const mappedScopeField = mapping[scopeField];
 
-        if (mapping && mappedScopeField) {
-            mappedScope[mappedScopeField] = queryScope[scopeField];
-        } else {
-            mappedScope[scopeField] = queryScope[scopeField];
-        }
+    if (mapping && mappedScopeField) {
+      mappedScope[mappedScopeField] = queryScope[scopeField];
+    } else {
+      mappedScope[scopeField] = queryScope[scopeField];
     }
+  }
 
-    return mappedScope;
+  return mappedScope;
 }

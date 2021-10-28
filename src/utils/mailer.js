@@ -4,9 +4,9 @@ Copyright (C) 2018 ISA group
 http://www.isa.us.es/
 https://github.com/isa-group/governify-registry
 
-governify-registry is an Open-source software available under the 
-GNU General Public License (GPL) version 2 (GPL v2) for non-profit 
-applications; for commercial licensing terms, please see README.md 
+governify-registry is an Open-source software available under the
+GNU General Public License (GPL) version 2 (GPL v2) for non-profit
+applications; for commercial licensing terms, please see README.md
 for any inquiry.
 
 This program is free software; you can redistribute it and/or modify
@@ -23,20 +23,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 'use strict';
 const governify = require('governify-commons');
 const config = governify.configurator.getConfig('main');
-const logger = require('../logger');
+// const logger = governify.getLogger().tag('mailer');
 
 const nodemailer = require('nodemailer');
 const sgTransport = require('nodemailer-sendgrid-transport');
 
 // it is necessary to create this object since it is passed to sendGrid transport nodemailer
-var options = {
-    auth: {
-        api_key: config.email.mailerApiKey
-    }
+const options = {
+  auth: {
+    api_key: config.email.mailerApiKey
+  }
 };
 
 /**
@@ -47,5 +46,5 @@ var options = {
  * @requires nodemailer-sendgrid-transport
  * */
 
-/** Initialize mailer transport with sendgrid credentials.*/
+/** Initialize mailer transport with sendgrid credentials. */
 module.exports = nodemailer.createTransport(sgTransport(options));

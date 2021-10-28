@@ -1,6 +1,7 @@
 {
     "agreementId": {
-        "type": "string"
+        "type": "string",
+        "index": true
     },
     "stateType": {
         "type": "string"
