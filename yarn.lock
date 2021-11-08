@@ -3008,10 +3008,10 @@
     "js-yaml" "^3.6.1"
     "json-schema-deref" "^0.3.2"
 
-"governify-commons@^1.17.0":
-  "integrity" "sha512-riSYlAQBZY2S7Gnfo6Co/l+opwabLaj0TFEtmyyOjDxWFhCCepVM8E2JpfD37f5ftfVJ8WF4SC7kJ9vcRjGqcg=="
-  "resolved" "https://registry.npmjs.org/governify-commons/-/governify-commons-1.17.4.tgz"
-  "version" "1.17.4"
+"governify-commons@^1.17.6-0":
+  "integrity" "sha512-XxLwbLPXhxDngahFhUzByJclR+pHZXCvbBbgCBhSZSkGQizGKpjo2WLMe1zI0+vmlwbJ3Cx1+FkjIOanKhFGSA=="
+  "resolved" "https://registry.npmjs.org/governify-commons/-/governify-commons-1.17.6-0.tgz"
+  "version" "1.17.6-0"
   dependencies:
     "@opentelemetry/api" "0.20.0"
     "@opentelemetry/context-async-hooks" "0.20.0"
