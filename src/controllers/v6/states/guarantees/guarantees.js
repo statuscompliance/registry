@@ -255,7 +255,7 @@ function _guaranteeIdGET (req, res) {
       periods = utils.time.getPeriods(manager.agreement, requestWindow);
       // Create query for every period
       allQueries = periods.map(function (period) {
-        return gUtils.buildGuaranteeQuery(guaranteeId, period.from.format(), period.to.format());
+        return gUtils.buildGuaranteeQuery(guaranteeId, period.from, period.to);
       });
     } else {
       allQueries.push(gUtils.buildGuaranteeQuery(guaranteeId));
