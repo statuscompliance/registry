@@ -43,6 +43,7 @@ module.exports = {
   // Guarantees
   statesAgreementGuaranteesGET: _statesAgreementGuaranteesGET,
   statesAgreementGuaranteesGuaranteeGET: _statesAgreementGuaranteesGuaranteeGET,
+  statesAgreementGuaranteesGuaranteeIdPagGET:_statesAgreementGuaranteesGuaranteeIdPagGET,
   statesAgreementGuaranteesGuaranteePenaltiyGET: _statesAgreementGuaranteesGuaranteePenaltiyGET,
   // Metrics
   statesAgreementMetricsGET: _statesAgreementMetricsGET,
@@ -115,6 +116,18 @@ function _statesAgreementGuaranteesGET (req, res, next) {
 function _statesAgreementGuaranteesGuaranteeGET (req, res, next) {
   states.agreements.guaranteeIdGET(req, res, next);
 }
+
+/**
+ * statesAgreementGuaranteesGuaranteeGET.
+ * @param {Object} req request
+ * @param {Object} res response
+ * @param {Object} next next function
+ * @alias module:StateRegistry.statesAgreementGuaranteesGuaranteeGET
+ * */
+ function _statesAgreementGuaranteesGuaranteeIdPagGET (req, res, next) {
+  states.agreements.guaranteeIdPagGET(req, res, next);
+}
+
 
 /**
  * statesAgreementGuaranteesGuaranteePenaltiyPOST.

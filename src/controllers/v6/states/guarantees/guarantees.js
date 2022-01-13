@@ -34,6 +34,7 @@ const logger = governify.getLogger().tag('guarantees');
 const ErrorModel = require('../../../../errors').errorModel;
 
 const stateManager = require('../../../../stateManager/v6/state-manager');
+const db = require('../../../../database');
 
 const gUtils = require('./gUtils.js');
 const utils = require('../../../../utils');
@@ -56,6 +57,7 @@ const controllerErrorHandler = utils.errors.controllerErrorHandler;
 module.exports = {
   guaranteesGET: _guaranteesGET,
   guaranteeIdGET: _guaranteeIdGET,
+  guaranteeIdPagGET: _guaranteeIdPagGET,
   guaranteeIdPenaltyGET: _guaranteeIdPenaltyGET,
   getGuarantees: _getGuarantees
 };
@@ -213,6 +215,7 @@ function _guaranteesGET (req, res) {
   });
 }
 
+
 /**
  * Get guarantees by ID.
  * @param {Object} args {agreement: String, guarantee: String}
@@ -238,7 +241,7 @@ function _guaranteeIdGET (req, res) {
   } else {
     logger.info('### NO Streaming mode ###');
   }
-
+  
   stateManager({
     id: agreementId
   }).then(function (manager) {
@@ -268,6 +271,7 @@ function _guaranteeIdGET (req, res) {
         const errorString = 'Query validation error';
         return controllerErrorHandler(res, 'guarantees-controller', '_guaranteeIdGET', 400, errorString);
       } else {
+        
         return manager.get('guarantees', queryInd, JSON.parse(forceUpdate)).then(function (success) {
           if (config.streaming) {
             success.forEach(function (element) {
@@ -277,7 +281,7 @@ function _guaranteeIdGET (req, res) {
             const result = success.map(function (element) {
               return manager.current(element);
             });
-
+            
             results.push(result);
           }
         }, function (err) {
@@ -296,6 +300,50 @@ function _guaranteeIdGET (req, res) {
     const errorString = 'Error while initializing state manager for agreement: ' + agreementId;
     return controllerErrorHandler(res, 'guarantees-controller', '_guaranteeIdGET', err.code || 500, errorString, err);
   });
+}
+
+/**
+ * Get all guarantees.
+ * @param {Object} args {agreement: String, num: Number, offset: Number, noEvidences: Boolean}
+ * @param {Object} res response
+ * @param {Object} next next function
+ * @alias module:guarantees.guaranteeIdPagGET
+ * */
+async function _guaranteeIdPagGET (req, res) {
+
+  const args = req.swagger.params;
+  const agreementId = args.agreement.value;
+  const guaranteeId = args.guarantee.value;
+  const noEvidences = req.query.noEvidences ? req.query.noEvidences : 'false';
+  let num = req.query.num;
+  if(!num){
+    num = 2;
+  }
+  let offset = req.query.offset;
+  if(!offset){
+    offset = 0;
+  };
+  const StateModel = db.models.StateModel;
+
+  let dbresult;
+  await StateModel.find({agreementId,id:guaranteeId}).limit(1000).sort({'period.from':-1})
+    .exec((err, states) => {
+      if(err){
+        res.status(500).json(new ErrorModel(500, err));
+      }else{
+        dbresult = states;
+        dbresult = dbresult.map(state => {
+          let records = state.records;
+          records = records.reduce((acc, record) => {
+            if(record.time > acc.time) acc = record;
+            return acc;
+          })
+          return {records,period:state.period,id:state.id , agreementId:state.agreementId};
+        })
+        dbresult = dbresult.filter(state => state.records.evidences.length > 0 || (noEvidences === 'true'))
+        res.send(dbresult.slice(offset,offset+num));
+      }
+    });
 }
 
 /**

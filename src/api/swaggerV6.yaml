@@ -314,6 +314,50 @@ paths:
           schema:
             $ref: '#/definitions/error_model'
       x-swagger-router-controller: StateRegistry
+  '/states/{agreement}/guarantees/{guarantee}/paged':
+    get:
+      tags:
+        - state-registry
+      description: XXX
+      operationId: statesAgreementGuaranteesGuaranteeIdPagGET
+      parameters:
+        - name: agreement
+          in: path
+          description: XXX
+          required: true
+          type: string
+        - name: guarantee
+          in: path
+          description: XXX
+          required: true
+          type: string
+        - name: num
+          in: query
+          description: XXX
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: XXX
+          required: false
+          type: integer
+        - name: noEvidences
+          in: query
+          description: XXX
+          required: false
+          type: boolean
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/guarantee_state'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error_model'
+      x-swagger-router-controller: StateRegistry
   '/states/{agreement}/guarantees/{guarantee}/penalty':
     get:
       tags:
