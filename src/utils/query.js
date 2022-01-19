@@ -56,7 +56,7 @@ module.exports = class Query {
   static parseToQueryParams (object, root) {
     let string = '';
     // For each field in object
-    for (let f in object) {
+    for (const f in object) {
       const field = object[f];
       // Check if it is an Object, an Array or a literal value
       if (field instanceof Object && !(field instanceof Array)) {

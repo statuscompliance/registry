@@ -58,7 +58,7 @@ function _getPeriods (agreement, window) {
   const Wfrom = new Date(window.from ? window.from : from);
   const Wto = window.end ? new Date(window.end) : new Date();
 
-  const dates = gPeriods.getDates(from, to, window.period ? window.period : "monthly", Wto, window.rules);
+  const dates = gPeriods.getDates(from, to, window.period ? window.period : 'monthly', Wto, window.rules);
   return gPeriods.getPeriods(dates, agreement.context.validity.timeZone, true, Wfrom, Wto);
 }
 
@@ -69,7 +69,7 @@ function _getPeriods (agreement, window) {
  * @return {Set} set of periods
  * @alias module:utils.getLastPeriod
  * */
- function _getLastPeriod (agreement, window) {
+function _getLastPeriod (agreement, window) {
   if (!window) {
     window = {};
   }
@@ -78,7 +78,7 @@ function _getPeriods (agreement, window) {
   const to = new Date();
 
   const Wto = window.end ? new Date(window.end) : new Date();
-  return gPeriods.getLastPeriod(from, to, window.period ? window.period : "monthly", Wto, window.rules, agreement.context.validity.timeZone);
+  return gPeriods.getLastPeriod(from, to, window.period ? window.period : 'monthly', Wto, window.rules, agreement.context.validity.timeZone);
 }
 
 /**

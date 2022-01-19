@@ -91,9 +91,9 @@ function _metricQuery (query, metricId, metricDefinition) {
   query.period = query.period
     ? query.period
     : {
-        from: query.window ? query.window.initial : '*',
-        to: query.window ? query.window.end : '*'
-      };
+      from: query.window ? query.window.initial : '*',
+      to: query.window ? query.window.end : '*'
+    };
 
   if (!schemaValidationResults.isValid) {
     validation = validation && false;
