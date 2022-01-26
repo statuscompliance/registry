@@ -160,8 +160,8 @@ function processPricing (agreementDef, query, manager) {
           const periods = utils.time.getPeriods(agreementDef, query.window
             ? query.window
             : {
-                window: {}
-              });
+              window: {}
+            });
           periods.forEach(function (period) {
             // Populate scopes from groupBy (e.g. serviceLine & activity)
             const classifier = {};

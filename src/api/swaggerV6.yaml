@@ -302,6 +302,16 @@ paths:
           description: XXX
           required: false
           type: boolean
+        - name: lasts
+          in: query
+          description: XXX
+          required: false
+          type: integer
+        - name: withNoEvidences
+          in: query
+          description: XXX
+          required: false
+          type: boolean
       responses:
         '200':
           description: Success

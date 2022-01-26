@@ -104,13 +104,13 @@ function changeOverride (override, agreement, guarantee, deleteOverride) {
                         },
                         deleteOverride
                           ? {
-                              $pull: {
-                                overrides: override
-                              }
+                            $pull: {
+                              overrides: override
                             }
+                          }
                           : {
-                              overrides: newOverrides
-                            },
+                            overrides: newOverrides
+                          },
                         {
                           upsert: true
                         },

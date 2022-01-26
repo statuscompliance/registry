@@ -54,6 +54,7 @@ module.exports = {
   statesDELETE: _statesDELETE,
   guaranteesGET: require('../guarantees/guarantees.js').guaranteesGET,
   guaranteeIdGET: require('../guarantees/guarantees.js').guaranteeIdGET,
+  guaranteeIdPagGET: require('../guarantees/guarantees.js').guaranteeIdPagGET,
   statesFilter: _statesFilter
 };
 
