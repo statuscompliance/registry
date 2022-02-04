@@ -1,3 +1,17 @@
+# [3.5.0](https://github.com/governify/registry/compare/v3.4.0...v3.5.0) (2022-02-04)
+
+
+### Bug Fixes
+
+* guarantees state error ([24f2ad2](https://github.com/governify/registry/commit/24f2ad220a42cdc504c032771e785abe08fb2bc4))
+
+
+### Features
+
+* Page guarantees states ([49fc0d3](https://github.com/governify/registry/commit/49fc0d340d30e4b5edcb470ac6386b4f1915547c))
+
+
+
 # [3.4.0](https://github.com/governify/registry/compare/v3.3.0...v3.4.0) (2021-10-28)
 
 
