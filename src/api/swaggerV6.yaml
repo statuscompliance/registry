@@ -834,6 +834,30 @@ paths:
           schema:
             $ref: '#/definitions/error_model'
       x-swagger-router-controller: BillRegistry
+  '/setUpAccountableRegistry/{agreement}':
+    get:
+      description: Set up the accountable registry
+      operationId: setUpAccountableRegistryGET
+      parameters:
+        - name: agreement
+          in: path
+          description: Agreement id
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: string
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error_model'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error_model'
+      x-swagger-router-controller: AccountableRegistry
 definitions:
   query:
     type: object
