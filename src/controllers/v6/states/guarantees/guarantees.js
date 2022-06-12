@@ -252,7 +252,7 @@ async function _guaranteeIdGET(req, res) {
       { $addFields: { record_size: { $size: "$record.evidences" } } },
       { $project: { records: 0 } }
       ];
-      withNoEvidences === 'true' && aggregateArray.push({ $match: { record_size: { $gte: 1 } } })
+      withNoEvidences === 'false' && aggregateArray.push({ $match: { record_size: { $gte: 1 } } })
       evidences === 'false' && aggregateArray.push({ $project: { record: { evidences: 0 } } })
       lasts && aggregateArray.push({ $limit: parseInt(lasts) })
       await StateModel.aggregate(aggregateArray).allowDiskUse(true)
