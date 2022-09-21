@@ -1,3 +1,12 @@
+# [3.6.0](https://github.com/governify/registry/compare/v3.5.0...v3.6.0) (2022-09-21)
+
+
+### Features
+
+* added accountable registry endpoint ([ae2a6e7](https://github.com/governify/registry/commit/ae2a6e746c507dbbe84fcbd6a20ecd9b23a52358))
+
+
+
 # [3.5.0](https://github.com/governify/registry/compare/v3.4.0...v3.5.0) (2022-02-04)
 
 
