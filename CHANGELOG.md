@@ -1,3 +1,17 @@
+# [3.7.0](https://github.com/governify/registry/compare/v3.6.0...v3.7.0) (2023-02-12)
+
+
+### Bug Fixes
+
+* accountable registry ([5828516](https://github.com/governify/registry/commit/58285161d38fd9d4e95bf22b1f41222c170dc71d))
+
+
+### Features
+
+* Installed newrelic ([05e5407](https://github.com/governify/registry/commit/05e54079fcc6dd5215e2cd6ecc89a39180b30225))
+
+
+
 # [3.6.0](https://github.com/governify/registry/compare/v3.5.0...v3.6.0) (2022-09-21)
 
 
