@@ -62,7 +62,7 @@ module.exports = {
 };
 
 // Method used internally
-function _getGuarantees (agreementId, guaranteeId, query, forceUpdate) {
+function _getGuarantees(agreementId, guaranteeId, query, forceUpdate) {
   return new Promise(function (resolve, reject) {
     stateManager({
       id: agreementId
@@ -103,7 +103,7 @@ function _getGuarantees (agreementId, guaranteeId, query, forceUpdate) {
  * @param {Object} next next function
  * @alias module:guarantees.guaranteesGET
  * */
-function _guaranteesGET (req, res) {
+function _guaranteesGET(req, res) {
   const agreementId = req.swagger.params.agreement.value;
   const from = req.query.from;
   const to = req.query.to;
@@ -221,7 +221,7 @@ function _guaranteesGET (req, res) {
  * @param {Object} next next function
  * @alias module:guarantees.guaranteeIdGET
  * */
-async function _guaranteeIdGET (req, res) {
+async function _guaranteeIdGET(req, res) {
   logger.info('New request to GET guarantee');
   const args = req.swagger.params;
   const agreementId = args.agreement.value;
@@ -230,8 +230,9 @@ async function _guaranteeIdGET (req, res) {
   const forceUpdate = req.query.forceupdate ? req.query.forceupdate : 'false';
   const from = req.query.from;
   const to = req.query.to;
-  const withNoEvidences = req.query.withNoEvidences ? req.query.withNoEvidences : 'false';
+  const withNoEvidences = req.query.withNoEvidences;
   let lasts = req.query.lasts;
+  let evidences = req.query.evidences;
 
   let ret;
   if (config.streaming) {
@@ -244,30 +245,27 @@ async function _guaranteeIdGET (req, res) {
   }
 
   if (lasts || withNoEvidences) {
-    if (!lasts) {
-      lasts = 2;
-    }
     const StateModel = db.models.StateModel;
-
-    let dbresult;
-    await StateModel.find({ agreementId, id: guaranteeId }).limit(1000).sort({ 'period.from': -1 })
-      .exec((err, states) => {
-        if (err) {
-          res.status(500).json(new ErrorModel(500, err));
-        } else {
-          dbresult = states;
-          dbresult = dbresult.map(state => {
-            let records = state.records;
-            records = records.reduce((acc, record) => {
-              if (record.time > acc.time) acc = record;
-              return acc;
-            });
-            return { records, period: state.period, id: state.id, agreementId: state.agreementId };
-          });
-          dbresult = dbresult.filter(state => state.records.evidences.length > 0 || (withNoEvidences === 'true'));
-          res.send(dbresult.slice(0, lasts));
-        }
-      });
+    try {
+      let aggregateArray = [{ $match: { agreementId: agreementId, id: guaranteeId } },
+      { $addFields: { record: { $last: "$records" } } },
+      { $addFields: { record_size: { $size: "$record.evidences" } } },
+      { $project: { records: 0 } }
+      ];
+      withNoEvidences === 'false' && aggregateArray.push({ $match: { record_size: { $gte: 1 } } })
+      evidences === 'false' && aggregateArray.push({ $project: { record: { evidences: 0 } } })
+      lasts && aggregateArray.push({ $limit: parseInt(lasts) })
+      await StateModel.aggregate(aggregateArray).allowDiskUse(true)
+        .exec((err, states) => {
+          if (err) {
+            res.status(500).json(new ErrorModel(500, err));
+          } else {
+            res.send(states);
+          }
+        });
+    } catch (error) {
+      console.log(error)
+    }
   } else {
     stateManager({
       id: agreementId
@@ -336,7 +334,7 @@ async function _guaranteeIdGET (req, res) {
  * @param {Object} next next function
  * @alias module:guarantees.guaranteeIdPenaltyPOST
  * */
-function _guaranteeIdPenaltyGET (req, res) {
+function _guaranteeIdPenaltyGET(req, res) {
   const args = req.swagger.params;
   const guaranteeId = args.guarantee.value;
   const agreementId = args.agreement.value;
