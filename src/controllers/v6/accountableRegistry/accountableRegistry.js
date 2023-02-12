@@ -30,7 +30,6 @@ const Promise = require('bluebird');
 const governify = require('governify-commons');
 const config = governify.configurator.getConfig('main');
 const logger = governify.getLogger().tag('accountable-registry');
-const $RefParser = require('json-schema-ref-parser');
 
 const ErrorModel = require('../../../errors/index.js').errorModel;
 const stateManager = require('../../../stateManager/v6/state-manager');
@@ -38,10 +37,7 @@ const stateManager = require('../../../stateManager/v6/state-manager');
 const gUtils = require('../states/guarantees/gUtils.js');
 const utils = require('../../../utils');
 const Query = utils.Query;
-const agreements = require('../states/agreements/agreements.js');
-const guarantees = require('../states/guarantees/guarantees.js');
-const { processSequentialPromises } = require('../../../utils/promise.js');
-const { resolve, reject } = require('bluebird');
+const { resolve } = require('bluebird');
 
 /**
  * Registry agreement module.
@@ -134,17 +130,25 @@ function _setUpAccountableRegistryGET (req, res) {
                     //     if (newPeriodsFromGuarantees) {
                     //         periods = utils.time.getPeriods(manager.agreement, requestWindow);
                     //     } else {
-                             periods = [{ from: new Date("2021-09-15T22:00:00.000Z").toISOString(), to: new Date("2021-10-15T21:59:59.999Z").toISOString() }];
+
+                            periods = [{ from: new Date("2022-02-15T22:00:00.000Z").toISOString(), to: new Date("2022-03-15T21:59:59.999Z").toISOString() }];
+                    
                     //     }
 
                     //     // Create query for every period
-                         allQueries = periods.map(function (period) {
-                             return gUtils.buildGuaranteeQuery(guarantee.id, period.from, period.to);
-                         });
+
+                          allQueries = periods.map(function (period) {
+                              return gUtils.buildGuaranteeQuery(guarantee.id, period.from, period.to);
+                          });
+
                     // } else {
                         // if(lastPeriod){
-                            //const period = utils.time.getLastPeriod(manager.agreement, requestWindow);
-                            //allQueries.push(gUtils.buildGuaranteeQuery(guarantee.id, period.from, period.to));
+
+
+                            // const period = utils.time.getLastPeriod(manager.agreement, requestWindow);
+                            // allQueries.push(gUtils.buildGuaranteeQuery(guarantee.id, period.from, period.to));
+
+
                         // }else{
                         //     allQueries.push(guarantee.id);
                         // }
@@ -194,7 +198,7 @@ function _setUpAccountableRegistryGET (req, res) {
                     }, []);
                     //guaranQueries.push({"guarantee": guaranteeId, "scopedGuarantees":processScopedGuarantees})
                     Promise.each(processScopedGuarantees, function (guaranteeParam) {
-                        return processScopedGuarantee(guaranteeParam.manager, guaranteeParam.query, guaranteeParam.guarantee, guaranteeParam.ofElement).then(function (value) {
+                        return processScopedGuarantee(guaranteeParam.manager, guaranteeParam.query, guaranteeParam.guarantee, guaranteeParam.ofElement).then(function () {
                           logger.debug('Scoped guarantee has been processed');
                           // Once we have calculated the scoped guarantee state, we add it to the array 'guaranteeValues'
                           // guaranteesValues = guaranteesValues.concat(value);
@@ -208,14 +212,22 @@ function _setUpAccountableRegistryGET (req, res) {
                       }).catch(function (err) {
                         console.log('Error processing scoped guarantee for: ' + guaranteeId)
                       });
-                }).then(function () {
+                }).then(function (result) {
                   let AgreementData = {"agreement": manager.agreement, "metricQueries": metricQueries}
 
                   try{
-                    governify.infrastructure.getService('internal.accountable').post('/api/v1/setUp/' + agreementId, AgreementData).then( (response) => {
+                    governify.httpClient.post('http://localhost:5900/api/v1/setUp/' + agreementId, AgreementData).then( (response) => {
+                      res.send({
+                        code:200,
+                        message: "Agreement has been set up"
+                      })
                       return resolve();
                     }).catch((err) => {
                       logger.error(err);
+                      res.send({
+                        code:500,
+                        message: "Error setting up agreement"
+                      });
                     })
                     // end stream
                     if (config.streaming) {
@@ -271,35 +283,34 @@ function processScopedGuarantee(manager, query, guarantee, ofElement){
             }
             // We get the metrics to calculate from the with section of the scoped guarantee
             if (ofElement.with) {
-                const window = ofElement.window;
-                window.initial = query.period.from;
-                if (query.period && query.period.to) {
-                    window.end = query.period.to;
-                }
-                
-                window.timeZone = agreement.context.validity.timeZone;
-                // For each metric, we create an object with the parameters needed by the manager to be able to calculate the metric state
-                for (const metricId in ofElement.with) {
-                    processMetrics.push({
-                    metric: metricId,
-                    scope: scopeWithDefault,
-                    parameters: ofElement.with[metricId],
-                    evidences: evidences,
-                    window: window,
-                    period: {
-                        from: query.period ? query.period.from : '*',
-                        to: query.period ? query.period.to : '*'
-                    }
-                    });
-                }
+              const window = ofElement.window;
+              window.initial = query.period.from;
+              if (query.period && query.period.to) {
+                  window.end = query.period.to;
+              }
+              
+              window.timeZone = agreement.context.validity.timeZone;
+              // For each metric, we create an object with the parameters needed by the manager to be able to calculate the metric state
+              for (const metricId in ofElement.with) {
+                processMetrics.push({
+                  metric: metricId,
+                  scope: scopeWithDefault,
+                  parameters: ofElement.with[metricId],
+                  evidences: evidences,
+                  window: window,
+                  period: {
+                      from: query.period ? query.period.from : '*',
+                      to: query.period ? query.period.to : '*'
+                  }
+                });
+              }
             }
 
-            const timedScopes = [];
-            const metricValues = [];
-            
-            Promise.each(processMetrics, function (metricParam) {
-                return new Promise(async function (resolve, reject) {
-                    var metric = agreement.terms.metrics[metricParam.metric];
+            const promisesA = []
+            processMetrics.forEach(function (metricParam) {
+
+                promisesA.push(new Promise(function (resolve, reject) {
+                    let metric = agreement.terms.metrics[metricParam.metric];
                     if (!metric) {
                         return reject('Metric ' + metricParam.metric + ' not found.');
                     }
@@ -312,171 +323,104 @@ function processScopedGuarantee(manager, query, guarantee, ofElement){
                         collectorQuery.evidences = metricParam.evidences;
                     }
                     var scope = metricParam.scope;
+
+                    logger.info('Using collector type: ' + collector.type);
+
                     if (collector.type === 'POST-GET-V1') {
-                        metric.measure.scope = Object.keys(scope).length > 0 ? scope : metricParam.scope;
-                        metric.measure.window = metricParam.window;
-                        var compositeResponse = [];
-                        const requestMetric = await governify.infrastructure.getService(collector.infrastructurePath).request({
-                          url: collector.endpoint,
-                          method: 'POST',
-                          data: { config: collector.config, metric: metric.measure }
-                        }
-                        ).catch(err => {
-                          const errorString = 'Error in Collector response ' + err.response.status + ':' + err.response.data;
-                        });
-                        const collectorResponse = requestMetric.data;
-                        const monthMetrics = await getComputationV2(collector.infrastructurePath, '/' + collectorResponse.computation.replace(/^\//, ''), 60000).catch(err => {
-                          const errorString = 'Error obtaining computation from computer: ' + metricParam.metric + '(' + err + ')';
-                        });
-                
-                        try {
-                          // Check if computer response is correct
-                          if (monthMetrics && Array.isArray(monthMetrics)) {
-                            // For each state returned by computer map the scope
-                            monthMetrics.forEach(function (metricState) {
-                              if (metricState.log && metric.scope) {
-                                // Getting the correct log for mapping scope
-                                const logId = Object.keys(metricState.log)[0];
-                                const log = agreement.context.definitions.logs[logId];
-                                // doing scope mapping
-                                metricState.scope = utils.scopes.computerToRegistryParser(metricState.scope, log.scopes);
-                              }
-                              // aggregate metrics in order to return all
-                              compositeResponse.push(metricState);
-                            });
-                            logger.info('Mapping of columns names in log processed.');
-                
-                            return resolve({
-                              metricId: metricParam.metric,
-                              metricValues: compositeResponse
-                            });
-                          } else {
-                            const errorString = 'Error in computer response for metric: ' + metricParam.metric + '. Response is not an array:  ' + JSON.stringify(monthMetrics);
-                          }
-                        } catch (err) {
-                          const errorString = 'Error processing computer response for metric: ' + metricParam.metric;
-                        }
-                      } else if (collector.type === 'PPINOT-V1') { // For ppinot collector
-                        var metric = agreement.terms.metrics[metricParam.metric];
-                        if (!metric) {
-                            return reject('Metric ' + metricParam.metric + ' not found.');
-                        }
-                
-                        const metricCollectorObject = metric.collector;
-                
-                        /** ### BUILD COMPUTER REQUEST QUERY ###**/
-                        var collectorQuery = {};
-                        collectorQuery.parameters = metricParam.parameters;
-                        collectorQuery.window = metricParam.window;
-                
-                        if (metricParam.evidences) {
-                          collectorQuery.evidences = metricParam.evidences;
-                        }
-                
-                        // Select logs data. If metric has not log, select by default log.
-                        let logDefinition, logId;
-                        if (metric.log) {
-                          logId = Object.keys(metric.log)[0]; // control this potential error
-                          if (!logId) { throw new Error('The log field of metric is not well defined in the agreement'); }
-                          logDefinition = metric.log[logId];
-                        } else {
-                          // Search default log
-                          const agLogs = agreement.context.definitions.logs;
-                          for (const l in agLogs) {
-                            if (agLogs[l].default) {
-                              logId = l;
-                              logDefinition = agLogs[l];
-                              break;
-                            }
-                          }
-                          if (!logDefinition) { throw new Error('Agreement is not well defined. It Must has at least a default log.'); }
-                        }
-                        collectorQuery.logs = {};
-                        collectorQuery.logs[logId] = new LogField(
-                            logDefinition.uri,
-                            logDefinition.stateUri,
-                            logDefinition.terminator,
-                            logDefinition.structure
-                        );
-                        var scope = utils.scopes.registryToComputerParser(metricParam.scope, logDefinition.scopes);
 
-                        collectorQuery.config = new Config(
-                        '',
-                        metricCollectorObject.config.schedules,
-                        metricCollectorObject.config.holidays || null,
-                        governify.infrastructure.getServices().internal.registry.default + '/api/v6/states/' + agreement.id + '/guarantees/' + metricParam.metric + '/overrides',
-                        metricCollectorObject.config.measures
-                        );
-                
-                        if (!collectorQuery.logs) {
-                        return reject('Log not found for metric ' + metricParam.metric + '. ' +
-                                        'Please, specify metric log or default log.');
-                        }
-                        collectorQuery.scope = Object.keys(scope).length > 0 ? scope : metricQuery.scope;
+                      const urlParams = {...metric.measure}
 
-                        // Build URL query that will use on computer request
-                        const urlParams = Query.parseToQueryParams(collectorQuery);
-                        logger.debug('Sending URL params to computer:', urlParams);
-                        var compositeResponse = [];
-                        logger.info('Sending request to computer with params: %s', JSON.stringify(collectorQuery, null, 2));
-                        // Build and send computer request
-                        process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-                        metricQueries.push({
-                            guaranteeID: query.guarantee,
-                            collector: collector,
-                            urlParams: urlParams,
-                            metric: metricParam.metric
-                        })
-                        resolve()
-                        // const requestMetric = await governify.infrastructure.getService(collector.infrastructurePath).request({
-                        //     url: collector.endpoint + '/' + metricCollectorObject.name.replace(/^\//, '') + '?' + encodeURI(urlParams),
-                        //     method: 'GET',
-                        //     responseType: 'stream'
-                        // }).catch(err => {
-                        //     const errorString = 'Error in PPINOT Computer response ' + err.response.status + ':' + err.response.data;
-                        //     logger.error(errorString)
-                        // });
-                        // const requestStream = requestMetric.data;
-                        // requestStream.pipe(JSONStream.parse()).on('data', monthMetrics => {
-                        //     try {
-                        //         // Check if computer response is correct
-                        //         if (monthMetrics && Array.isArray(monthMetrics)) {
-                        //         // For each state returned by computer map the scope
-                        //         monthMetrics.forEach(function (metricState) {
-                        //             if (metricState.log && metric.scope) {
-                        //             // Getting the correct log for mapping scope
-                        //             const logId = Object.keys(metricState.log)[0];
-                        //             const log = agreement.context.definitions.logs[logId];
-                        //             // doing scope mapping
-                        //             metricState.scope = utils.scopes.computerToRegistryParser(metricState.scope, log.scopes);
-                        //             }
-                        //             // aggregate metrics in order to return all
-                        //             compositeResponse.push(metricState);
-                        //         });
-                        //         logger.info('Mapping of columns names in log processed.');
-                        //         } else {
-                        //         const errorString = 'Error in computer response for metric: ' + metricParam.metric + '. Response is not an array:  ' + JSON.stringify(monthMetrics);
-                        //         }
-                        //     } catch (err) {
-                        //         const errorString = 'Error processing computer response for metric: ' + metricParam.metric;
-                        //     }
-                        // }).on('end', function () {
-                        //     console.log({
-                        //         metricId: metricParam.metric,
-                        //         metricValues: compositeResponse
-                        //     });
-                        // });
-                    }
-                });
-                  
-              }).then(function () {
-                return resolve();
-              }).catch(function (err) {
-                console.log('Error processing timedScopes metrics for guarantee: ' + guarantee.id);
-              });
+                      urlParams.scope = metricParam.scope;
+                      
+                      urlParams.window = metricParam.window;
+                      // console.log(metricParam.scope)
+                      metricQueries.push({
+                        guaranteeID: query.guarantee,
+                        collector: collector,
+                        urlParams: urlParams,
+                        metric: metricParam.metric
+                      })
+                      resolve()
+                    } else if (collector.type === 'PPINOT-V1') { // For ppinot collector
+                      let metric = agreement.terms.metrics[metricParam.metric];
+                      if (!metric) {
+                          return reject('Metric ' + metricParam.metric + ' not found.');
+                      }
               
-              resolve();
+                      const metricCollectorObject = metric.collector;
+              
+                      /** ### BUILD COMPUTER REQUEST QUERY ###**/
+                      var collectorQuery = {};
+                      collectorQuery.parameters = metricParam.parameters;
+                      collectorQuery.window = metricParam.window;
+              
+                      if (metricParam.evidences) {
+                        collectorQuery.evidences = metricParam.evidences;
+                      }
+              
+                      // Select logs data. If metric has not log, select by default log.
+                      let logDefinition, logId;
+                      if (metric.log) {
+                        logId = Object.keys(metric.log)[0]; // control this potential error
+                        if (!logId) { throw new Error('The log field of metric is not well defined in the agreement'); }
+                        logDefinition = metric.log[logId];
+                      } else {
+                        // Search default log
+                        const agLogs = agreement.context.definitions.logs;
+                        for (const l in agLogs) {
+                          if (agLogs[l].default) {
+                            logId = l;
+                            logDefinition = agLogs[l];
+                            break;
+                          }
+                        }
+                        if (!logDefinition) { throw new Error('Agreement is not well defined. It Must has at least a default log.'); }
+                      }
+                      collectorQuery.logs = {};
+                      collectorQuery.logs[logId] = new LogField(
+                          logDefinition.uri,
+                          logDefinition.stateUri,
+                          logDefinition.terminator,
+                          logDefinition.structure
+                      );
+                      var scope = utils.scopes.registryToComputerParser(metricParam.scope, logDefinition.scopes);
+
+                      collectorQuery.config = new Config(
+                      '',
+                      metricCollectorObject.config.schedules,
+                      metricCollectorObject.config.holidays || null,
+                      governify.infrastructure.getServices().internal.registry.default + '/api/v6/states/' + agreement.id + '/guarantees/' + metricParam.metric + '/overrides',
+                      metricCollectorObject.config.measures
+                      );
+              
+                      if (!collectorQuery.logs) {
+                      return reject('Log not found for metric ' + metricParam.metric + '. ' +
+                                      'Please, specify metric log or default log.');
+                      }
+                      collectorQuery.scope = Object.keys(scope).length > 0 ? scope : metricQuery.scope;
+
+                      // Build URL query that will use on computer request
+                      const urlParams = Query.parseToQueryParams(collectorQuery);
+                      logger.debug('Sending URL params to computer:', urlParams);
+                      logger.info('Sending request to computer with params: %s', JSON.stringify(collectorQuery, null, 2));
+                      // Build and send computer request
+                      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+                      metricQueries.push({
+                          guaranteeID: query.guarantee,
+                          collector: collector,
+                          urlParams: urlParams,
+                          metric: metricParam.metric
+                      })
+                      resolve()
+                    }
+                }));
             });
+            Promise.all(promisesA).then(function () {
+              resolve();
+            }).catch(function (err) {
+              console.log('Error processing timedScopes metrics for guarantee: ' + guarantee.id);
+            });
+          });
     } catch (err) {
         // Controlling errors that are not in promises
         const error = new Error(500, '', err);

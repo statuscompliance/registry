@@ -231,6 +231,9 @@ function _put (stateType, query, value, metadata) {
                                     logger.error("DB result = " + JSON.stringify(result, null, 2));
                                     return reject(new ErrorModel(500, "Inconsistent DB: multiple states for query " + JSON.stringify(refineQuery(stateManager.agreement.id, stateType, query), null, 2)));
                                 } else { */
+                                if(query.scope.servicio==="INT_PRV_CITASEVO_V1.0.0"){
+                                  console.log(result)
+                                }
                 return resolve(result);
                 //   }
               });
@@ -249,7 +252,7 @@ function _put (stateType, query, value, metadata) {
                             logger.error("Inconsistent DB: multiple states for query = " + JSON.stringify(refineQuery(stateManager.agreement.id, stateType, query), null, 2));
                             logger.error("DB result = " + JSON.stringify(result, null, 2));
                             return reject(new ErrorModel(500, "Inconsistent DB: multiple states for query " + JSON.stringify(refineQuery(stateManager.agreement.id, stateType, query), null, 2)));
-                        } else { */
+                        } else { */             
             return resolve(result);
             // }
           });
@@ -288,30 +291,40 @@ function _update (stateType, query, logsState, forceUpdate) {
           });
         break;
       case 'guarantees':
-        // const guaranteeDefinition = stateManager.agreement.terms.guarantees.find((e) => {
-        //   return query.guarantee === e.id;
-        // });
-        // if(query.period.from === '2021-09-15T22:00:00.000Z' && guaranteeDefinition.of[0].reliable){
+        const guaranteeDefinition = stateManager.agreement.terms.guarantees.find((e) => {
+          return query.guarantee === e.id;
+        });
+        // const period = utils.time.getLastPeriod(stateManager.agreement, guaranteeDefinition.of[0].window);
+        // //const reliableScope = query.period.from === '2021-09-15T22:00:00.000Z'
+        // const reliableScope = query.period.from === period.from
+        // if(reliableScope && guaranteeDefinition.of[0].reliable){
         //   try{
         //     governify.infrastructure.getService('internal.accountable').get('/api/v1/guarantees/' + query.guarantee).then( (response) => {
         //       const reliableGuaranteeState = response.data.guaranteeState
         //       const processGuarantees = [];
-        //       processGuarantees.push(stateManager.put(stateType, {
-        //         guarantee: query.guarantee,
-        //         period: reliableGuaranteeState.period,
-        //         scope: reliableGuaranteeState.scope
-        //       }, reliableGuaranteeState.value, {
-        //         //   "logsState": logsState,
-        //         metrics: reliableGuaranteeState.metrics,
-        //         evidences: reliableGuaranteeState.evidences
-        //         //  penalties: guaranteeState.penalties ? guaranteeState.penalties : null
-        //       }));
+              
+        //       // console.log(reliableGuaranteeState)
+        //       // console.log(reliableGuaranteeState.length)
+        //       reliableGuaranteeState.forEach( (guaranteeState) => {
+        //         processGuarantees.push(stateManager.put(stateType, {
+        //           guarantee: query.guarantee,
+        //           period: guaranteeState.period,
+        //           scope: guaranteeState.scope
+        //         }, guaranteeState.value, {
+        //           //   "logsState": logsState,
+        //           metrics: guaranteeState.metrics,
+        //           evidences: guaranteeState.evidences
+        //           //  penalties: guaranteeState.penalties ? guaranteeState.penalties : null
+        //         }));
+        //       });
         //       logger.debug('Created parameters array for saving states of guarantee of length ' + processGuarantees.length);
         //       logger.debug('Persisting guarantee states...');
         //       Promise.all(processGuarantees).then(function (guarantees) {
         //         logger.debug('All guarantee states have been persisted');
         //         const result = [];
         //         for (const a in guarantees) {
+
+        //           // console.log(guarantees[a][0].records)
         //           result.push(guarantees[a][0]);
         //         }
         //         return resolve(result);
@@ -325,39 +338,41 @@ function _update (stateType, query, logsState, forceUpdate) {
         //     return promiseErrorHandler(reject, 'state-manager', '_update', 500, errorString, err);
         //   }
         // }else{
-        calculators.guaranteeCalculator.process(stateManager, query, forceUpdate)
-        .then(function (guaranteeStates) {
-          logger.debug('Guarantee states for ' + guaranteeStates.guaranteeId + ' have been calculated (' + guaranteeStates.guaranteeValues.length + ') ');
-          logger.debug('Guarantee states: ' + JSON.stringify(guaranteeStates, null, 2));
-          const processGuarantees = [];
-          guaranteeStates.guaranteeValues.forEach(function (guaranteeState) {
-            logger.debug('Guarantee state: ' + JSON.stringify(guaranteeState, null, 2));
-            processGuarantees.push(stateManager.put(stateType, {
-              guarantee: query.guarantee,
-              period: guaranteeState.period,
-              scope: guaranteeState.scope
-            }, guaranteeState.value, {
-              //   "logsState": logsState,
-              metrics: guaranteeState.metrics,
-              evidences: guaranteeState.evidences
-              //  penalties: guaranteeState.penalties ? guaranteeState.penalties : null
-            }));
+          calculators.guaranteeCalculator.process(stateManager, query, forceUpdate)
+          .then(function (guaranteeStates) {
+            // console.log(1)
+            // console.log(guaranteeStates.guaranteeValues.length)
+            logger.debug('Guarantee states for ' + guaranteeStates.guaranteeId + ' have been calculated (' + guaranteeStates.guaranteeValues.length + ') ');
+            logger.debug('Guarantee states: ' + JSON.stringify(guaranteeStates, null, 2));
+            const processGuarantees = [];
+            guaranteeStates.guaranteeValues.forEach(function (guaranteeState) {
+              logger.debug('Guarantee state: ' + JSON.stringify(guaranteeState, null, 2));
+              processGuarantees.push(stateManager.put(stateType, {
+                guarantee: query.guarantee,
+                period: guaranteeState.period,
+                scope: guaranteeState.scope
+              }, guaranteeState.value, {
+                //   "logsState": logsState,
+                metrics: guaranteeState.metrics,
+                evidences: guaranteeState.evidences
+                //  penalties: guaranteeState.penalties ? guaranteeState.penalties : null
+              }));
+            });
+            logger.debug('Created parameters array for saving states of guarantee of length ' + processGuarantees.length);
+            logger.debug('Persisting guarantee states...');
+            Promise.all(processGuarantees).then(function (guarantees) {
+              logger.debug('All guarantee states have been persisted');
+              const result = [];
+              for (const a in guarantees) {
+                result.push(guarantees[a][0]);
+              }
+              return resolve(result);
+            });
+          }).catch(function (err) {
+            logger.error(err);
+            const errorString = 'Error processing guarantees';
+            return promiseErrorHandler(reject, 'state-manager', '_update', 500, errorString, err);
           });
-          logger.debug('Created parameters array for saving states of guarantee of length ' + processGuarantees.length);
-          logger.debug('Persisting guarantee states...');
-          Promise.all(processGuarantees).then(function (guarantees) {
-            logger.debug('All guarantee states have been persisted');
-            const result = [];
-            for (const a in guarantees) {
-              result.push(guarantees[a][0]);
-            }
-            return resolve(result);
-          });
-        }).catch(function (err) {
-          logger.error(err);
-          const errorString = 'Error processing guarantees';
-          return promiseErrorHandler(reject, 'state-manager', '_update', 500, errorString, err);
-        });
         // }
         break;
       case 'metrics':

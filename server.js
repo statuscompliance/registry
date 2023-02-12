@@ -174,7 +174,7 @@ function _deploy (configurations, commonsMiddleware, callback) {
             logger.info('Swagger-ui is available on https://localhost:%d/api/%s/docs', serverPort, CURRENT_API_VERSION);
           });
         } else {
-          http.createServer(app).listen(serverPort, function () {
+          http.createServer(app).listen(serverPort,'0.0.0.0', function () {
             logger.info('Your server is listening on port %d (http://localhost:%d)', serverPort, serverPort);
             logger.info('Swagger-ui is available on http://localhost:%d/api/%s/docs', serverPort, CURRENT_API_VERSION);
             if (callback) {
