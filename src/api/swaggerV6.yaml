@@ -844,6 +844,14 @@ paths:
           description: Agreement id
           required: true
           type: string
+        - name: from
+          in: query
+          description: From date period
+          type: string
+        - name: to
+          in: query
+          description: To date period
+          type: string
       responses:
         '200':
           description: Success
