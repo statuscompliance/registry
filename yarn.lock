@@ -1720,11 +1720,6 @@
   "resolved" "https://registry.npmjs.org/eslint-config-standard-jsx/-/eslint-config-standard-jsx-8.1.0.tgz"
   "version" "8.1.0"
 
-"eslint-config-standard@^13.0.1":
-  "integrity" "sha512-zLKp4QOgq6JFgRm1dDCVv1Iu0P5uZ4v5Wa4DTOkg2RFMxdCX/9Qf7lz9ezRj2dBRa955cWQF/O/LWEiYWAHbTw=="
-  "resolved" "https://registry.npmjs.org/eslint-config-standard/-/eslint-config-standard-13.0.1.tgz"
-  "version" "13.0.1"
-
 "eslint-config-standard@14.1.1":
   "integrity" "sha512-Z9B+VR+JIXRxz21udPTL9HpFMyoMUEeX1G251EQ6e05WD9aPVtVBn09XUmZ259wCMlCDmYDSZG62Hhm+ZTJcUg=="
   "resolved" "https://registry.npmjs.org/eslint-config-standard/-/eslint-config-standard-14.1.1.tgz"
@@ -2337,10 +2332,10 @@
     "js-yaml" "^3.6.1"
     "json-schema-deref" "^0.3.2"
 
-"governify-commons@^1.17.6-1":
-  "integrity" "sha512-Qee97lJJRV38hKLkq6z7HwemIiLo3pPJFLEa8DL6lCPeWvZ/5gof2QEEoCkEHczXYh9bwZC2p528MaxRPcg51A=="
-  "resolved" "https://registry.npmjs.org/governify-commons/-/governify-commons-1.17.6-1.tgz"
-  "version" "1.17.6-1"
+"governify-commons@^1.18.0":
+  "integrity" "sha512-AAYLRU72/T1nd/0i5RO+Y2/ZPTsRuugaG2I1tMHK0QF2aHVggGks0LJ67V0coxjWhZRXk5aS0/lKiVveDKNLFA=="
+  "resolved" "https://registry.npmjs.org/governify-commons/-/governify-commons-1.18.0.tgz"
+  "version" "1.18.0"
   dependencies:
     "@opentelemetry/api" "0.20.0"
     "@opentelemetry/context-async-hooks" "0.20.0"

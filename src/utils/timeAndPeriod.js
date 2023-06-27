@@ -52,14 +52,20 @@ function _getPeriods (agreement, window) {
     window = {};
   }
 
-  const from = new Date(window.initial ? window.initial : agreement.context.validity.initial);
-  const to = new Date();
+  const initial = new Date(window.initial ? window.initial : agreement.context.validity.initial);
+  const currentDate = new Date();
+  
+  const periodFrom = new Date(window.from ? window.from : initial);
+  const periodTo = window.end ? new Date(window.end) : new Date();
+  
+  const dates = gPeriods.getDates(initial, currentDate, window.period ? window.period : 'monthly', periodTo, window.rules);
+  
+  const wFrom = dates.filter(date => date < periodFrom).at(-1) || periodFrom;
+  const wTo = dates.filter(date => date > periodTo).at(0) || periodTo;
+  
+  // const periods = gPeriods.getPeriods(dates, agreement.context.validity.timeZone, true, wFrom, wTo);
 
-  const Wfrom = new Date(window.from ? window.from : from);
-  const Wto = window.end ? new Date(window.end) : new Date();
-
-  const dates = gPeriods.getDates(from, to, window.period ? window.period : 'monthly', Wto, window.rules);
-  return gPeriods.getPeriods(dates, agreement.context.validity.timeZone, true, Wfrom, Wto);
+  return [{ from: wFrom.toISOString(), to: wTo.toISOString() }]
 }
 
 /**
