@@ -1,15 +1,17 @@
 {
     "id": {
         "type": "string",
-        "index": true
+        "required": true
     },
     "version": {
         "type": "string"
     },
     "type": {
+        "required": true,
         "type": "string"
     },
     "context": {
+        "required": true,
         "type": "object",
         "properties": {
             "provider": {
@@ -33,6 +35,7 @@
         }
     },
     "terms": {
+        "required": true,
         "type": "object",
         "properties": {
             "guarantees": {
