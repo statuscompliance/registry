@@ -24,10 +24,10 @@ telemetry:
   server: governify-telemetry:8200
 maxAttempts: 20
 models:
-  agreementTemplate:
-    name: AgreementTemplateModel
-    path: "./src/models/agreementTemplateModel.json"
-    indexableParams: { id: 1, version: 1 }
+  template:
+    name: TemplateModel
+    path: "./src/models/agreementModel.json"
+    indexableParams: { id: 1 }
   agreement:
     name: AgreementModel
     path: "./src/models/agreementModel.json"

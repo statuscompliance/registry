@@ -26,53 +26,53 @@ consumes:
 produces:
   - application/json
 paths:
-  /agreementTemplates:
+  /templates:
     get:
       tags:
-        - agreementTemplate-registry
-      description: Get all agreementTemplates
-      operationId: agreementTemplatesGET
+        - template-registry
+      description: Get all templates
+      operationId: templatesGET
       responses:
         '200':
           description: Success
           schema:
             type: array
             items:
-              $ref: '#/definitions/agreementTemplate'
+              $ref: '#/definitions/template'
         '500':
           description: Internal Server Error
           schema:
             $ref: '#/definitions/error_model'
-      x-swagger-router-controller: AgreementTemplateRegistry
+      x-swagger-router-controller: TemplateRegistry
     delete:
       tags:
-        - agreementTemplate-registry
+        - template-registry
       description: XXX
-      operationId: agreementTemplatesDELETE
+      operationId: templatesDELETE
       responses:
         '200':
           description: Success
           schema:
             type: array
             items:
-              $ref: '#/definitions/agreementTemplate'
+              $ref: '#/definitions/template'
         '400':
           description: Bad request
           schema:
             $ref: '#/definitions/error_model'
-      x-swagger-router-controller: AgreementTemplateRegistry
+      x-swagger-router-controller: TemplateRegistry
     post:
       tags:
-        - agreementTemplate-registry
-      description: Create a new agreementTemplate
-      operationId: agreementTemplatesPOST
+        - template-registry
+      description: Create a new template
+      operationId: templatesPOST
       parameters:
-        - name: agreementTemplate
+        - name: template
           in: body
           description: XXX
           required: true
           schema:
-            $ref: '#/definitions/agreementTemplate'
+            $ref: '#/definitions/template'
       responses:
         '200':
           description: Success
@@ -80,15 +80,15 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/error_model'
-      x-swagger-router-controller: AgreementTemplateRegistry
-  '/agreementTemplates/{agreementTemplateId}':
+      x-swagger-router-controller: TemplateRegistry
+  '/templates/{templateId}':
     get:
       tags:
-        - agreementTemplate-registry
-      description: Get an agreementTemplate by ID
-      operationId: agreementTemplateIdGET
+        - template-registry
+      description: Get an template by ID
+      operationId: templateIdGET
       parameters:
-        - name: agreementTemplateId
+        - name: templateId
           in: path
           description: XXX
           required: true
@@ -97,7 +97,7 @@ paths:
         '200':
           description: Success
           schema:
-            $ref: '#/definitions/agreementTemplate'
+            $ref: '#/definitions/template'
         '404':
           description: Not found
           schema:
@@ -106,14 +106,14 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/error_model'
-      x-swagger-router-controller: AgreementTemplateRegistry
+      x-swagger-router-controller: TemplateRegistry
     delete:
       tags:
-        - agreementTemplate-registry
+        - template-registry
       description: XXX
-      operationId: agreementTemplateIdDELETE
+      operationId: templateIdDELETE
       parameters:
-        - name: agreementTemplateId
+        - name: templateId
           in: path
           description: XXX
           required: true
@@ -122,12 +122,12 @@ paths:
         '200':
           description: Success
           schema:
-            $ref: '#/definitions/agreementTemplate'
+            $ref: '#/definitions/template'
         '400':
           description: Bad request
           schema:
             $ref: '#/definitions/error_model'
-      x-swagger-router-controller: AgreementTemplateRegistry
+      x-swagger-router-controller: TemplateRegistry
   /agreements:
     get:
       tags:
@@ -971,7 +971,7 @@ paths:
 definitions:
   query:
     type: object
-  agreementTemplate:
+  template:
     type: object
     # db validation scheme is defined in its own file at src/models/<fileName>.json
   agreement:

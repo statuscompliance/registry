@@ -73,8 +73,7 @@ function _connect (callback) {
     instance.db = db;
     if (!instance.models) {
       instance.models = {};
-      setupModel(instance, config.models.agreementTemplate.name, config.models.agreementTemplate.path,config.models.agreementTemplate.indexableParams);
-  
+      setupModel(instance, config.models.template.name, config.models.template.path,config.models.template.indexableParams);
       setupModel(instance, config.models.agreement.name, config.models.agreement.path);
       setupModel(instance, config.models.state.name, config.models.state.path);
       setupModel(instance, config.models.overrides.name, config.models.overrides.path);
