@@ -26,6 +26,108 @@ consumes:
 produces:
   - application/json
 paths:
+  /agreementTemplates:
+    get:
+      tags:
+        - agreementTemplate-registry
+      description: Get all agreementTemplates
+      operationId: agreementTemplatesGET
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/agreementTemplate'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error_model'
+      x-swagger-router-controller: AgreementTemplateRegistry
+    delete:
+      tags:
+        - agreementTemplate-registry
+      description: XXX
+      operationId: agreementTemplatesDELETE
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/agreementTemplate'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error_model'
+      x-swagger-router-controller: AgreementTemplateRegistry
+    post:
+      tags:
+        - agreementTemplate-registry
+      description: Create a new agreementTemplate
+      operationId: agreementTemplatesPOST
+      parameters:
+        - name: agreementTemplate
+          in: body
+          description: XXX
+          required: true
+          schema:
+            $ref: '#/definitions/agreementTemplate'
+      responses:
+        '200':
+          description: Success
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error_model'
+      x-swagger-router-controller: AgreementTemplateRegistry
+  '/agreementTemplates/{agreementTemplateId}':
+    get:
+      tags:
+        - agreementTemplate-registry
+      description: Get an agreementTemplate by ID
+      operationId: agreementTemplateIdGET
+      parameters:
+        - name: agreementTemplateId
+          in: path
+          description: XXX
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/agreementTemplate'
+        '404':
+          description: Not found
+          schema:
+            $ref: '#/definitions/error_model'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error_model'
+      x-swagger-router-controller: AgreementTemplateRegistry
+    delete:
+      tags:
+        - agreementTemplate-registry
+      description: XXX
+      operationId: agreementTemplateIdDELETE
+      parameters:
+        - name: agreementTemplateId
+          in: path
+          description: XXX
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/agreementTemplate'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error_model'
+      x-swagger-router-controller: AgreementTemplateRegistry
   /agreements:
     get:
       tags:
@@ -869,6 +971,9 @@ paths:
 definitions:
   query:
     type: object
+  agreementTemplate:
+    type: object
+    # db validation scheme is defined in its own file at src/models/<fileName>.json
   agreement:
     type: object
     # properties:

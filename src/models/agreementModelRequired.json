@@ -1,0 +1,602 @@
+{
+    "id": {
+        "type": "string",
+        "index": true,
+        "required": true
+    },
+    "version": {
+        "type": "string",
+        "required": true
+    },
+    "type": {
+        "type": "string",
+        "required": true
+    },
+    "context": {
+        "required": [
+            "validity",
+            "infrastructure",
+            "definitions"
+        ],
+        "provider": {
+            "type": "string"
+        },
+        "consumer": {
+            "type": "string"
+        },
+        "validity": {
+            "initial": {
+                "required": true,
+                "type": "string"
+            },
+            "timeZone": {
+                "required": true,
+                "type": "string"
+            },
+            "end": {
+                "type": "string"
+            }
+        },
+        "definitions": {
+            "schemas": {
+                "type": "object",
+                "patternProperties": {
+                    "^[a-zA-Z0-9]*$": {
+                        "type": "object",
+                        "properties": {
+                            "description": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string"
+                            },
+                            "unit": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "scopes": {
+                "type": "object",
+                "patternProperties": {
+                    "^[a-zA-Z0-9]*$": {
+                        "type": "object",
+                        "patternProperties": {
+                            "^[a-zA-Z0-9]*$": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "type": {
+                                        "type": "string"
+                                    },
+                                    "metadata": {
+                                        "type": "object",
+                                        "patternProperties": {
+                                            "^[a-zA-Z0-9]*$": {}
+                                        }
+                                    },
+                                    "format": {
+                                        "type": "string"
+                                    },
+                                    "default": {}
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "log": {
+                "type": "object",
+                "patternProperties": {
+                    "^[a-zA-Z0-9]*$": {
+                        "type": "object",
+                        "properties": {
+                            "default": {
+                                "type": "boolean"
+                            },
+                            "uri": {
+                                "type": "string"
+                            },
+                            "stateUri": {
+                                "type": "string"
+                            },
+                            "measures": {
+                                "type": "string"
+                            },
+                            "scopes": {
+                                "type": "object",
+                                "patternProperties": {
+                                    "^[a-zA-Z0-9]*$": {
+                                        "type": "object",
+                                        "patternProperties": {
+                                            "^[a-zA-Z0-9]*$": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "infrastructure": {
+            "type": "object",
+            "patternProperties": {
+                "^[a-zA-Z0-9]*$": {
+                    "type": "string"
+                }
+            }
+        },
+        "iAgree": {
+            "type": "string"
+        }
+    },
+    "terms": {
+        "type": "object",
+        "required": true,
+        "guarantees": {
+            "type": "array",
+            "required": true,
+            "items": {
+                "guarantee": {
+                    "type": "object",
+                    "required": true,
+                    "properties": {
+                        "id": {
+                            "required": true,
+                            "type": "string"
+                        },
+                        "scope": {
+                            "type": "object",
+                            "patternProperties": {
+                                "^[a-zA-Z0-9]*$": {}
+                            }
+                        },
+                        "of": {
+                            "required": true,
+                            "type": "array",
+                            "items": {
+                                "scoped_guarantee": {
+                                    "type": "object",
+                                    "properties": {
+                                        "scope": {
+                                            "type": "object",
+                                            "patternProperties": {
+                                                "^[a-zA-Z0-9]*$": {}
+                                            }
+                                        },
+                                        "objective": {
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "with": {
+                                            "type": "object",
+                                            "patternProperties": {
+                                                "^[a-zA-Z0-9]*$": {
+                                                    "type": "object",
+                                                    "patternProperties": {
+                                                        "^[a-zA-Z0-9]*$": {}
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "window": {
+                                            "required": true,
+                                            "$ref": "#/window"
+                                        },
+                                        "evidences": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/evidence"
+                                            }
+                                        },
+                                        "penalties": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/compensation"
+                                            }
+                                        },
+                                        "rewards": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/compensation"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metrics": {
+            "required": true,
+            "$ref": "#/metrics"
+        },
+        "configurations": {
+            "type": "object",
+            "additionalProperties": {
+                "$ref": "#/configuration"
+            }
+        },
+        "pricing": {
+            "required": true,
+            "$ref": "#/pricing"
+        },
+        "quotas": {
+            "type": "array",
+            "items": {
+                "$ref": "#/quota"
+            }
+        },
+        "rates": {
+            "type": "array",
+            "items": {
+                "$ref": "#/rate"
+            }
+        }
+    },
+    "configuration": {
+        "type": "object",
+        "properties": {
+            "of": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/scopedConfiguration"
+                }
+            },
+            "scope": {
+                "$ref": "#/scope"
+            }
+        }
+    },
+    "scopedConfiguration": {
+        "type": "object",
+        "properties": {
+            "scope": {
+                "type": "object",
+                "patternProperties": {
+                    "^[a-zA-Z0-9]*$": {}
+                }
+            },
+            "value": {
+                "oneOf": [
+                    {
+                        "type": "string"
+                    },
+                    {
+                        "type": "number"
+                    },
+                    {
+                        "type": "boolean"
+                    }
+                ]
+            }
+        }
+    },
+    "scope": {
+        "type": "object",
+        "patternProperties": {
+            "^[a-zA-Z0-9]*$": {}
+        }
+    },
+    "pricing": {
+        "type": "object",
+        "properties": {
+            "cost": {
+                "type": "number",
+                "format": "double"
+            },
+            "currency": {
+                "type": "string"
+            },
+            "billing": {
+                "required": true,
+                "$ref": "#/billing"
+            }
+        }
+    },
+    "billing": {
+        "type": "object",
+        "properties": {
+            "period": {
+                "required": true,
+                "type": "string"
+            },
+            "initial": {
+                "type": "string"
+            },
+            "penalties": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/compensation"
+                }
+            },
+            "rewards": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/compensation"
+                }
+            }
+        }
+    },
+    "metrics": {
+        "type": "object",
+        "patternProperties": {
+            "^[a-zA-Z0-9]*$": {
+                "type": "object",
+                "properties": {
+                    "schema": {
+                        "required": true,
+                        "type": "object",
+                        "properties": {
+                            "description": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string"
+                            },
+                            "unit": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "computer": {
+                        "type": "string"
+                    },
+                    "parameters": {
+                        "type": "object",
+                        "patternProperties": {
+                            "^[a-zA-Z0-9]*$": {}
+                        }
+                    },
+                    "scope": {
+                        "required": true,
+                        "type": "object",
+                        "patternProperties": {
+                            "^[a-zA-Z0-9]*$": {}
+                        }
+                    },
+                    "metadata": {
+                        "type": "object",
+                        "patternProperties": {
+                            "^[a-zA-Z0-9]*$": {}
+                        }
+                    },
+                    "defaultStateReload": {
+                        "type": "boolean"
+                    },
+                    "window": {
+                        "$ref": "#/window"
+                    }
+                }
+            }
+        }
+    },
+    "rate": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "string"
+            },
+            "scope": {
+                "type": "object",
+                "patternProperties": {
+                    "^[a-zA-Z0-9]*$": {
+                        "type": "object",
+                        "patternProperties": {
+                            "^[a-zA-Z0-9]*$": {}
+                        }
+                    }
+                }
+            },
+            "over": {
+                "type": "object",
+                "patternProperties": {
+                    "^[a-zA-Z0-9]*$": {
+                        "type": "object",
+                        "patternProperties": {
+                            "^[a-zA-Z0-9]*$": {}
+                        }
+                    }
+                }
+            },
+            "of": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/scopedRate"
+                }
+            }
+        }
+    },
+    "quota": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "string"
+            },
+            "scope": {
+                "type": "object",
+                "patternProperties": {
+                    "^[a-zA-Z0-9]*$": {
+                        "type": "object",
+                        "patternProperties": {
+                            "^[a-zA-Z0-9]*$": {}
+                        }
+                    }
+                }
+            },
+            "over": {
+                "type": "object",
+                "patternProperties": {
+                    "^[a-zA-Z0-9]*$": {
+                        "type": "object",
+                        "patternProperties": {
+                            "^[a-zA-Z0-9]*$": {}
+                        }
+                    }
+                }
+            },
+            "of": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/scopedQuota"
+                }
+            }
+        }
+    },
+    "scopedQuota": {
+        "type": "object",
+        "properties": {
+            "scope": {
+                "type": "object",
+                "patternProperties": {
+                    "^[a-zA-Z0-9]*$": {}
+                }
+            },
+            "limits": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/limit"
+                }
+            }
+        }
+    },
+    "scopedRate": {
+        "type": "object",
+        "properties": {
+            "scope": {
+                "type": "object",
+                "patternProperties": {
+                    "^[a-zA-Z0-9]*$": {}
+                }
+            },
+            "limits": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/limit"
+                }
+            }
+        }
+    },
+    "limit": {
+        "type": "object",
+        "properties": {
+            "max": {
+                "type": "number"
+            },
+            "period": {
+                "type": "string"
+            }
+        }
+    },
+    "window": {
+        "type": "object",
+        "properties": {
+            "initial": {
+                "type": "string"
+            },
+            "end": {
+                "type": "string"
+            },
+            "type": {
+                "required": true,
+                "type": "string"
+            },
+            "period": {
+                "required": true,
+                "type": "string"
+            }
+        }
+    },
+    "evidence": {
+        "type": "object",
+        "patternProperties": {
+            "^[a-zA-Z0-9]*$": {
+                "type": "object",
+                "properties": {
+                    "schema": {
+                        "type": "object",
+                        "patternProperties": {
+                            "^[a-zA-Z0-9]*$": {}
+                        }
+                    },
+                    "computer": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    },
+    "compensation": {
+        "type": "object",
+        "properties": {
+            "over": {
+                "$ref": "#/over"
+            },
+            "of": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/compensation_of"
+                }
+            },
+            "aggregatedBy": {
+                "type": "string"
+            },
+            "groupBy": {
+                "type": "object",
+                "patternProperties": {
+                    "^[a-zA-Z0-9]*$": {
+                        "type": "object",
+                        "patternProperties": {
+                            "^[a-zA-Z0-9]*$": {}
+                        }
+                    }
+                }
+            },
+            "upTo": {
+                "type": "number",
+                "format": "double"
+            }
+        }
+    },
+    "compensation_of": {
+        "type": "object",
+        "properties": {
+            "value": {
+                "type": "string"
+            },
+            "condition": {
+                "type": "string"
+            }
+        }
+    },
+    "over": {
+        "type": "object",
+        "patternProperties": {
+            "^[a-zA-Z0-9]*$": {
+                "type": "object",
+                "properties": {
+                    "description": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "unit": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}
