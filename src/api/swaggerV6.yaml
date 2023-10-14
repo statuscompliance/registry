@@ -81,6 +81,34 @@ paths:
           schema:
             $ref: '#/definitions/error_model'
       x-swagger-router-controller: TemplateRegistry
+  '/templates/regexp':
+    post:
+      tags:
+        - template-registry
+      description: Get all template matching regexpPattern in  ID
+      operationId: templateRegexpIdPOST
+      parameters:
+        - name: regexpPattern
+          in: body
+          description: XXX
+          required: true
+          schema:
+            $ref: '#/definitions/regexpPattern'
+
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/template'
+        '404':
+          description: Not found
+          schema:
+            $ref: '#/definitions/error_model'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error_model'
+      x-swagger-router-controller: TemplateRegistry
   '/templates/{templateId}':
     get:
       tags:
@@ -974,6 +1002,9 @@ definitions:
   template:
     type: object
     # db validation scheme is defined in its own file at src/models/<fileName>.json
+  regexpPattern:
+    type: object
+
   agreement:
     type: object
     # properties:

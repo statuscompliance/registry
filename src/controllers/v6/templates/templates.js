@@ -50,11 +50,12 @@ module.exports = {
   templatesDELETE: _templatesDELETE,
   templatesGET: _templatesGET,
   templateIdGET: _templateIdGET,
+  templateRegexpIdPOST: _templateRegexpIdPOST,
   templateIdDELETE: _templateIdDELETE,
 };
 
 /**
- * Post an template
+ * Post a template
  * @param {Object} args {template: String}
  * @param {Object} res response
  * @param {Object} next next function
@@ -68,6 +69,15 @@ function _templatesPOST (args, res) {
       res.status(500).json(new ErrorModel(500, err));
     } else {
       const template = new db.models.TemplateModel(schema);
+      //check if the id follows a pattern
+      const idPattern = /^template-(.*)-v(\d+)\.(\d+)\.(\d+)$/ ;
+      const exampleId = "template-my-string-example-v0.002.012"
+      const requestId = schema.id
+      if(!idPattern.test(requestId)){
+        return res.status(400).json({"error": "Bad formed id","required pattern":` ${idPattern.toString()}`,"your id":`${requestId}`,"example":`${exampleId}` })
+      }
+      //check type = "template"
+      if(!(schema.type=="template")) return res.status(400).json(new ErrorModel(400, "Template must have: 'type':'template'"));
       template.save(function (err,data) {
         if (err) {
             logger.error('Mongo error saving template template: ' + err.toString());
@@ -95,6 +105,7 @@ function _templatesDELETE (args, res) {
   TemplateModel.remove({}, function (err) {
     if (!err) {
       logger.info('Deleted all templates');
+      res.sendStatus(204);
     } else {
       res.sendStatus(404);
       logger.warn("Can't delete all templates: " + err);
@@ -126,15 +137,54 @@ function _templatesGET (args, res) {
   });
 }
 
+
+
 /**
- * Get an template by template ID.
+ * Get a template by regex in template ID .
+ * @param {Object} args {template: String}
+ * @param {Object} res response
+ * @param {Object} next next function
+ * @alias module:template.templateRegexIdGET
+ * */
+function _templateRegexpIdPOST (args, res) {
+  console.log(Object.keys(args))
+  const schema  = args.regexpPattern.value;
+  if(!(schema.pattern))  return res.status(400).json({"error": "missing required pattern property","required object example": {pattern:"psg"}})
+  if(typeof(schema.pattern) != "string"){
+    return res.status(400).json({"error": "pattern must be a string","required object example": {pattern:"psg"}})
+  }
+
+  if(_isBadRegExp(schema.pattern)) {
+    logger.info('New request to GET template with bad regex = ' + schema.pattern);
+    return res.status(400);
+  }
+  logger.info('New request to GET template with regex = ' + schema.pattern);
+const TemplateModel = db.models.TemplateModel;
+TemplateModel.find({ id: { $regex: schema.pattern }
+}, function (err, template) {
+  if (err) {
+    logger.error(err.toString());
+    return res.status(500).json(new ErrorModel(500, err));
+  }
+  
+  if (!template) {
+    logger.warn('There is no template with id: ' + args.templateId.value);
+    return res.status(404).json(new ErrorModel(404, 'There is no template with id: ' + args.templateId.value));
+  }
+
+  logger.info('template returned');
+  res.status(200).json(template);
+});
+}
+
+/**
+ * Get a template by template ID.
  * @param {Object} args {template: String}
  * @param {Object} res response
  * @param {Object} next next function
  * @alias module:template.templateIdGET
  * */
 function _templateIdGET (args, res) {
-  console.log(Object.keys(args))
   logger.info('New request to GET template with id = ' + args.templateId.value);
   const TemplateModel = db.models.TemplateModel;
   TemplateModel.findOne({
@@ -155,8 +205,9 @@ function _templateIdGET (args, res) {
   });
 }
 
+
 /**
- * Delete an template by template ID.
+ * Delete a template by template ID.
  * @param {Object} args {template: String}
  * @param {Object} res response
  * @param {Object} next next function
@@ -168,7 +219,7 @@ function _templateIdDELETE (args, res) {
   if (templateId) {
     const TemplateModel = db.models.TemplateModel;
     TemplateModel.remove({
-      _id: templateId
+      id: templateId
     }, function (err) {
       if (!err) {
         logger.info('Deleted template with id ' + templateId);
@@ -185,4 +236,13 @@ function _templateIdDELETE (args, res) {
 }
 
 
+
+function _isBadRegExp(string){
+  try {
+    const reg = new RegExp(string)
+    return false;
+  } catch (error) {
+    return true
+  }
+}
 

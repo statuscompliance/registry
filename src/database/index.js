@@ -73,11 +73,15 @@ function _connect (callback) {
     instance.db = db;
     if (!instance.models) {
       instance.models = {};
-      setupModel(instance, config.models.template.name, config.models.template.path,config.models.template.indexableParams);
-      setupModel(instance, config.models.agreement.name, config.models.agreement.path);
-      setupModel(instance, config.models.state.name, config.models.state.path);
-      setupModel(instance, config.models.overrides.name, config.models.overrides.path);
-      setupModel(instance, config.models.bills.name, config.models.bills.path);
+      try {
+        setupModel(instance, config.models.template.name, config.models.template.path,config.models.template.indexableParams);
+        setupModel(instance, config.models.agreement.name, config.models.agreement.path);
+        setupModel(instance, config.models.state.name, config.models.state.path);
+        setupModel(instance, config.models.overrides.name, config.models.overrides.path);
+        setupModel(instance, config.models.bills.name, config.models.bills.path);
+      } catch (error) {
+        throw new Error("Error setting the /models files with /configuration files: "+error)
+      }
     }
     if (callback) {
       callback();

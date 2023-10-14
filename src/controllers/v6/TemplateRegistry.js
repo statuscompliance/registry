@@ -39,8 +39,9 @@ module.exports = {
   templatesDELETE: _templatesDELETE,
   templatesPOST: _templatesPOST,
 
-  templateTemplateIdGET: _templateTemplateIdGET,
-  templateTemplateIdDELETE: _templateTemplateIdDELETE,
+  templateIdGET: _templateIdGET,
+  templateRegexpIdPOST: _templateRegexpIdPOST,
+  templateIdDELETE: _templateIdDELETE,
 
 };
 
@@ -52,10 +53,20 @@ module.exports = {
  * @param {Object} next next function
  * @alias module:TemplateRegistry.templatesIdDELETE
  * */
-function _templateTemplateIdDELETE (req, res, next) {
-  templates.templateTemplateIdDELETE(req.swagger.params, res, next);
+function _templateIdDELETE (req, res, next) {
+  templates.templateIdDELETE(req.swagger.params, res, next);
 }
 
+/**
+ * templatesRegexIdGET.
+ * @param {Object} req request
+ * @param {Object} res response
+ * @param {Object} next next function
+ * @alias module:TemplateRegistry.templatesRegexIdGET
+ * */
+function _templateRegexpIdPOST (req, res, next) {
+  templates.templateRegexpIdPOST(req.swagger.params, res, next);
+}
 /**
  * templatesIdGET.
  * @param {Object} req request
@@ -63,8 +74,8 @@ function _templateTemplateIdDELETE (req, res, next) {
  * @param {Object} next next function
  * @alias module:TemplateRegistry.templatesIdGET
  * */
-function _templateTemplateIdGET (req, res, next) {
-  templates.templateTemplateIdGET(req.swagger.params, res, next);
+function _templateIdGET (req, res, next) {
+  templates.templateIdGET(req.swagger.params, res, next);
 }
 
 /**
