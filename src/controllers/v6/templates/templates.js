@@ -30,6 +30,7 @@ const $RefParser = require('json-schema-ref-parser');
 const db = require('../../../database');
 
 const states = require('../states/states');
+const { json } = require('body-parser');
 const ErrorModel = require('../../../errors/index.js').errorModel;
 
 /**
@@ -50,7 +51,6 @@ module.exports = {
   templatesDELETE: _templatesDELETE,
   templatesGET: _templatesGET,
   templateIdGET: _templateIdGET,
-  templateRegexpIdPOST: _templateRegexpIdPOST,
   templateIdDELETE: _templateIdDELETE,
 };
 
@@ -70,8 +70,8 @@ function _templatesPOST (args, res) {
     } else {
       const template = new db.models.TemplateModel(schema);
       //check if the id follows a pattern
-      const idPattern = /^template-(.*)-v(\d+)\.(\d+)\.(\d+)$/ ;
-      const exampleId = "template-my-string-example-v0.002.012"
+      const idPattern = /^(.*)-v(\d+)\.(\d+)\.(\d+)$/ ;
+      const exampleId = "my-string-example-v0.002.012"
       const requestId = schema.id
       if(!idPattern.test(requestId)){
         return res.status(400).json({"error": "Bad formed id","required pattern":` ${idPattern.toString()}`,"your id":`${requestId}`,"example":`${exampleId}` })
@@ -120,14 +120,21 @@ function _templatesDELETE (args, res) {
  * @param {Object} next next function
  * @alias module:template.templatesGET
  * */
-function _templatesGET (args, res) {
+async function _templatesGET (req, res) {
   /**
      * parameters expected in the args:
      * namespace (String)
      **/
   logger.info('New request to GET templates templates/templates.js');
   const TemplateModel = db.models.TemplateModel;
-  TemplateModel.find(function (err, templates) {
+  let regExp = /.*/
+  if(req.query.id) {
+    logger.info("search by id",req.query.id)
+    regExp =  new RegExp(req.query.id.replace(/\*/g, '.*'))
+  }
+  TemplateModel.find({
+    id: regExp
+  },function (err, templates) {
     if (err) {
       logger.error(err.toString());
       res.status(500).json(new ErrorModel(500, err));
@@ -139,43 +146,7 @@ function _templatesGET (args, res) {
 
 
 
-/**
- * Get a template by regex in template ID .
- * @param {Object} args {template: String}
- * @param {Object} res response
- * @param {Object} next next function
- * @alias module:template.templateRegexIdGET
- * */
-function _templateRegexpIdPOST (args, res) {
-  console.log(Object.keys(args))
-  const schema  = args.regexpPattern.value;
-  if(!(schema.pattern))  return res.status(400).json({"error": "missing required pattern property","required object example": {pattern:"psg"}})
-  if(typeof(schema.pattern) != "string"){
-    return res.status(400).json({"error": "pattern must be a string","required object example": {pattern:"psg"}})
-  }
 
-  if(_isBadRegExp(schema.pattern)) {
-    logger.info('New request to GET template with bad regex = ' + schema.pattern);
-    return res.status(400);
-  }
-  logger.info('New request to GET template with regex = ' + schema.pattern);
-const TemplateModel = db.models.TemplateModel;
-TemplateModel.find({ id: { $regex: schema.pattern }
-}, function (err, template) {
-  if (err) {
-    logger.error(err.toString());
-    return res.status(500).json(new ErrorModel(500, err));
-  }
-  
-  if (!template) {
-    logger.warn('There is no template with id: ' + args.templateId.value);
-    return res.status(404).json(new ErrorModel(404, 'There is no template with id: ' + args.templateId.value));
-  }
-
-  logger.info('template returned');
-  res.status(200).json(template);
-});
-}
 
 /**
  * Get a template by template ID.

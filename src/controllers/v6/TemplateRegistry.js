@@ -86,7 +86,7 @@ function _templateIdGET (req, res, next) {
  * @alias module:TemplateRegistry.templatesGET
  * */
 function _templatesGET (req, res, next) {
-  templates.templatesGET(req.swagger.params, res, next);
+  templates.templatesGET(req, res, next);
 }
 
 /**
