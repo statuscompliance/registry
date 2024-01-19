@@ -60,12 +60,12 @@ function _getPeriods (agreement, window) {
   
   const dates = gPeriods.getDates(initial, currentDate, window.period ? window.period : 'monthly', periodTo, window.rules);
   
-  const wFrom = dates.filter(date => date < periodFrom).at(-1) || periodFrom;
-  const wTo = dates.filter(date => date > periodTo).at(0) || periodTo;
+  const wFrom = dates.filter(date => date < periodFrom).slice(-1)[0] || periodFrom;
+  const wTo = dates.filter(date => date > periodTo)[0] || periodTo;
   
   // const periods = gPeriods.getPeriods(dates, agreement.context.validity.timeZone, true, wFrom, wTo);
 
-  return [{ from: wFrom.toISOString(), to: wTo.toISOString() }]
+  return [{ from: new Date(wFrom).toISOString(), to: new Date(wTo).toISOString() }]
 }
 
 /**
