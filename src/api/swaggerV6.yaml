@@ -26,6 +26,136 @@ consumes:
 produces:
   - application/json
 paths:
+  /templates:
+    get:
+      tags:
+        - template-registry
+      description: Get all templates
+      operationId: templatesGET
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/template'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error_model'
+      x-swagger-router-controller: TemplateRegistry
+    delete:
+      tags:
+        - template-registry
+      description: XXX
+      operationId: templatesDELETE
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/template'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error_model'
+      x-swagger-router-controller: TemplateRegistry
+    post:
+      tags:
+        - template-registry
+      description: Create a new template
+      operationId: templatesPOST
+      parameters:
+        - name: template
+          in: body
+          description: XXX
+          required: true
+          schema:
+            $ref: '#/definitions/template'
+      responses:
+        '200':
+          description: Success
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error_model'
+      x-swagger-router-controller: TemplateRegistry
+  '/templates/regexp':
+    post:
+      tags:
+        - template-registry
+      description: Get all template matching regexpPattern in  ID
+      operationId: templateRegexpIdPOST
+      parameters:
+        - name: regexpPattern
+          in: body
+          description: XXX
+          required: true
+          schema:
+            $ref: '#/definitions/regexpPattern'
+
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/template'
+        '404':
+          description: Not found
+          schema:
+            $ref: '#/definitions/error_model'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error_model'
+      x-swagger-router-controller: TemplateRegistry
+  '/templates/{templateId}':
+    get:
+      tags:
+        - template-registry
+      description: Get an template by ID
+      operationId: templateIdGET
+      parameters:
+        - name: templateId
+          in: path
+          description: XXX
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/template'
+        '404':
+          description: Not found
+          schema:
+            $ref: '#/definitions/error_model'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error_model'
+      x-swagger-router-controller: TemplateRegistry
+    delete:
+      tags:
+        - template-registry
+      description: XXX
+      operationId: templateIdDELETE
+      parameters:
+        - name: templateId
+          in: path
+          description: XXX
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/template'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error_model'
+      x-swagger-router-controller: TemplateRegistry
   /agreements:
     get:
       tags:
@@ -844,6 +974,14 @@ paths:
           description: Agreement id
           required: true
           type: string
+        - name: from
+          in: query
+          description: From date period
+          type: string
+        - name: to
+          in: query
+          description: To date period
+          type: string
       responses:
         '200':
           description: Success
@@ -861,6 +999,12 @@ paths:
 definitions:
   query:
     type: object
+  template:
+    type: object
+    # db validation scheme is defined in its own file at src/models/<fileName>.json
+  regexpPattern:
+    type: object
+
   agreement:
     type: object
     # properties:

@@ -57,9 +57,10 @@ function _createReadable (readFunction) {
     logger.error('Error while streaming: ' + err.toString());
 
     // can receive data parameters
-  }).on('data', function () {
-    logger.info('Streaming data...');
-  });
+  })
+  // .on('data', function () {
+  //   logger.info('Streaming data...');
+  // });
 
   if (!readFunction) {
     streamReadable._read = function () { };

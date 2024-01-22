@@ -73,10 +73,15 @@ function _connect (callback) {
     instance.db = db;
     if (!instance.models) {
       instance.models = {};
-      setupModel(instance, config.models.agreement.name, config.models.agreement.path);
-      setupModel(instance, config.models.state.name, config.models.state.path);
-      setupModel(instance, config.models.overrides.name, config.models.overrides.path);
-      setupModel(instance, config.models.bills.name, config.models.bills.path);
+      try {
+        setupModel(instance, config.models.template.name, config.models.template.path,config.models.template.indexableParams);
+        setupModel(instance, config.models.agreement.name, config.models.agreement.path);
+        setupModel(instance, config.models.state.name, config.models.state.path);
+        setupModel(instance, config.models.overrides.name, config.models.overrides.path);
+        setupModel(instance, config.models.bills.name, config.models.bills.path);
+      } catch (error) {
+        throw new Error("Error setting the /models files with /configuration files: "+error)
+      }
     }
     if (callback) {
       callback();
@@ -109,7 +114,7 @@ function _close (done) {
  * @param {String} modelName model name
  * @param {String} jsonModelUri model URI
  * */
-function setupModel (instance, modelName, jsonModelUri) {
+function setupModel (instance, modelName, jsonModelUri,indexableParams) {
   const referencedJsonModel = jsyaml.safeLoad(fs.readFileSync(jsonModelUri));
   $RefParser.dereference(referencedJsonModel, function (err, dereferencedJsonModel) {
     if (err) {
@@ -118,6 +123,9 @@ function setupModel (instance, modelName, jsonModelUri) {
     const mongooseSchema = new mongoose.Schema(dereferencedJsonModel, {
       minimize: false
     });
+    if(indexableParams){
+      mongooseSchema.index(indexableParams, { unique: true });
+    }
     const mongooseModel = mongoose.model(modelName, mongooseSchema);
     instance.models[modelName] = mongooseModel;
   });

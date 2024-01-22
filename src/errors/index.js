@@ -37,7 +37,7 @@ module.exports = {
  * Error model for error response.
  * @param {String} code error code
  * @param {String} message error message
- * @alias module:rrors.errorModel
+ * @alias module:Errors.errorModel
  * */
 function _Error (code, message) {
   this.code = code;

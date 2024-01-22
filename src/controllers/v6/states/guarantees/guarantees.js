@@ -167,7 +167,8 @@ function _guaranteesGET(req, res) {
         if (from && to) {
           requestWindow.from = from;
           requestWindow.end = to;
-          if (newPeriodsFromGuarantees) {
+          // if (newPeriodsFromGuarantees) {
+          if (true) {
             periods = utils.time.getPeriods(manager.agreement, requestWindow);
           } else {
             periods = [{ from: new Date(from).toISOString(), to: new Date(to).toISOString() }];

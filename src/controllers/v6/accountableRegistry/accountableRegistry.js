@@ -131,7 +131,7 @@ function _setUpAccountableRegistryGET (req, res) {
                     //         periods = utils.time.getPeriods(manager.agreement, requestWindow);
                     //     } else {
 
-                            periods = [{ from: new Date("2022-02-15T22:00:00.000Z").toISOString(), to: new Date("2022-03-15T21:59:59.999Z").toISOString() }];
+                              periods = [{ from: req.from.value, to: req.to.value }];
                     
                     //     }
 
@@ -216,10 +216,10 @@ function _setUpAccountableRegistryGET (req, res) {
                   let AgreementData = {"agreement": manager.agreement, "metricQueries": metricQueries}
 
                   try{
-                    governify.httpClient.post('http://localhost:5900/api/v1/setUp/' + agreementId, AgreementData).then( (response) => {
+                    governify.httpClient.post('http://host.docker.internal:6100/api/v1/setUp/' + agreementId, AgreementData).then( (response) => {
                       res.send({
-                        code:200,
-                        message: "Agreement has been set up"
+                        code: response.data.code,
+                        message: response.data.message
                       })
                       return resolve();
                     }).catch((err) => {
