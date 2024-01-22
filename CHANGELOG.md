@@ -1,3 +1,21 @@
+# [3.8.0](https://github.com/governify/registry/compare/v3.7.0...v3.8.0) (2024-01-22)
+
+
+### Bug Fixes
+
+* agreement model required propeties ([eb7d905](https://github.com/governify/registry/commit/eb7d90507ed74cb9279bdcd9b477e94d49e42969))
+* unsuported functions and requirements ([392796b](https://github.com/governify/registry/commit/392796b8d8e2c34c0a6311982d9c109014afcf4f))
+
+
+### Features
+
+* agreementTemplates ([fe13206](https://github.com/governify/registry/commit/fe1320619714e969241046be4851ac07b5503b76))
+* Fixed calculation for periods ([4463242](https://github.com/governify/registry/commit/4463242a4883ebd651730f8880c2bd578ac22f3f))
+* Parametrized accountableRegistry endpoint ([7791b55](https://github.com/governify/registry/commit/7791b55f54f8e03ecd3d7dd2bfb20c2f31d5fc42))
+* regexp in templates ([9ce6485](https://github.com/governify/registry/commit/9ce6485185c1667880e8fef8ff6cf35650be235b))
+
+
+
 # [3.7.0](https://github.com/governify/registry/compare/v3.6.0...v3.7.0) (2023-02-12)
 
 
