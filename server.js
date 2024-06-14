@@ -91,7 +91,7 @@ function _deploy (configurations, commonsMiddleware, callback) {
   // Default server options
   app.use(compression());
 
-  logger.info("Using '%s' as HTTP body size", config.server.bodySize);
+  logger.info("Using '" + config.server.bodySize + "' as HTTP body size");
   app.use(
     bodyParser.urlencoded({
       limit: config.server.bodySize,
@@ -170,13 +170,13 @@ function _deploy (configurations, commonsMiddleware, callback) {
             cert: fs.readFileSync('certs/cert.pem')
           }, app).listen(serverPort, function () {
             logger.info('HTTPS_SERVER mode');
-            logger.info('Your server is listening on port %d (https://localhost:%d)', serverPort, serverPort);
-            logger.info('Swagger-ui is available on https://localhost:%d/api/%s/docs', serverPort, CURRENT_API_VERSION);
+            logger.info('Your server is listening on port '+ serverPort +'(https://localhost:' +serverPort +')');
+            logger.info('Swagger-ui is available on https://localhost:' + serverPort+ '/api/' +CURRENT_API_VERSION+'/docs');
           });
         } else {
           http.createServer(app).listen(serverPort,'0.0.0.0', function () {
-            logger.info('Your server is listening on port %d (http://localhost:%d)', serverPort, serverPort);
-            logger.info('Swagger-ui is available on http://localhost:%d/api/%s/docs', serverPort, CURRENT_API_VERSION);
+            logger.info('Your server is listening on port '+ serverPort +'(http://localhost:' +serverPort +')');
+            logger.info('Swagger-ui is available on http://localhost:' + serverPort+ '/api/' +CURRENT_API_VERSION+'/docs');
             if (callback) {
               callback(server);
             }

@@ -48,7 +48,7 @@ const ErrorModel = require('../../../errors/index.js').errorModel;
  * */
 module.exports = {
   templatesPOST: _templatesPOST,
-  templatesDELETE: _templatesDELETE,
+  // templatesDELETE: _templatesDELETE,
   templatesGET: _templatesGET,
   templateIdGET: _templateIdGET,
   templateIdDELETE: _templateIdDELETE,
@@ -70,8 +70,8 @@ function _templatesPOST (args, res) {
     } else {
       const template = new db.models.TemplateModel(schema);
       //check if the id follows a pattern
-      const idPattern = /^(.*)-v(\d+)\.(\d+)\.(\d+)$/ ;
-      const exampleId = "my-string-example-v0.002.012"
+      const idPattern = /^(.*)-v(\d+)\-(\d+)\-(\d+)(-clone)?$/;
+      const exampleId = "my-string-example-v0-002-012";
       const requestId = schema.id
       if(!idPattern.test(requestId)){
         return res.status(400).json({"error": "Bad formed id","required pattern":` ${idPattern.toString()}`,"your id":`${requestId}`,"example":`${exampleId}` })
@@ -92,26 +92,26 @@ function _templatesPOST (args, res) {
   });
 }
 
-/**
- * Delete all templates.
- * @param {Object} args {}
- * @param {Object} res response
- * @param {Object} next next function
- * @alias module:template.templatesDELETE
- * */
-function _templatesDELETE (args, res) {
-  logger.info('New request to DELETE all templates');
-  const TemplateModel = db.models.TemplateModel;
-  TemplateModel.remove({}, function (err) {
-    if (!err) {
-      logger.info('Deleted all templates');
-      res.sendStatus(204);
-    } else {
-      res.sendStatus(404);
-      logger.warn("Can't delete all templates: " + err);
-    }
-  });
-}
+// /**
+//  * Delete all templates.
+//  * @param {Object} args {}
+//  * @param {Object} res response
+//  * @param {Object} next next function
+//  * @alias module:template.templatesDELETE
+//  * */
+// function _templatesDELETE (args, res) {
+//   logger.info('New request to DELETE all templates');
+//   const TemplateModel = db.models.TemplateModel;
+//   TemplateModel.remove({}, function (err) {
+//     if (!err) {
+//       logger.info('Deleted all templates');
+//       res.sendStatus(204);
+//     } else {
+//       res.sendStatus(404);
+//       logger.warn("Can't delete all templates: " + err);
+//     }
+//   });
+// }
 
 /**
  * Get all templates.

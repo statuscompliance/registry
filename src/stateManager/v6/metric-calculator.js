@@ -123,7 +123,7 @@ function processMetric (agreement, metricId, metricQuery) {
           data: { config: collector.config, metric: metric.measure }
         }
         ).catch(err => {
-          const errorString = 'Error in Collector response ' + err.response.status + ':' + err.response.data;
+          const errorString = 'Error in Collector response ' + err.response.status + ':' + JSON.stringify( err.response.data,null, 2);
           return promiseErrorHandler(reject, 'metrics', processMetric.name, err.response.status, errorString);
         });
         const collectorResponse = requestMetric.data;

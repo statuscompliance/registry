@@ -26,7 +26,7 @@ maxAttempts: 20
 models:
   template:
     name: TemplateModel
-    path: "./src/models/agreementModel.json"
+    path: "./src/models/templateModel.json"
     indexableParams: { id: 1 }
   agreement:
     name: AgreementModel

@@ -2,21 +2,18 @@
     "id": {
         "type": "string"
     },
+    "templateId": {
+        "type": "string"
+    },
     "version": {
         "type": "string"
     },
     "type": {
         "type": "string"
     },
-    "templateId": {
-        "type": "string"
-    },
     "context": {
         "type": "object",
         "properties": {
-            "templateURL": {
-                "type": "string"
-            },
             "provider": {
                 "type": "string"
             },

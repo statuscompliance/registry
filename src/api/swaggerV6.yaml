@@ -44,23 +44,7 @@ paths:
           schema:
             $ref: '#/definitions/error_model'
       x-swagger-router-controller: TemplateRegistry
-    delete:
-      tags:
-        - template-registry
-      description: XXX
-      operationId: templatesDELETE
-      responses:
-        '200':
-          description: Success
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/template'
-        '400':
-          description: Bad request
-          schema:
-            $ref: '#/definitions/error_model'
-      x-swagger-router-controller: TemplateRegistry
+
     post:
       tags:
         - template-registry
