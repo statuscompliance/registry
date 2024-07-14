@@ -42,7 +42,7 @@ module.exports = {
  * @param {function} callback callback function
  * @alias module:registry.deploy
  * */
-function _deploy (configurations, commonsMiddleware, callback) {
+function _deploy (configurations, expressMiddlewares, callback) {
   const governify = require('governify-commons');
   const config = governify.configurator.getConfig('main');
 
@@ -143,8 +143,9 @@ function _deploy (configurations, commonsMiddleware, callback) {
   app.use('/api/latest/api-docs', function (req, res) {
     res.redirect('/api/' + CURRENT_API_VERSION + '/api-docs');
   });
-
-  app.use(commonsMiddleware);
+  for (const middleware of expressMiddlewares) {
+    app.use(middleware);
+  }
   logger.info('Trying to deploy server');
   if (configurations) {
     logger.info('Reading configuration...');
@@ -170,13 +171,13 @@ function _deploy (configurations, commonsMiddleware, callback) {
             cert: fs.readFileSync('certs/cert.pem')
           }, app).listen(serverPort, function () {
             logger.info('HTTPS_SERVER mode');
-            logger.info('Your server is listening on port '+ serverPort +'(https://localhost:' +serverPort +')');
-            logger.info('Swagger-ui is available on https://localhost:' + serverPort+ '/api/' +CURRENT_API_VERSION+'/docs');
+            logger.info('Your server is listening on port ' + serverPort + '(https://localhost:' + serverPort + ')');
+            logger.info('Swagger-ui is available on https://localhost:' + serverPort + '/api/' + CURRENT_API_VERSION + '/docs');
           });
         } else {
-          http.createServer(app).listen(serverPort,'0.0.0.0', function () {
-            logger.info('Your server is listening on port '+ serverPort +'(http://localhost:' +serverPort +')');
-            logger.info('Swagger-ui is available on http://localhost:' + serverPort+ '/api/' +CURRENT_API_VERSION+'/docs');
+          http.createServer(app).listen(serverPort, '0.0.0.0', function () {
+            logger.info('Your server is listening on port ' + serverPort + '(http://localhost:' + serverPort + ')');
+            logger.info('Swagger-ui is available on http://localhost:' + serverPort + '/api/' + CURRENT_API_VERSION + '/docs');
             if (callback) {
               callback(server);
             }

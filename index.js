@@ -19,6 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 'use strict';
+const oasTelemetry = require('@oas-tools/oas-telemetry');
+const YAML = require('yaml');
+const fs = require('fs');
+let oasDoc = fs.readFileSync('./src/api/swaggerV6.yaml', 'utf8');
+oasDoc = YAML.parse(oasDoc);
+
+const oasTelemetryMiddleware = oasTelemetry({ spec: JSON.stringify(oasDoc) });
 
 if (process.env.NEW_RELIC_APP_NAME && process.env.NEW_RELIC_LICENSE_KEY) require('newrelic');
 
@@ -36,7 +43,7 @@ governify.init({
   ]
 }).then(commonsMiddleware => {
   const registry = require('./server.js');
-  registry.deploy(null, commonsMiddleware, function () {
+  registry.deploy(null, [commonsMiddleware, oasTelemetryMiddleware], function () {
     logger.info('Deploy successfully done');
   });
 });
