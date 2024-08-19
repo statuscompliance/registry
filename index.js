@@ -20,12 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 'use strict';
 const oasTelemetry = require('@oas-tools/oas-telemetry');
-const YAML = require('yaml');
 const fs = require('fs');
-let oasDoc = fs.readFileSync('./src/api/swaggerV6.yaml', 'utf8');
-oasDoc = YAML.parse(oasDoc);
+const oasDoc = fs.readFileSync('./src/api/swaggerV6.yaml', 'utf8');
 
-const oasTelemetryMiddleware = oasTelemetry({ spec: JSON.stringify(oasDoc) });
+const oasTelemetryMiddleware = oasTelemetry({ spec: oasDoc });
 
 if (process.env.NEW_RELIC_APP_NAME && process.env.NEW_RELIC_LICENSE_KEY) require('newrelic');
 
