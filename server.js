@@ -144,7 +144,7 @@ function _deploy (configurations, expressMiddlewares, callback) {
     res.redirect('/api/' + CURRENT_API_VERSION + '/api-docs');
   });
   for (const middleware of expressMiddlewares) {
-    app.use(middleware);
+    if (middleware) app.use(middleware);
   }
   logger.info('Trying to deploy server');
   if (configurations) {
