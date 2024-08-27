@@ -143,6 +143,21 @@ function _deploy (configurations, expressMiddlewares, callback) {
   app.use('/api/latest/api-docs', function (req, res) {
     res.redirect('/api/' + CURRENT_API_VERSION + '/api-docs');
   });
+
+  const v8 = require('v8');
+  app.get('/heapStats', function (req, res) {
+    var heapStats = v8.getHeapStatistics();
+
+    // Round stats to MB
+    var roundedHeapStats = Object.getOwnPropertyNames(heapStats).reduce(function (map, stat) {
+      map[stat] = Math.round((heapStats[stat] / 1024 / 1024) * 1000) / 1000;
+      return map;
+    }, {});
+    roundedHeapStats['units'] = 'MB';
+
+    res.send(roundedHeapStats);
+  });
+
   for (const middleware of expressMiddlewares) {
     if (middleware) app.use(middleware);
   }

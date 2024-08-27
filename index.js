@@ -23,7 +23,6 @@ const oasTelemetry = require('@oas-tools/oas-telemetry');
 const fs = require('fs');
 // Telemetry middleware ===================================
 let oasTelemetryMiddleware = null;
-console.log('TELEMETRY_ENABLED', process.env.TELEMETRY_ENABLED);
 if (process.env.TELEMETRY_ENABLED === 'true') {
   const oasDoc = fs.readFileSync('./src/api/swaggerV6.yaml', 'utf8');
   oasTelemetryMiddleware = oasTelemetry({ spec: oasDoc });
