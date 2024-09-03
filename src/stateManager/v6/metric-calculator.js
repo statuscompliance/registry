@@ -291,8 +291,8 @@ function getComputationV2 (infrastructurePath, computationURL, ttl) {
   return new Promise((resolve, reject) => {
     try {
       if (ttl < 0) { reject('Retries time surpased TTL.'); return; }
-      const realTimeout = 1000; // Minimum = firstTimeout
-      const firstTimeout = 500;
+      const realTimeout = 200; // Minimum = firstTimeout
+      const firstTimeout = 100;
       setTimeout(async () => {
         governify.infrastructure.getService(infrastructurePath).get(computationURL).then(response => {
           if (response.status === 202) {
